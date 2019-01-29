@@ -1,0 +1,8 @@
+function open_new_tab(){
+    var a1 = '<a href="#" class="alpha1_toolbox_open2" id="open_records" onclick="';
+    var a2 = "$('.req-data-row input:checked').each(function() { var record_url = $(this).attr('rel');	window.open(record_url, '_blank');})";
+    var a3 = '">открыть во вкладке</a>';
+    document.getElementsByClassName('alpha1_toolbox_open')[0].outerHTML = document.getElementsByClassName('alpha1_toolbox_open')[0].outerHTML + a1 + a2 + a3;
+}
+
+open_new_tab();
