@@ -1,7 +1,7 @@
 function useful_tag () {
 	if (document.getElementById('redactor-uuid-0').innerText.indexOf('[фулл_мсг]') !== -1) {
-		var msg = document.getElementById('redactor-uuid-0').innerText.split('[фулл_мсг]')
-		document.getElementById('redactor-uuid-0').innerText = msg[0] + full_msg() + msg[1]
+		var msg = document.getElementById('redactor-uuid-0').innerHTML.split('[фулл_мсг]')
+		document.getElementById('redactor-uuid-0').innerHTML = msg[0] + '<blockquote>' + full_msg() + '</blockquote>' + msg[1]
 	};
 	setTimeout(useful_tag, 1000);
 }
@@ -20,7 +20,7 @@ function full_msg() {
 		if ( doc[i].startsWith('Reporter:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('Skype:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('E-mail:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
-		if ( doc[i].startsWith('next_lesson_type:') == true) { delete doc[i]; doc.splice( i, 1); i = 0;  continue;};
+		if ( doc[i].startsWith('next_lesson_type:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('next_lesson_student:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('next_lesson_teacher:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('next_lesson_start_time:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
