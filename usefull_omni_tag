@@ -1,0 +1,34 @@
+function useful_tag () {
+	if (document.getElementById('redactor-uuid-0').innerText.indexOf('[фулл_мсг]') !== -1) {
+		var msg = document.getElementById('redactor-uuid-0').innerText.split('[фулл_мсг]')
+		document.getElementById('redactor-uuid-0').innerText = msg[0] + full_msg() + msg[1]
+	};
+	setTimeout(useful_tag, 1000);
+}
+
+function full_msg() {
+	var doc = document.getElementsByClassName('text-area')[0].innerText.split('\n');
+	for (var i = 0; i < doc.length; i++) {
+		if ( doc[i].startsWith('Location:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('OS:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('Browser:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('Screen resolution:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('stepDescription:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('cmsEditUrl:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('User-Agent:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('Referrer:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('Reporter:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('Skype:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('E-mail:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('next_lesson_type:') == true) { doc.splice( i, 1); i = 0;  continue;};
+		if ( doc[i].startsWith('next_lesson_student:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('next_lesson_teacher:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('next_lesson_start_time:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('Frontend build:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('Device ID:') == true) { doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i] == '') { doc.splice( i, 1); i = 0; continue;};
+	};
+	return doc.join('\n');
+}
+
+useful_tag()
