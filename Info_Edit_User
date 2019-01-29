@@ -1,0 +1,12 @@
+(function() {
+    var id = 'ID: ' + document.getElementsByClassName('table ')[0].children[1].children[0].children[1].innerText;
+    var name = '&#13;&#10;Name: ' + document.getElementsByClassName('table ')[0].children[1].children[2].children[1].innerText;
+    var mail = '&#13;&#10;eMail: ' + document.getElementsByClassName('table ')[0].children[1].children[4].children[1].innerText;
+    var phone = '&#13;&#10;Phone: ' + document.getElementsByClassName('table ')[0].children[1].children[5].children[1].innerText;
+    var skype = '&#13;&#10;Skype: ' + document.getElementsByClassName('table ')[0].children[1].children[7].children[1].innerText;
+    var identity = '&#13;&#10;Identity: ' + document.getElementsByClassName('table ')[0].children[1].children[1].children[1].innerText;
+    var copyf = "document.getElementById('textareacomment').select(); document.execCommand('copy');";
+
+    document.getElementsByClassName('thead-dark')[0].outerHTML = '<textarea name="comment" id="textareacomment" cols="40" rows="3" style="margin: 0px 0px 0px; width: 0px; height: 0px;">' + id + name + mail + phone + skype + identity + '</textarea>' + document.getElementsByClassName('thead-dark')[0].outerHTML;
+    document.getElementsByClassName('btn')[0].outerHTML = '<a class="btn btn-sm btn-secondary mr-1 mb-1" id="btnCopy" value="Copy" onclick="' + copyf + '">Копировать инфо</a>' + document.getElementsByClassName('btn')[0].outerHTML;
+})();
