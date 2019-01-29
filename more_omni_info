@@ -1,0 +1,18 @@
+function more_info(){
+    var i;
+    for (i = 0; i < document.getElementsByClassName('req-case-content').length; i++) {
+        document.getElementsByClassName('req-case-content')[i].removeAttribute('style');
+        var text1 = document.getElementsByClassName('req-case-content')[i].outerHTML.replace('div','span');
+        document.getElementsByClassName('req-case-content')[i].outerHTML = '';
+        //---- Текст
+        document.getElementsByClassName('req-case-date')[i].removeAttribute('style');
+        var text2 = document.getElementsByClassName('req-case-date')[i].outerHTML.replace('div','span');
+        document.getElementsByClassName('req-case-date')[i].outerHTML = '';
+        //---- Время
+        document.getElementsByClassName('req-inf-cont')[i].outerHTML = document.getElementsByClassName('req-inf-cont')[i].outerHTML + text2 + text1;
+        document.getElementsByClassName('req-case-date')[i].setAttribute('style','margin-left: -65px;');
+    }
+    setTimeout(more_info, 4000);
+}
+
+setTimeout(more_info, 1000);
