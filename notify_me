@@ -1,0 +1,20 @@
+var blacklist = new Array();
+var audio = new Audio('https://notificationsounds.com/soundfiles/8b16ebc056e613024c057be590b542eb/file-sounds-1113-unconvinced.mp3');
+setTimeout(video_test, 500);
+
+function video_test(){
+  for (var i = 0; i < document.getElementsByClassName('req-case-content').length; i++) {
+    var accept_blacklist = true;
+		for (var q = 0; q < blacklist.length; q++) {
+			if(blacklist[q] == document.getElementsByClassName('req-case-main')[i].innerText.replace(/[^-0-9]/gim,'')){
+			  accept_blacklist = false;
+	  	};
+		};
+		if(accept_blacklist !== false) {
+			audio.play();
+			console.log(document.getElementsByClassName('inl req-inf-txt req-txt-comm')[i].children[0].href);
+			blacklist[blacklist.length] = document.getElementsByClassName('req-case-main')[i].innerText.replace(/[^-0-9]/gim,'');
+	 	};
+	};
+	setTimeout(video_test, 500);
+};
