@@ -7,6 +7,6 @@
     var identity = '&#13;&#10;Identity: ' + document.getElementsByClassName('table ')[0].children[1].children[1].children[1].innerText;
     var copyf = "document.getElementById('textareacomment').select(); document.execCommand('copy');";
 
-    document.getElementsByClassName('thead-dark')[0].outerHTML = '<textarea name="comment" id="textareacomment" cols="40" rows="3" style="margin: 0px 0px 0px; width: 0px; height: 0px; visibility: hidden">' + id + name + mail + phone + skype + identity + '</textarea>' + document.getElementsByClassName('thead-dark')[0].outerHTML;
+    document.getElementsByClassName('thead-dark')[0].outerHTML = '<textarea name="comment" id="textareacomment" cols="40" rows="3" style="margin: 0px 0px 0px; width: 0px; height: 0px;">' + id + name + mail + phone + skype + identity + '</textarea>' + document.getElementsByClassName('thead-dark')[0].outerHTML;
     document.getElementsByClassName('btn')[0].outerHTML = '<a class="btn btn-sm btn-secondary mr-1 mb-1" id="btnCopy" value="Copy" onclick="' + copyf + '">Копировать инфо</a>' + document.getElementsByClassName('btn')[0].outerHTML;
 })();
