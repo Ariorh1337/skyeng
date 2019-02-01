@@ -1,0 +1,31 @@
+//This script will make you too much powerful
+//With great power comes great responsibility
+//Нажми на конвертик в боксе что бы магия свершилась
+
+var yourname = 'Дмитрий Омельченко' //укажи сюда свое имя
+
+function take_this_ticket() {
+	for (i = 0; i < document.getElementsByClassName('req-data-row').length; i++) {
+		if (document.getElementsByClassName('req-data-row')[i].className.indexOf('highlight') !== -1) {
+			document.getElementsByClassName('req-data-row')[i].children[0].children[0].children[1].click();
+    	};
+	};
+	$('.req-data-row input:checked').each(function() { var record_url = $(this).attr('rel');	window.open(record_url, '_blank');})
+	for (i = 0; i < document.getElementById('new_staff_id').children.length; i++) {
+		if (document.getElementById('new_staff_id').children[i].innerText == yourname) {
+			document.getElementById('new_staff_id').value = document.getElementById('new_staff_id').children[i].value;
+		};
+	};
+	document.getElementsByClassName('group-action')[0].click();
+}
+
+function check_this_ticket() {
+	for (i = 0; i < document.getElementsByClassName('icon-envelope').length; i++) {
+		if (document.getElementsByClassName('icon-envelope')[i].getAttribute('onClick') == null) {
+			document.getElementsByClassName('icon-envelope')[i].setAttribute('onClick','take_this_ticket()');
+		};
+	};
+	setTimeout(can_i_check_this_ticket, 1000);
+}
+
+check_this_ticket()
