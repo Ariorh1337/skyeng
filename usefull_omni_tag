@@ -34,9 +34,11 @@ function full_msg() {
 		if ( doc[i].startsWith('student_skype:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('student_email: ') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('next_lesson_teach er:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
-        if ( doc[i].startsWith('ne xt_lesson_type:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('ne xt_lesson_type:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('nex t_lesson_type:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('next_ lesson_student:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 
-        if ( doc[i].startsWith('teacher_id:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
+		if ( doc[i].startsWith('teacher_id:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('teacher_name:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('teacher_phone:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
 		if ( doc[i].startsWith('teacher_skype:') == true) { delete doc[i]; doc.splice( i, 1); i = 0; continue;};
