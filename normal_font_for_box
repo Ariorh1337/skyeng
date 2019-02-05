@@ -1,0 +1,10 @@
+function change_font() {
+	for (var i = 0; i < document.getElementsByClassName('req-inf-txt').length; i++) {
+		if (document.getElementsByClassName('req-inf-txt')[i].getAttribute('style') == null) {
+			document.getElementsByClassName('req-inf-txt')[i].setAttribute('style','font-family: Arial; font-size: 15px;');
+        }
+	}
+	setTimeout(change_font, 1000);
+}
+
+change_font()
