@@ -1,10 +1,11 @@
 function edit_chat() {
-  if (document.getElementById('chat_edit') == null) {
-    document.getElementsByClassName("chat_redirect")[0].outerHTML = document.getElementsByClassName("chat_redirect")[0].outerHTML + '<span id="chat_edit" class="chat_redirect chat_reopen active" onClick="document.getElementById(' + "'priority-select'" + ').value = 4; UpdateCaseParams();"><a class="modal-trigger">Крит чат</a></span>'
-	}
-	if (document.getElementById('chat_edit') !== null) {
+	if (document.getElementById('chat_edit') == null) {
+		document.getElementsByClassName("chat_redirect")[0].outerHTML = document.getElementsByClassName("chat_redirect")[0].outerHTML + '<span id="chat_edit" class="chat_redirect chat_reopen active" onClick="document.getElementById(' + "'priority-select'" + ').value = 4; UpdateCaseParams();"><a class="modal-trigger">Крит чат</a></span>' + '<span id="chat_close" class="chat_redirect chat_reopen active" onClick="xajax_CloseMyChat(ChatId,' + "'close'" + ');" style="color: red;"><a class="modal-trigger">Закрыть</a></span>'
+	} else {
 		document.getElementById('chat_edit').setAttribute('style','display: inline;')
 		document.getElementById('chat_edit').className = "chat_redirect chat_reopen active"
+		document.getElementById('chat_close').setAttribute('style','display: inline; color: red;')
+		document.getElementById('chat_close').className = "chat_redirect chat_reopen active"
 	}
 }
 
