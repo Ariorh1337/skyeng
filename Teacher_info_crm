@@ -1,0 +1,8 @@
+//Пример работы скрипта: https://i.imgur.com/nUg4h5X.png
+//Если нажать на ID П от он откроется в Информации о пользователе
+
+function ai() {
+    window.open('https://id.skyeng.ru/admin/users/' + document.getElementsByClassName('teacher_select')[0].value, '_blank');
+}
+
+document.getElementsByClassName('b-order-table__status-header')[0].outerHTML = document.getElementsByClassName('b-order-table__status-header')[0].outerHTML + '<th onClick="' + 'window.open(' + "'https://id.skyeng.ru/admin/users/" + document.getElementsByClassName('teacher_select')[0].value + "', '_blank'" + ');' + '" style="color: red;">' + document.getElementsByClassName('teacher_select')[0].value + '</th>'
