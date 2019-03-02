@@ -1,0 +1,88 @@
+//Чем 2.0 лучше старой версии? Теперь статус ученика + часовой пояс подтягиваются из CRM
+//Примеры: https://i.imgur.com/HO3XWWi.png   ||   https://i.imgur.com/bBTmwND.png
+//Выкладываю код сразу для TamperMonkey ибо здесь тонкая настройка, все взаимо связанно
+//Просто создайте 2 отдельных скрипта в TamperMonkey и поместите код:
+
+//_______________________________________________Скрипт_1_____________________________________________________________//
+// ==UserScript==
+// @name         Info EditUser
+// @version      2.0
+// @description  Make a button COPY USER INFO
+// @author       Ariorh
+// @match        https://id.skyeng.ru/admin/users/*
+// ==/UserScript==
+
+var settings = 0;
+
+if (location.href.indexOf('?') == -1) {
+	if (document.getElementsByClassName('table')[0].children[1].children[23].children[1].innerText.indexOf('student[main]') !== -1) {
+	   winopen();
+	}
+} else {
+	settings = location.href.split('?')
+}
+
+if (settings !== 0) {
+	document.getElementsByClassName('table')[0].children[1].children[0].setAttribute('style','background: ' + settings[1])
+}
+
+text_area()
+
+function text_area() {
+    var id = 'ID: ' + document.getElementsByClassName('table ')[0].children[1].children[0].children[1].innerText;
+    var name = '&#13;&#10;Name: ' + document.getElementsByClassName('table ')[0].children[1].children[2].children[1].innerText;
+    var mail = '&#13;&#10;eMail: ' + document.getElementsByClassName('table ')[0].children[1].children[4].children[1].innerText;
+    var phone = '&#13;&#10;Phone: ' + document.getElementsByClassName('table ')[0].children[1].children[5].children[1].innerText;
+    var skype = '&#13;&#10;Skype: ' + document.getElementsByClassName('table ')[0].children[1].children[7].children[1].innerText;
+    var identity = '&#13;&#10;Identity: ' + document.getElementsByClassName('table ')[0].children[1].children[1].children[1].innerText;
+    var copyf = "document.getElementById('textareacomment').select(); document.execCommand('copy');";
+
+    if (settings !== 0) {
+        var time = '&#13;&#10;Time: ' + settings[2];
+        document.getElementsByClassName('thead-dark')[0].outerHTML = '<textarea name="comment" id="textareacomment" cols="40" rows="3" style="margin: 0px 0px 0px; width: 0px; height: 0px;">' + id + name + mail + phone + skype + identity + time + '</textarea>' + document.getElementsByClassName('thead-dark')[0].outerHTML;
+    } else {
+        document.getElementsByClassName('thead-dark')[0].outerHTML = '<textarea name="comment" id="textareacomment" cols="40" rows="3" style="margin: 0px 0px 0px; width: 0px; height: 0px;">' + id + name + mail + phone + skype + identity + '</textarea>' + document.getElementsByClassName('thead-dark')[0].outerHTML;
+    }
+    document.getElementsByClassName('btn')[0].outerHTML = '<a class="btn btn-sm btn-secondary mr-1 mb-1" id="btnCopy" value="Copy" onclick="' + copyf + '">Копировать инфо</a>' + document.getElementsByClassName('btn')[0].outerHTML;
+}
+
+function winopen(){
+	var user_id = document.getElementsByClassName('table ')[0].children[1].children[0].children[1].innerText;
+	var params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no' + 'width=10,height=10,left=10,top=10';
+	var newWin = window.open('https://crm.skyeng.ru/admin/orderPriority/search?user=' + user_id + '?script_request', 'test', params);
+}
+
+
+//_______________________________________________Скрипт_2_____________________________________________________________//
+// ==UserScript==
+// @name         status_script_check
+// @version      0.7
+// @description  Get info about status for info_user
+// @author       Ariorh
+// @match        https://crm.skyeng.ru/admin/orderPriority/search?user=*?script_request
+// ==/UserScript==
+
+(function() {
+    var status_student = 'none';
+    if ( document.getElementsByClassName('b-order-table__status-cell')[1].children[0].children[0].children[1].className.indexOf('status_group_6') !== -1) {
+        status_student = 'purple';
+        }
+    if ( document.getElementsByClassName('b-order-table__status-cell')[1].children[0].children[0].children[1].className.indexOf('status_group_5') !== -1) {
+        status_student = 'green';
+        }
+    if ( document.getElementsByClassName('b-order-table__status-cell')[1].children[0].children[0].children[1].className.indexOf('status_group_4') !== -1) {
+        status_student = 'lightblue';
+        }
+    if ( document.getElementsByClassName('b-order-table__status-cell')[1].children[0].children[0].children[1].className.indexOf('status_group_3') !== -1) {
+        status_student = 'orange';
+        }
+    if ( document.getElementsByClassName('b-order-table__status-cell')[1].children[0].children[0].children[1].className.indexOf('status_group_2') !== -1) {
+        status_student = 'pink';
+        }
+    if ( document.getElementsByClassName('b-order-table__status-cell')[1].children[0].children[0].children[1].className.indexOf('status_group_1') !== -1) {
+        status_student = 'grey';
+        }
+
+    window.opener.location.href = 'https://id.skyeng.ru/admin/users/' + location.href.replace(/[^0-9]/gim,'') + '?' + status_student + '?' + document.getElementsByClassName('utc utc-main')[0].innerText.replace(/ /ig,'');
+    window.close()
+})();
