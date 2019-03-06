@@ -6,7 +6,7 @@
 //_______________________________________________Скрипт_1_____________________________________________________________//
 // ==UserScript==
 // @name         Info EditUser2.0
-// @version      2.1
+// @version      2.2
 // @description  Make a button COPY USER INFO
 // @author       Ariorh
 // @match        https://id.skyeng.ru/admin/users/*
@@ -15,15 +15,19 @@
 var settings = 0;
 
 if (location.href.indexOf('?') == -1) {
-	if (document.getElementsByClassName('table')[0].children[1].children[23].children[1].innerText.indexOf('student[main]') !== -1) {
-	   winopen();
-	}
+	if (location.href.indexOf('?') == -1) {
+        for (var i = 0; i < document.getElementsByTagName('tbody')[0].children.length; i++) {
+            if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText.indexOf('student[main]') > 0) {
+                winopen();
+            }
+        }
+    }
 } else {
 	settings = location.href.split('?')
 }
 
 if (settings !== 0) {
-	document.getElementsByClassName('table')[0].children[1].children[0].setAttribute('style','background: ' + settings[1])
+	document.getElementsByTagName('tbody')[0].children[0].setAttribute('style','background: ' + settings[1]);
 }
 
 text_area()
