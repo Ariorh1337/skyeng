@@ -6,7 +6,7 @@
 //_______________________________________________Скрипт_1_____________________________________________________________//
 // ==UserScript==
 // @name         Info EditUser2.0
-// @version      2.0
+// @version      2.1
 // @description  Make a button COPY USER INFO
 // @author       Ariorh
 // @match        https://id.skyeng.ru/admin/users/*
@@ -29,12 +29,27 @@ if (settings !== 0) {
 text_area()
 
 function text_area() {
-    var id = 'ID: ' + document.getElementsByClassName('table ')[0].children[1].children[0].children[1].innerText;
-    var name = '&#13;&#10;Name: ' + document.getElementsByClassName('table ')[0].children[1].children[2].children[1].innerText;
-    var mail = '&#13;&#10;eMail: ' + document.getElementsByClassName('table ')[0].children[1].children[4].children[1].innerText;
-    var phone = '&#13;&#10;Phone: ' + document.getElementsByClassName('table ')[0].children[1].children[5].children[1].innerText;
-    var skype = '&#13;&#10;Skype: ' + document.getElementsByClassName('table ')[0].children[1].children[7].children[1].innerText;
-    var identity = '&#13;&#10;Identity: ' + document.getElementsByClassName('table ')[0].children[1].children[1].children[1].innerText;
+    for (var i = 0; i < document.getElementsByTagName('tbody')[0].children.length; i++) {
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Id') {
+            var id = 'ID: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+        }
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Имя') {
+            var name = '&#13;&#10;Name: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+        }
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Почта') {
+            var mail = '&#13;&#10;eMail: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+        }
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Телефон') {
+            var phone = '&#13;&#10;Phone: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+        }
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Skype') {
+            var skype = '&#13;&#10;Skype: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+        }
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Identity') {
+            var identity = '&#13;&#10;Identity: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+        }
+    }
+
     var copyf = "document.getElementById('textareacomment').select(); document.execCommand('copy');";
 
     if (settings !== 0) {
