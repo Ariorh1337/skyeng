@@ -1,0 +1,39 @@
+// ==UserScript==
+// @name         Hide_Button
+// @version      0.2
+// @description  Hide filters button
+// @author       Ariorh
+// @match        https://secure.usedesk.ru/tickets*
+// ==/UserScript==
+
+var sup = "if (document.getElementById('hide_button').innerText == 'Hide') { \
+		document.getElementsByClassName('mail-sidebar')[0].setAttribute('style','display:none;');\
+		document.getElementsByClassName('mail-body')[0].firstElementChild.setAttribute('style','display: none;');\
+		document.getElementsByClassName('mail-body')[0].setAttribute('style','width: 100%; float: left;');\
+		document.getElementById('hide_button').innerText = 'Show';\
+	} else {\
+		document.getElementsByClassName('mail-sidebar')[0].setAttribute('style','');\
+		document.getElementsByClassName('mail-body')[0].firstElementChild.setAttribute('style','');\
+		document.getElementsByClassName('mail-body')[0].setAttribute('style','width: 78%; float: right;');\
+		document.getElementById('hide_button').innerText = 'Hide';\
+	}"
+
+document.getElementById('main-menu').outerHTML = document.getElementById('main-menu').outerHTML + '\
+<div><div style="text-align: center;">Фильтры</div><div id="hide_button" class="btn" style="color: black;background-color: darkgreen;justify-content: center; display: flex;" onClick="' + sup + '">Show</div></div>';
+
+function on_or_off () {
+	if (document.getElementsByClassName('switch-animate')[0].className.indexOf('switch-on') == 0) {
+		document.getElementById('hide_button').setAttribute('style','color: black;background-color: darkgreen; justify-content: center; display: flex;');
+	} else {
+		document.getElementById('hide_button').setAttribute('style','color: black;background-color: grey; justify-content: center; display: flex;');
+	}
+}
+
+setInterval(on_or_off, 500);
+
+window.onload = function(){
+	document.getElementsByClassName('mail-sidebar')[0].setAttribute('style','display:none;');
+	document.getElementsByClassName('mail-body')[0].firstElementChild.setAttribute('style','display: none;');
+	document.getElementsByClassName('mail-body')[0].setAttribute('style','width: 100%; float: left;');
+	document.getElementById('hide_button').innerText = 'Show';
+};
