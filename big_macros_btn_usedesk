@@ -1,0 +1,18 @@
+/*
+Этот скрипт добавляет черную кнопку шаблонов когда нажата кнопка ответить пользователю
+Гифка как это работает: https://i.imgur.com/pObpAg4.gifv
+*/
+
+// ==UserScript==
+// @name         Кнопка шаблонов
+// @version      0.1
+// @description  Добавляет заметную кнопку шаблонов
+// @author       Ariorh
+// @match        https://secure.usedesk.ru/tickets/*
+// ==/UserScript==
+
+(function() {
+    var macros_btn = '<a id="btn_macros" class="btn btn-default btn-primary" title="Вставить шаблон" onclick="' + "document.getElementsByClassName('re-macros')[0].click();" + '" style="display:none; position: relative; left: 4px;"><i class="fa fa-cogs"></i></a>'
+    document.getElementById('editable_reminder').outerHTML = document.getElementById('editable_reminder').outerHTML + macros_btn;
+    document.getElementById('reply-link-public').setAttribute('onClick',"document.getElementById('btn_macros').setAttribute('style','position: relative; left: 4px;');");
+})();
