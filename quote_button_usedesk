@@ -1,0 +1,14 @@
+/*
+Этот скрипт добавляет кнопку цитировать, после нажатия вставляет выделенный текст с меткой цитата
+Посмотреть пример работы можно здесь: https://i.imgur.com/8XMvJjh.gifv
+*/
+
+// ==UserScript==
+// @name         Цитата
+// @version      0.1
+// @description  Добавляет кнопку цитирования
+// @author       Ariorh
+// @match        https://secure.usedesk.ru/tickets/*
+// ==/UserScript==
+
+document.getElementById('redactor-toolbar-0').lastChild.outerHTML = document.getElementById('redactor-toolbar-0').lastChild.outerHTML + '<li><a id="qoute_btn" class="btn" onmouseover="document.getElementById(' + "'qoute_btn').setAttribute('hidenText'" + ', window.getSelection().toString());" onmouseout="document.getElementById(' + "'qoute_btn').removeAttribute('hidenText'" + ')" onclick="document.getElementsByClassName(' + "'redactor-editor')[0].innerHTML = document.getElementsByClassName('redactor-editor')[0].innerHTML + '<blockquote>' + document.getElementById('qoute_btn').getAttribute('hidenText') + '</blockquote>';" + '">Цитата</a></li>';
