@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Hide_Button
-// @version      0.2
+// @version      0.3
 // @description  Hide filters button
 // @author       Ariorh
 // @match        https://secure.usedesk.ru/tickets*
@@ -20,17 +20,7 @@ var sup = "if (document.getElementById('hide_button').innerText == 'Hide') { \
 	}"
 
 document.getElementById('main-menu').outerHTML = document.getElementById('main-menu').outerHTML + '\
-<div><div style="text-align: center;">Фильтры</div><div id="hide_button" class="btn" style="color: black;background-color: darkgreen;justify-content: center; display: flex;" onClick="' + sup + '">Show</div></div>';
-
-function on_or_off () {
-	if (document.getElementsByClassName('switch-animate')[0].className.indexOf('switch-on') == 0) {
-		document.getElementById('hide_button').setAttribute('style','color: black;background-color: darkgreen; justify-content: center; display: flex;');
-	} else {
-		document.getElementById('hide_button').setAttribute('style','color: black;background-color: grey; justify-content: center; display: flex;');
-	}
-}
-
-setInterval(on_or_off, 500);
+<div><div style="text-align: center;">Фильтры</div><div id="hide_button" class="btn" style="color: black;background-color: grey;justify-content: center; display: flex;" onClick="' + sup + '">Show</div></div>';
 
 window.onload = function(){
 	document.getElementsByClassName('mail-sidebar')[0].setAttribute('style','display:none;');
