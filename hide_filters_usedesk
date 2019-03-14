@@ -4,6 +4,7 @@
 // @description  Hide filters button
 // @author       Ariorh
 // @match        https://secure.usedesk.ru/tickets*
+// @exclude      https://secure.usedesk.ru/tickets/*
 // ==/UserScript==
 
 var sup = "if (document.getElementById('hide_button').innerText == 'Hide') { \
