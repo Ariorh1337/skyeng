@@ -1,0 +1,14 @@
+/*
+Этот скрипт добавляет кнопку статуса на левую панель. Кнопка работает везде где есть левый бар (даже в тикете)
+Пример работы скрипта: https://i.imgur.com/N4WkteT.gifv
+*/
+
+// ==UserScript==
+// @name         On\Off
+// @version      0.1
+// @description  Кнопка онлайн и офлайн
+// @author       Ariorh
+// @match        https://secure.usedesk.ru/tickets*
+// ==/UserScript==
+
+document.getElementsByClassName('sidebar-menu-inner')[0].lastElementChild.outerHTML = document.getElementsByClassName('sidebar-menu-inner')[0].lastElementChild.outerHTML + '<div style="position: relative; top: 5px;"><div style="text-align: center;">Статус</div><span id="status_on_button" class="btn" style="color: black;background-color: green;width: 30px;float: left;justify-content: center;display: flex;" onClick="' + "$.ajax({ method: 'POST', url: '/change/ticketOnlineStatus', data: {user: USER_ID, status: true} }).done(function (res) { console.log(res); }); if (document.getElementsByClassName('make-switch')[0].firstElementChild.className) { document.getElementsByClassName('make-switch')[0].firstElementChild.className = 'switch-on switch-animate'; };" + '">On</span><span id="status_off_button" class="btn" style="color: black;background-color: grey;width: 30px;float: right;justify-content: center;display: flex;" onClick="' + "$.ajax({ method: 'POST', url: '/change/ticketOnlineStatus', data: {user: USER_ID, status: false} }).done(function (res) { console.log(res); }); if (document.getElementsByClassName('make-switch')[0].firstElementChild.className) { document.getElementsByClassName('make-switch')[0].firstElementChild.className = 'switch-off switch-animate'; };" + '">Off</span></div>'
