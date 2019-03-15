@@ -1,0 +1,67 @@
+/*
+Этот скрипт добавляет пометки о том сколько времени прошло с момента создание тикета
+Пример работы: https://i.imgur.com/ocCFIAf.png
+*/
+
+// ==UserScript==
+// @name         Time_to_expire
+// @version      0.1
+// @description  Время тикета с момента создания
+// @author       Ariorh
+// @match        https://secure.usedesk.ru/tickets*
+// @exclude      https://secure.usedesk.ru/tickets/*
+// ==/UserScript==
+
+window.onload = function(){
+    setTimeout(start_it, 10000);
+}
+
+function start_it () {
+    var currentTime = new Date();
+
+    for (var i = 0; document.getElementsByClassName('sorting_1').length > i; i++) {
+        if (document.getElementsByClassName('sorting_1')[i].innerText.length == 5) {
+            var time = calc_date(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes() , document.getElementsByClassName('sorting_1')[0].innerText);
+            if (time.split(':')[0] == -1) {
+                var min = time.split(':')[1].slice(1);
+                document.getElementsByClassName('text-center')[i].innerHTML = document.getElementsByClassName('text-center')[0].innerHTML + '<span class="label time" style="background-color: blueviolet;">' + min + 'м' + '</span>';
+                //console.log(time[0] * 1 + 1 + ':' + time[1].slice(1));
+            } else {
+                var hour = time.split(':')[0].slice(1) - 1;
+                var min = time.split(':')[1].slice(1);
+                document.getElementsByClassName('text-center')[i].innerHTML = document.getElementsByClassName('text-center')[0].innerHTML + '<span class="label time" style="background-color: blueviolet;">' + hour + 'ч' + min + 'м' + '</span>';
+                //console.log(time.split(':')[0].slice(1) - 1 + ':' + time.split(':')[1].slice(1));
+            }
+        }
+    }
+    setInterval(update_it, 1000);
+}
+
+function update_it () {
+    var currentTime = new Date();
+
+    for (var i = 0; document.getElementsByClassName('time').length > i; i++) {
+        var time = calc_date(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes() , document.getElementsByClassName('sorting_1')[0].innerText);
+        if (time.split(':')[0] == -1) {
+            var min = time.split(':')[1].slice(1);
+            document.getElementsByClassName('time')[0].innerText = min + 'м';
+            //console.log(time[0] * 1 + 1 + ':' + time[1].slice(1));
+        } else {
+            var hour = time.split(':')[0].slice(1) - 1;
+            var min = time.split(':')[1].slice(1);
+            document.getElementsByClassName('time')[0].innerText = hour + 'ч' + min + 'м'
+            //console.log(time.split(':')[0].slice(1) - 1 + ':' + time.split(':')[1].slice(1));
+        }
+    }
+}
+
+function calc_date (firstDate , secondDate) {
+	var getDate = (string) => new Date(0, 0,0, string.split(':')[0], string.split(':')[1]);
+	var different = (getDate(secondDate) - getDate(firstDate));
+
+	var hours = Math.floor((different % 86400000) / 3600000);
+	var minutes = Math.round(((different % 86400000) % 3600000) / 60000);
+	var result = hours + ':' + minutes;
+
+	return result
+}
