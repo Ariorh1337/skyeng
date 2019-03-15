@@ -1,11 +1,12 @@
 /*
 Этот скрипт добавляет пометки о том сколько времени прошло с момента создание тикета
+Обновление времени после перезагрузки страницы *временно*
 Пример работы: https://i.imgur.com/ocCFIAf.png
 */
 
 // ==UserScript==
 // @name         Time_to_expire
-// @version      0.1
+// @version      0.2
 // @description  Время тикета с момента создания
 // @author       Ariorh
 // @match        https://secure.usedesk.ru/tickets*
@@ -20,7 +21,7 @@ function start_it () {
     var currentTime = new Date();
 
     for (var i = 0; document.getElementsByClassName('sorting_1').length > i; i++) {
-        if (document.getElementsByClassName('sorting_1')[i].innerText.length == 5) {
+        if (document.getElementById('ticket_list').children[i].children[6].innerText.length == 5) {
             var time = calc_date(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes() , document.getElementsByClassName('sorting_1')[0].innerText);
             if (time.split(':')[0] == -1) {
                 var min = time.split(':')[1].slice(1);
