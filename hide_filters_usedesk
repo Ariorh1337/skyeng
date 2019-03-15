@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Hide_Button
-// @version      0.3
+// @version      0.4
 // @description  Hide filters button
 // @author       Ariorh
 // @match        https://secure.usedesk.ru/tickets*
@@ -13,9 +13,9 @@ var sup = "if (document.getElementById('hide_button').innerText == 'Hide') { \
 		document.getElementsByClassName('mail-body')[0].setAttribute('style','width: 100%; float: left;');\
 		document.getElementById('hide_button').innerText = 'Show';\
 	} else {\
-		document.getElementsByClassName('mail-sidebar')[0].setAttribute('style','');\
+		document.getElementsByClassName('mail-sidebar')[0].setAttribute('style','width: 290px;');\
 		document.getElementsByClassName('mail-body')[0].firstElementChild.setAttribute('style','');\
-		document.getElementsByClassName('mail-body')[0].setAttribute('style','width: 78%; float: right;');\
+		document.getElementsByClassName('mail-body')[0].setAttribute('style','width: 82%; float: right;');\
 		document.getElementById('hide_button').innerText = 'Hide';\
 	}"
 
