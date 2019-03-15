@@ -1,0 +1,48 @@
+/*
+Этот скрипт изменяет порядок сортировки сообщений и действий в тикете.
+Новый ответ и комментарий теперь внизу страницы.
+Пример работы скрипта: https://i.imgur.com/prPznU3.gifv
+*/
+
+// ==UserScript==
+// @name         Better_sort
+// @version      0.1
+// @description  Изменяет сортировку ответов
+// @author       Ariorh
+// @match        https://secure.usedesk.ru/tickets/*
+// ==/UserScript==
+
+var message = ['',''], i;
+for (i = 2; document.getElementsByClassName('mail-body')[0].children.length > i; i++) {
+	message[i] = document.getElementsByClassName('mail-body')[0].children[i].outerHTML;
+};
+
+do {
+	document.getElementsByClassName('mail-body')[0].lastElementChild.outerHTML = '';
+} while (document.getElementsByClassName('mail-body')[0].children[3] !== undefined);
+
+for (i = message.length; i > 0; i--) {
+	document.getElementsByClassName('mail-body')[0].lastElementChild.outerHTML = document.getElementsByClassName('mail-body')[0].lastElementChild.outerHTML + message[i];
+};
+
+var a = -1;
+for (i = 0; document.getElementsByClassName('mail-info').length > i; i++) {
+	if (document.getElementsByClassName('mail-info')[i].className == 'mail-info') {
+		a += 1
+		message[a] = document.getElementsByClassName('mail-info')[i].outerHTML;
+	};
+};
+
+for (i = 0; document.getElementsByClassName('mail-info').length > i; i++) {
+	if (document.getElementsByClassName('mail-info')[i].className == 'mail-info') {
+		document.getElementsByClassName('mail-info')[i].outerHTML = '';
+	};
+};
+
+a = -1
+for (i = 0; document.getElementsByClassName('mail-text').length > i; i++) {
+	if (document.getElementsByClassName('mail-text')[i].className == 'mail-text  ') {
+		a += 1;
+		document.getElementsByClassName('mail-text')[i].outerHTML = message[a] + document.getElementsByClassName('mail-text')[i].outerHTML;
+    };
+};
