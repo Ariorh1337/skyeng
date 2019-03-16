@@ -5,8 +5,8 @@
 */
 
 // ==UserScript==
-// @name         Time_to_expire
-// @version      0.2
+// @name         time_from_creation
+// @version      0.3
 // @description  Время тикета с момента создания
 // @author       Ariorh
 // @match        https://secure.usedesk.ru/tickets*
@@ -22,7 +22,7 @@ function start_it () {
 
     for (var i = 0; document.getElementsByClassName('sorting_1').length > i; i++) {
         if (document.getElementById('ticket_list').children[i].children[6].innerText.length == 5) {
-            var time = calc_date(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes() , document.getElementsByClassName('sorting_1')[0].innerText);
+            var time = calc_date(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes() , document.getElementById('ticket_list').children[i].children[7].innerText);
             if (time.split(':')[0] == -1) {
                 var min = time.split(':')[1].slice(1);
                 document.getElementsByClassName('text-center')[i].innerHTML = document.getElementsByClassName('text-center')[0].innerHTML + '<span class="label time" style="background-color: blueviolet;">' + min + 'м' + '</span>';
@@ -42,7 +42,7 @@ function update_it () {
     var currentTime = new Date();
 
     for (var i = 0; document.getElementsByClassName('time').length > i; i++) {
-        var time = calc_date(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes() , document.getElementsByClassName('sorting_1')[0].innerText);
+        var time = calc_date(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes() , document.getElementById('ticket_list').children[i].children[7].innerText);
         if (time.split(':')[0] == -1) {
             var min = time.split(':')[1].slice(1);
             document.getElementsByClassName('time')[0].innerText = min + 'м';
