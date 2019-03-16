@@ -6,43 +6,45 @@
 
 // ==UserScript==
 // @name         Better_sort
-// @version      0.1
+// @version      0.2
 // @description  Изменяет сортировку ответов
 // @author       Ariorh
 // @match        https://secure.usedesk.ru/tickets/*
 // ==/UserScript==
 
-var message = ['',''], i;
-for (i = 2; document.getElementsByClassName('mail-body')[0].children.length > i; i++) {
-	message[i] = document.getElementsByClassName('mail-body')[0].children[i].outerHTML;
-};
+document.getElementsByClassName('mail-body-full')[0].setAttribute('id','first_elem');
 
-do {
-	document.getElementsByClassName('mail-body')[0].lastElementChild.outerHTML = '';
-} while (document.getElementsByClassName('mail-body')[0].children[3] !== undefined);
+var div = document.createElement('div')
+document.getElementsByClassName('mail-env')[0].appendChild(div);
+div.outerHTML = '<div class="mail-body mail-body-full" id="second_elem"></div>';
 
-for (i = message.length; i > 0; i--) {
-	document.getElementsByClassName('mail-body')[0].lastElementChild.outerHTML = document.getElementsByClassName('mail-body')[0].lastElementChild.outerHTML + message[i];
-};
+var from = document.getElementById('first_elem'),
+    to = document.getElementById('second_elem');
 
-var a = -1;
+    to.insertBefore(from.lastChild, to.lastChild);
+
+while (from.children.length >= 3) {
+    to.insertBefore(from.lastChild, to.lastChild);
+}
+
+var a = -1, i;
 for (i = 0; document.getElementsByClassName('mail-info').length > i; i++) {
 	if (document.getElementsByClassName('mail-info')[i].className == 'mail-info') {
 		a += 1
 		message[a] = document.getElementsByClassName('mail-info')[i].outerHTML;
-	};
-};
+	}
+}
 
 for (i = 0; document.getElementsByClassName('mail-info').length > i; i++) {
 	if (document.getElementsByClassName('mail-info')[i].className == 'mail-info') {
 		document.getElementsByClassName('mail-info')[i].outerHTML = '';
-	};
-};
+	}
+}
 
 a = -1
 for (i = 0; document.getElementsByClassName('mail-text').length > i; i++) {
 	if (document.getElementsByClassName('mail-text')[i].className == 'mail-text  ') {
-		a += 1;
+		a += 1
 		document.getElementsByClassName('mail-text')[i].outerHTML = message[a] + document.getElementsByClassName('mail-text')[i].outerHTML;
-    };
-};
+    }
+}
