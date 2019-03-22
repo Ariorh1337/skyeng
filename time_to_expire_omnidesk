@@ -1,0 +1,39 @@
+/*
+Показывает время с момента создания в самом тикете
+Пример работы: https://i.imgur.com/bbwBWoy.png
+*/
+
+// ==UserScript==
+// @name         Time to expire
+// @version      0.2
+// @description  Make visible your time
+// @author       Ariorh
+// @match        https://help.skyeng.ru/staff/cases/record/*
+// ==/UserScript==
+
+var div = document.createElement('div')
+document.getElementsByClassName('request-content-title-act')[0].appendChild(div);
+div.outerHTML = '<div id="time_to_explode" class="request-status-open fl-right" style="color: black; background-color: red; width: 60px; text-align: center;"></div>';
+
+function calc_time (firstDate) {
+	var currentTime = new Date();
+	var secondDate = String(currentTime.getUTCHours() + 3 + ':' + currentTime.getUTCMinutes());
+	var getDate = (string) => new Date(0, 0,0, string.split(':')[0], string.split(':')[1]);
+	var different = (getDate(secondDate) - getDate(firstDate));
+	var hours = Math.floor((Number(different) % 86400000) / 3600000);
+	var minutes = Math.round(((Number(different) % 86400000) % 3600000) / 60000);
+	var result = [hours, minutes];
+	return result
+}
+
+function change_time () {
+	var time = calc_time(document.getElementsByClassName('request-date-time')[0].innerText.split(',')[0])
+	document.getElementById('time_to_explode').innerText = time[0] + 'ч ' + time[1] + 'м'
+	if (time[0] == 0 && time[1] < 10) {document.getElementById('time_to_explode').setAttribute('style','color: black; background-color: red; width: 60px; text-align: center;')} else if (time[0] == 0 && time[1] < 40) {
+	document.getElementById('time_to_explode').setAttribute('style','color: black; background-color: orange; width: 60px; text-align: center;')} else if (time[0] < 4) {
+	document.getElementById('time_to_explode').setAttribute('style','color: black; background-color: yellow; width: 60px; text-align: center;')} else if (time[0] < 11) {
+	document.getElementById('time_to_explode').setAttribute('style','color: black; background-color: grey; width: 60px; text-align: center;')}
+}
+
+change_time ();
+setInterval(change_time,20000);
