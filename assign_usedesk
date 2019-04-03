@@ -1,0 +1,27 @@
+/*
+Создает кнопку при нажатии на которую тикет будет твоим.
+Пример работы: https://i.imgur.com/zWAZgHY.gifv
+*/
+
+// ==UserScript==
+// @name         Assign Button
+// @version      0.1
+// @description  Add assign button in ticket
+// @author       Ariorh
+// @match        https://secure.usedesk.ru/tickets/*
+// ==/UserScript==
+
+var qwerty = "var ticketIds = [Number(location.href.replace(/[^0-9]/gim,''))]; \
+var data = {'ticket_ids': ticketIds}; \
+jQuery.ajax({ \
+    type: 'POST', \
+    url: '/tickets/edit-assignee-multiple', \
+    data: data, \
+    success: function(json) \
+    { \
+        location.reload(); \
+    } \
+});"
+var div = document.createElement('a')
+document.getElementById('ticket-buttons').appendChild(div);
+div.outerHTML = '<a id="btn_macros" class="btn btn-default btn-primary" title="Ассайн тикета на себя" onclick="' + qwerty + '" style="position: relative; left: 4px;"><div>ASSIGN</div></a>';
