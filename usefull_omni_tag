@@ -11,18 +11,19 @@
 // @match        https://help.skyeng.ru/staff/cases/record/*
 // ==/UserScript==
 
-var test = document.getElementById('redactor-voice-0').parentElement.children[2];
-test.setAttribute('id', 'redactor-uuid-0');
-test.className = test.className.replace('redactor-in-0','');
-
 function useful_tag () {
+    if (document.getElementById('redactor-uuid-0') == null) {
+        var test = document.getElementsByClassName('redactor-box')[0].children[2];
+        test.setAttribute('id', 'redactor-uuid-0');
+        test.className = 'redactor-layer redactor-styles js_omni_redactor_container redactor-placeholder wdt-emoji-picker-ready';
+    }
+    if (document.getElementsByClassName('redactor-in')[0]) {
+        document.getElementsByClassName('redactor-in')[0].classname = 'redactor-layer redactor-styles js_omni_redactor_container redactor-placeholder wdt-emoji-picker-ready';
+    }
 	if (document.getElementById('redactor-uuid-0').innerText.indexOf('[фулл_мсг]') !== -1) {
 		var msg = document.getElementById('redactor-uuid-0').innerHTML.split('[фулл_мсг]')
 		document.getElementById('redactor-uuid-0').innerHTML = msg[0] + '<pre>' + full_msg() + '</pre>' + msg[1]
 	};
-    if (document.getElementsByClassName('redactor-in-1')[0]) {
-        document.getElementsByClassName('redactor-in-1')[0].classname = document.getElementsByClassName('redactor-in-1')[0].classname.replace('redactor-in-1','');
-    }
 }
 
 setInterval(useful_tag,100);
