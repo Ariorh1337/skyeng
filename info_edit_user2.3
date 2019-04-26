@@ -6,7 +6,7 @@
 //_______________________________________________Скрипт_1_____________________________________________________________//
 // ==UserScript==
 // @name         Info EditUser2.0
-// @version      2.2
+// @version      2.3
 // @description  Make a button COPY USER INFO
 // @author       Ariorh
 // @match        https://id.skyeng.ru/admin/users/*
@@ -37,17 +37,21 @@ function text_area() {
         if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Id') {
             var id = 'ID: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
         }
-        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Имя') {
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Имя' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Name') {
             var name = '&#13;&#10;Name: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
         }
-        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Почта') {
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Почта' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Email') {
             var mail = '&#13;&#10;eMail: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
         }
-        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Телефон') {
+        if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Телефон' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Phone') {
             var phone = '&#13;&#10;Phone: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
         }
         if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Skype') {
-            var skype = '&#13;&#10;Skype: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+            if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== 'platform' && document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== 'платформа' && document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                var skype = '&#13;&#10;Skype: <a href="skype:' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '?chat">' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '</a>';
+            } else {
+                var skype = '&#13;&#10;Skype: нет';
+            }
         }
         if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Identity') {
             var identity = '&#13;&#10;Identity: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
