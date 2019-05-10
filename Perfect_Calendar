@@ -1,0 +1,55 @@
+/* Ровный и красивый календарь 2й линии
+Пример работы есть на скрине: https://i.imgur.com/8KOshZV.png
+Что бы изменить размер элементов, найдите параметр: settings = 5
+И поменяйте на свое усмотрение */
+
+// ==UserScript==
+// @name         Perfect Calendar
+// @version      0.3
+// @description  Make calendar great again!
+// @author       Ariorh
+// @match        https://calendar.google.com/calendar/r/*
+// ==/UserScript==
+
+function asde(i) {
+	var main2 = document.querySelectorAll('[role="presentation"]')[i];
+	var button = main2.querySelectorAll('[role="button"]');
+	if (button.length > 29) {
+		return button
+    }
+}
+
+function asd() {
+    var settings = 5;
+    var i
+    var main = document.querySelectorAll('[role="presentation"]');
+    for (i = 0; i < main.length; i++) {
+        var button = asde(i);
+        if (button !== undefined) {
+            break;
+        }
+    }
+    for (i = 0; i < button.length; i++) {
+        if (button[i].style.left == '0%') {
+            button[i].style.width = settings + '%';
+        } else {
+            var isnum = (Number(button[i].style.top.slice(0, -2)) - 383) / 24;
+            var num = Number(button[i - 1].style.left.slice(0,-1)) + settings;
+            if (Math.ceil(isnum) - isnum > 0) {
+                button[i].style.width = settings + '%';
+                button[i].style.left = '';
+                button[i].style.right = '0%'
+                if (button[i - 1].style.right) {
+                    button[i].style.right = String(num) + '%';
+                }
+            } else {
+                button[i].style.left = String(num) + '%'
+                button[i].style.width = settings + '%';
+            }
+        }
+    }
+}
+
+window.onload = function() {
+    setInterval(asd, 1000);
+}
