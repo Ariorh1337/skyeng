@@ -40,7 +40,8 @@ function asd() {
                 button[i].style.left = '';
                 button[i].style.right = '0%'
                 if (button[i - 1].style.right) {
-                    button[i].style.right = String(num) + '%';
+                    var temp1337 = Number(button[i - 1].style.right.slice(0,-1)) + settings;
+                    button[i].style.right = temp1337 + '%';
                 }
             } else {
                 button[i].style.left = String(num) + '%'
