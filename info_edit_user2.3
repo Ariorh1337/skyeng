@@ -48,7 +48,7 @@ function text_area() {
         }
         if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Skype') {
             if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== 'platform' && document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== 'платформа' && document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                var skype = '&#13;&#10;Skype: <a href="skype:' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '?chat">' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '</a>';
+                var skype = '&#13;&#10;Skype: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
             } else {
                 var skype = '&#13;&#10;Skype: нет';
             }
@@ -79,10 +79,11 @@ function winopen(){
 //_______________________________________________Скрипт_2_____________________________________________________________//
 // ==UserScript==
 // @name         status_script_check
-// @version      0.7
+// @version      0.8
 // @description  Get info about status for info_user
 // @author       Ariorh
 // @match        https://crm.skyeng.ru/admin/orderPriority/search?user=*?script_request
+// @match        http://crm.skyeng.ru/admin/orderPriority/search?user=*?script_request
 // ==/UserScript==
 
 (function() {
@@ -105,7 +106,8 @@ function winopen(){
     if ( document.getElementsByClassName('b-order-table__status-cell')[1].children[0].children[0].children[1].className.indexOf('status_group_1') !== -1) {
         status_student = 'grey';
         }
-
-    window.opener.location.href = 'https://id.skyeng.ru/admin/users/' + location.href.replace(/[^0-9]/gim,'') + '?' + status_student + '?' + document.getElementsByClassName('utc utc-main')[0].innerText.replace(/ /ig,'');
+    var user = document.getElementsByClassName('order_row')[0];
+    var time = document.querySelector('small').innerText;
+    window.opener.location.href = 'https://id.skyeng.ru/admin/users/' + location.href.replace(/[^0-9]/gim,'') + '?' + status_student + '?' + time.replace(/ /ig,'');
     window.close()
 })();
