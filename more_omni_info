@@ -1,18 +1,33 @@
-function more_info(){
-    var i;
-    for (i = 0; i < document.getElementsByClassName('req-case-content').length; i++) {
-        document.getElementsByClassName('req-case-content')[i].removeAttribute('style');
-        var text1 = document.getElementsByClassName('req-case-content')[i].outerHTML.replace('div','span');
-        document.getElementsByClassName('req-case-content')[i].outerHTML = '';
-        //---- Текст
-        document.getElementsByClassName('req-case-date')[i].removeAttribute('style');
-        var text2 = document.getElementsByClassName('req-case-date')[i].outerHTML.replace('div','span');
-        document.getElementsByClassName('req-case-date')[i].outerHTML = '';
-        //---- Время
-        document.getElementsByClassName('req-inf-cont')[i].outerHTML = document.getElementsByClassName('req-inf-cont')[i].outerHTML + text2 + text1;
-        document.getElementsByClassName('req-case-date')[i].setAttribute('style','margin-left: -65px;');
+// ==UserScript==
+// @name         Больше информации
+// @version      1.0
+// @description  Больше информации о тикетах с временем
+// @author       Ariorh
+// @match        https://help.skyeng.ru/staff/cases/list/filter/*
+// ==/UserScript==
+
+function comment_my_box () {
+    var box = document.getElementsByClassName('req-data-row');
+    var time = document.querySelectorAll('.req-data-row > div[class="req-case-date"]');
+    var text = document.querySelectorAll('.req-data-row > div[class="req-case-content"]');
+
+    for (var i = 0; i < box.length; i++) {
+        if (document.getElementsByClassName('req-td req-inf')[i + 1].lastElementChild.getAttribute('name') !== 'comment') {
+            if (text[i].innerText !== '') {
+                const tex = document.createElement('span');
+                document.getElementsByClassName('req-inf-cont')[i].parentElement.append(tex);
+                tex.setAttribute('name','comment');
+                tex.style = 'color: darkslategrey;text-align: center;border-bottom: 1px solid grey;padding: 2px 2000px 2px 5px;margin-left: -77px;';
+                tex.innerText = time[i].innerText.replace(/(\r\n|\n|\r)/gm,"").slice(12, 24) + ' ~~~ ' + text[i].innerText.replace(/(\r\n|\n|\r)/gm,"");
+                box[i].children[0].style.height = '36px';
+                box[i].children[1].style.height = '36px';
+            }
+        }
     }
-    setTimeout(more_info, 4000);
 }
 
-setTimeout(more_info, 1000);
+setInterval( function () {
+    if (document.getElementsByName('comment').length == 0 || document.getElementsByName('comment').length < document.getElementsByClassName('req-data-row').length) {
+        comment_my_box();
+    }
+} , 1000)
