@@ -1,8 +1,15 @@
 //Пример работы скрипта: https://i.imgur.com/nUg4h5X.png
 //Если нажать на ID П от он откроется в Информации о пользователе
 
-function ai() {
-    window.open('https://id.skyeng.ru/admin/users/' + document.getElementsByClassName('teacher_select')[0].value, '_blank');
-}
+// ==UserScript==
+// @name         crm_teacher_info
+// @version      0.3
+// @description  Visible ID of teacher
+// @author       Ariorh
+// @match        https://crm.skyeng.ru/admin/orderPriority/search?*
+// ==/UserScript==
 
-document.getElementsByClassName('b-order-table__status-header')[0].outerHTML = document.getElementsByClassName('b-order-table__status-header')[0].outerHTML + '<th onClick="' + 'window.open(' + "'https://id.skyeng.ru/admin/users/" + document.getElementsByClassName('teacher_select')[0].value + "', '_blank'" + ');' + '" style="color: red;">' + document.getElementsByClassName('teacher_select')[0].value + '</th>'
+let teacher_id_str = document.getElementsByClassName('teacher_select')[0].value;
+let teacher_id_lnk = 'https://id.skyeng.ru/admin/users/' + teacher_id_str;
+var menu = document.querySelector('table[class="table table-condensed table-striped b-order-table"] > thead > tr');
+menu.lastElementChild.innerHTML = '<span>Teacher: </span><span onClick="window.open(\'' + teacher_id_lnk + '\',\'' + teacher_id_lnk + '\')" style="color: red; cursor: pointer;">  ' + teacher_id_str + '</span>';
