@@ -1,0 +1,181 @@
+<html style="height: 210px;">
+	<head>
+		<meta charset="utf-8">
+		<style>
+			.container {
+				min-width: 140px; /* Минимальная ширина контейнера */
+				height: 100px;
+				float:left;
+				text-align:center;
+			}
+			.test1 {
+				display: inline-table;
+				margin: 2%;
+			}
+			.vert{
+				text-align:center;
+				cursor: pointer;
+				width: 5%;
+			}
+			.green{
+				background-color:green;
+			}
+			.delete{
+				background-color:red;
+				cursor: pointer;
+			}
+			h3 {
+				display: block;
+				font-size: 1.17em;
+				text-align: center;
+				margin-top: 0%;
+				margin-bottom: 2%;
+				margin-left: 0;
+				margin-right: 0;
+				font-weight: bold;
+			}
+			table {
+				border: 1px solid black;
+				margin-bottom: 2%; 
+				font-size: 14px;
+			}
+		</style>
+		<script src="popup.js"></script>
+	</head>
+	<body class="container">
+		<div id="menu_1">
+			<span id="menu_left_1" class="test1 vert green">⬅</span>
+			<span style="margin: 2%; font-weight: bold; font-size: 14px;">Статистика</span>
+			<span id="menu_right_1" class="test1 vert green">➡</span>
+		</div>
+		<div id="menu_2" style="display: none">
+			<span id="menu_left_2" class="test1 vert green">⬅</span>
+			<span style="margin: 2%; font-weight: bold; font-size: 14px;">История</span>
+			<span id="menu_right_2" class="test1 vert green">➡</span>
+		</div>
+		<span class="test1" id="history" style="display: none">
+			<div id="history_menu0">
+				<span id="hist0_left_1" class="vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">1 Линия</span>
+				<span id="hist0_right_1" class="vert green">➡</span>
+			</div>
+			<div id="history_menu00" style="display: none">
+				<span id="hist0_left_2" class="vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">2 Линия</span>
+				<span id="hist0_right_2" class="vert green">➡</span>
+			</div>
+			<div id="history_menu1">
+				<span id="hist1_left_1" class="vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Cегодня</span>
+				<span id="hist1_right_1" class="vert green">➡</span>
+			</div>
+			<div id="history_menu2" style="display: none">
+				<span id="hist1_left_2" class="vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Неделя</span>
+				<span id="hist1_right_2" class="vert green">➡</span>
+			</div>
+			<div id="history_menu3" style="display: none">
+				<span id="hist1_left_3" class="vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Месяц</span>
+				<span id="hist1_right_3" class="vert green">➡</span>
+			</div>
+			<div id="history_menu4" style="display: none">
+					<span id="hist2_left_1" class="vert green">⬅</span>
+					<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Cегодня</span>
+					<span id="hist2_right_1" class="vert green">➡</span>
+				</div>
+			<div id="history_menu5" style="display: none">
+				<span id="hist2_left_2" class="vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Неделя</span>
+				<span id="hist2_right_2" class="vert green">➡</span>
+			</div>
+			<div id="history_menu6" style="display: none">
+				<span id="hist2_left_3" class="vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Месяц</span>
+				<span id="hist2_right_3" class="vert green">➡</span>
+			</div>
+			<div style="margin-top: 5%;">
+				<table border="1" id="history_table" style="text-align: center;">
+						<tbody id="hist1_today" style="display: none;"></tbody>
+						<tbody id="hist1_week" style="display: none;"></tbody>
+						<tbody id="hist1_month" style="display: none;"></tbody>
+						<tbody id="hist2_today" style="display: none;"></tbody>
+						<tbody id="hist2_week" style="display: none;"></tbody>
+						<tbody id="hist2_month" style="display: none;"></tbody>
+				</table>
+			</div>
+		</span>
+		<span id="block_1">
+			<div>
+				<span id="left_1" class="test1 vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Cегодня</span>
+				<span id="right_1" class="test1 vert green">➡</span>
+			</div>
+			<div class="test1">
+				<table border="1" style="text-align: center;">
+					<tbody>
+						<tr><td colspan="3">Просмотрено: </td><td id="looked" style="min-width: 12px;">0</td></tr>
+						<tr><td colspan="3">Действия: </td><td id="actions">0</td></tr>
+						<tr><td colspan="3">Тикеты 1Л: </td><td id="first">0</td></tr>
+						<tr><td colspan="3">Тикеты 2Л: </td><td id="second">0</td></tr>
+						<tr>
+							<td>Всего: </td>
+							<td id="total_crit" style="background-color: red; min-width: 10px;">0</td>
+							<td id="total_high" style="background-color: orange;">0</td>
+							<td id="total">0</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</span>
+		<span id="block_2" style="display: none;">
+			<div>
+				<span id="left_2" class="test1 vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Неделя</span>
+				<span id="right_2" class="test1 vert green">➡</span>
+			</div>
+			<div class="test1">
+					<table border="1">
+						<tbody>
+							<tr><td colspan="3">Просмотрено: </td><td id="looked2" style="text-align: center; min-width: 12px;">0</td></tr>
+							<tr><td colspan="3">Действия: </td><td id="actions2" style="text-align: center;">0</td></tr>
+							<tr><td colspan="3">Тикеты 1Л: </td><td id="first2" style="text-align: center;">0</td></tr>
+							<tr><td colspan="3">Тикеты 2Л: </td><td id="second2" style="text-align: center;">0</td></tr>
+							<tr>
+								<td>Всего: </td>
+								<td id="total_crit2" style="background-color: red; text-align: center; min-width: 10px;">0</td>
+								<td id="total_high2" style="background-color: orange; text-align: center;">0</td>
+								<td id="total2" style="text-align: center;">0</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+		</span>
+		<span id="block_3" style="display: none;">
+			<div>
+				<span id="left_3" class="test1 vert green">⬅</span>
+				<span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">Месяц</span>
+				<span id="right_3" class="test1 vert green">➡</span>
+			</div>
+			<div class="test1">
+				<table border="1">
+					<tbody>
+						<tr><td colspan="3">Просмотрено: </td><td id="looked3" style="text-align: center; min-width: 12px;">0</td></tr>
+						<tr><td colspan="3">Действия: </td><td id="actions3" style="text-align: center;">0</td></tr>
+						<tr><td colspan="3">Тикеты 1Л: </td><td id="first3" style="text-align: center;">0</td></tr>
+						<tr><td colspan="3">Тикеты 2Л: </td><td id="second3" style="text-align: center;">0</td></tr>
+						<tr>
+							<td>Всего: </td>
+							<td id="total_crit3" style="background-color: red; text-align: center; min-width: 10px;">0</td>
+							<td id="total_high3" style="background-color: orange; text-align: center;">0</td>
+							<td id="total3" style="text-align: center;">0</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</span>
+		<div>
+			<button id="reset_button" style="margin-bottom: 5%">сброс</button>
+		</div>
+	</body>
+</html>
