@@ -1,0 +1,39 @@
+{
+    "name": "Script Package",
+    "version": "0.1.0",
+    "description": "Сброрник всех скриптов",
+    "manifest_version": 2,
+    "options_page": "options.html",
+    "content_scripts": [
+    {
+        "js": ["timetable.js"],
+        "matches": ["*://timetable.skyeng.ru/*"]
+    },
+    {
+        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js"],
+        "matches": ["*://help.skyeng.ru/staff/cases/record/*","*://skyeng.omnidesk.ru/staff/cases/record/*"]
+    },
+    {
+        "js": ["info_user_status.js", "info_user_button.js"],
+        "matches": ["*://id.skyeng.ru/admin/users/*"]
+    },
+    {
+        "js": ["crm_teacher_info.js"],
+        "matches": ["*://crm.skyeng.ru/admin/orderPriority/search?*"]
+    },
+    {
+        "js": ["chat_separate.js", "chat_crit.js", "chat_close.js"],
+        "matches": ["*://skyeng.omnidesk.ru/staff/cases/chat/*", "*://help.skyeng.ru/staff/cases/chat/*"]
+    },
+    {
+        "js": ["box_ticket_info.js", "box_sort.js", "box_show_all.js","box_in_new_tab.js","box_in_new_tab_checkbox.js"],
+        "matches": ["*://help.skyeng.ru/staff/cases/list/*", "*://help.skyeng.ru/staff/cases/chat/*"]
+    },
+    {
+        "js": ["calc_date_text.js"],
+        "matches": ["*://qie.glitch.me/*"]
+    }],
+    "permissions": [
+        "*://*.skyeng.ru/*", "*://skyeng.omnidesk.ru/*", "storage"
+    ]
+}
