@@ -70,8 +70,8 @@ function get_lessons_info (ID, Day, Count, Month, Year) {
         if (Day == undefined || Day == '') { Day = t.getDate();} else if (String(Day).length < 2) { Day = String('0' + Day)};
         if (Month == undefined) { Month = t.getMonth() + 1;} else if (String(Month).length < 2) { Month = String('0' + Month)};
         if (Year == undefined) { Year = t.getFullYear();} else if (String(Year).length < 3) { Year = String('20' + Year)};
-        if (Count == undefined) { 
-            t.setDate( Number(Day + (7 - t.getDay())) )
+        if (Count == undefined || Count == '') { 
+            t.setDate( Number(Day) + (7 - t.getDay()) )
             Count = t.getDate(); 
             var Month2 = t.getMonth() + 1;
             var Year2 = t.getFullYear();

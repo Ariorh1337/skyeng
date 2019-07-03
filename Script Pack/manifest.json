@@ -1,16 +1,20 @@
 {
     "name": "Script Package",
-    "version": "0.1.0",
+    "version": "0.1.5",
     "description": "Сброрник всех скриптов",
     "manifest_version": 2,
     "options_page": "options.html",
+    "background": {
+        "scripts": ["jquery.js","background.js"],
+        "persistent": false
+      },
     "content_scripts": [
     {
         "js": ["timetable.js"],
         "matches": ["*://timetable.skyeng.ru/*"]
     },
     {
-        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js"],
+        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js", "ticket_input_label.js", "ticket_easy_info_window.js"],
         "matches": ["*://help.skyeng.ru/staff/cases/record/*","*://skyeng.omnidesk.ru/staff/cases/record/*"]
     },
     {
