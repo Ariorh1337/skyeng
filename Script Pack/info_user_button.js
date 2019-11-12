@@ -4,24 +4,47 @@ window.onload = function () {
     chrome.storage.local.get(['info_user_button'], function(result) {
         if (result['info_user_button'] === undefined) { chrome.storage.local.set({info_user_button: true}, function() {}); }
         if (result['info_user_button'] === true) {
+            var id = '', name = '', mail = '',phone = '',phoneD = '',skype = '',identity = '';
             for (var i = 0; i < document.getElementsByTagName('tbody')[0].children.length; i++) {
                 if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Id') {
-                    var id = 'ID: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                        id = 'ID: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    }
                 }
                 if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Имя' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Name') {
-                    var name = '&#13;&#10;Name: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                        if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                            name = '\nName: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                        }
+                    }
+                if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Фамилия' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Surname') {
+                    if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                        name = name + ' ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    }
                 }
                 if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Почта' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Email') {
-                    var mail = '&#13;&#10;eMail: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                        mail = '\neMail: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    }
                 }
                 if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Телефон' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Phone') {
-                    var phone = '&#13;&#10;Phone: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                        phone = '\nPhone: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    }
+                }
+                if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Домашний телефон' || document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Home phone') {
+                    if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                        phoneD = '\n<a href="tel:' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '">Phone2</a>: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    }
                 }
                 if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Skype') {
-                    var skype = '&#13;&#10;Skype: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                        skype = '\nSkype: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    }
                 }
-                if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Identity') {
-                    var identity = '&#13;&#10;Identity: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                if (document.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Legacy identity') {
+                    if (document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
+                        identity = '\nIdentity: ' + document.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
+                    }
                 }
             }
         

@@ -1,11 +1,11 @@
 {
     "name": "Script Package",
-    "version": "0.1.5",
+    "version": "0.2.2",
     "description": "Сброрник всех скриптов",
     "manifest_version": 2,
     "options_page": "options.html",
     "background": {
-        "scripts": ["jquery.js","background.js"],
+        "scripts": ["background.js"],
         "persistent": false
       },
     "content_scripts": [
@@ -14,7 +14,7 @@
         "matches": ["*://timetable.skyeng.ru/*"]
     },
     {
-        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js", "ticket_input_label.js", "ticket_easy_info_window.js"],
+        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js", "ticket_input_label.js", "ticket_easy_info_window.js","ticket_reminds_of.js"],
         "matches": ["*://help.skyeng.ru/staff/cases/record/*","*://skyeng.omnidesk.ru/staff/cases/record/*"]
     },
     {
@@ -26,16 +26,24 @@
         "matches": ["*://crm.skyeng.ru/admin/orderPriority/search?*"]
     },
     {
-        "js": ["chat_separate.js", "chat_crit.js", "chat_close.js"],
+        "js": ["chat_separate.js", "chat_crit.js", "chat_close.js", "ticket_easy_info_window.js"],
         "matches": ["*://skyeng.omnidesk.ru/staff/cases/chat/*", "*://help.skyeng.ru/staff/cases/chat/*"]
     },
     {
         "js": ["box_ticket_info.js", "box_sort.js", "box_show_all.js","box_in_new_tab.js","box_in_new_tab_checkbox.js"],
-        "matches": ["*://help.skyeng.ru/staff/cases/list/*", "*://help.skyeng.ru/staff/cases/chat/*"]
+        "matches": ["*://help.skyeng.ru/staff/cases/list/*"]
     },
     {
         "js": ["calc_date_text.js"],
         "matches": ["*://qie.glitch.me/*"]
+    },
+    {
+        "js": ["workbook.js"],
+        "matches": ["*://*.skyeng.ru/workbook/*"]
+    },
+    {
+        "js": ["crm_group.js"],
+        "matches": ["*://*.skyeng.ru/admin/group/edit?id=*"]
     }],
     "permissions": [
         "*://*.skyeng.ru/*", "*://skyeng.omnidesk.ru/*", "storage"

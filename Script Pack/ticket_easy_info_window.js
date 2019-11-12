@@ -5,7 +5,7 @@ if (localStorage.getItem('winTop') == null) {
 
 let wint = document.createElement('div');
 document.body.append(wint);
-wint.style = 'min-height: 73px; max-height: 450px; min-width: 76px; max-width: 340px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56);';
+wint.style = 'min-height: 73px; max-height: 450px; min-width: 76px; max-width: 370px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56);';
 let html_inner = inner_html.toString().slice(27);
 html_inner = html_inner.toString().slice('',-5)
 wint.innerHTML = html_inner;
@@ -24,17 +24,20 @@ wint.firstElementChild.firstElementChild.onmousedown = function (a) {
 wint.onmouseup = function () {document.removeEventListener('mousemove', listener);}
 document.getElementById('btn1_student').onclick = function () {get_info ("student");};
 document.getElementById('btn1_teacher').onclick = function () {get_info ("teacher");};
+
 document.getElementById('student_copy').onclick = function () {
-    let stdnt = document.getElementById('info_student_block').innerHTML;
-    copyToClipboard(stdnt.replace(/<br>/g,'\n'))
-}
+    let stdnt = document.getElementById('info_student_block').innerText;
+    copyToClipboard(stdnt) //.replace(/<br>/g,'\n')
+};
 document.getElementById('teacher_copy').onclick = function () {
-    let tcher = document.getElementById('info_teacher_block').innerHTML;
-    copyToClipboard(tcher.replace(/<br>/g,'\n'))
-}
+    let tcher = document.getElementById('info_teacher_block').innerText;
+    copyToClipboard(tcher) //.replace(/<br>/g,'\n')
+};
 document.getElementById('info_status').firstElementChild.children[2].onclick = function () {
-    copyToClipboard('https://profile.skyeng.ru/profile/' + document.querySelectorAll('label > input[class="form-custom-field"]')[1].value + '/showcase');
-}
+    let id = document.querySelectorAll('label > input[class="form-custom-field"]')[1].value.replace(/[^0-9]/g, "");
+    copyToClipboard('https://profile.skyeng.ru/profile/' + id + '/showcase');
+};
+
 document.getElementById('btn_hide').onclick = function () {
 	document.getElementById('btn_hide').style.display = 'none';
 	document.getElementById('info_block').style.display = 'none';
@@ -45,6 +48,58 @@ document.getElementById('btn_hide').onclick = function () {
 	document.getElementById('info_block').parentElement.children[1].style.display = 'none';
 	document.getElementById('info_block').parentElement.children[1].children[2].style.display = 'none';
 	document.getElementById('info_block').parentElement.children[1].children[3].style.display = 'none';
+}
+
+//Время П
+var dat = new Date()
+var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+tab.children[1].innerText = dat.getHours() - 3
+tab.children[2].innerText = dat.getHours() - 2
+tab.children[3].innerText = dat.getHours() - 1
+tab.children[4].innerText = dat.getHours()
+tab.children[5].innerText = dat.getHours() + 1
+tab.children[6].innerText = dat.getHours() + 2
+tab.children[7].innerText = dat.getHours() + 3
+
+var asd = document.querySelector('div[id=table_time] > table > tbody > tr');
+asd.children[8].onclick = function () {
+	if (asd.children[7].innerText < 23) {
+		for (var i = 1; i < 8; i++) {
+            asd.children[i].style.backgroundColor = '';
+			asd.children[i].innerText = Number(asd.children[i].innerText) + 1
+        }
+        
+        var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
+        var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+        for (var i = 0; i < busy_time.length; i++) {
+            for (var ii = 1; ii < 8; ii++) {
+                if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+            }
+        }
+    }	
+}
+asd.children[0].onclick = function () {
+	if (asd.children[1].innerText > 0) {
+		for (var i = 1; i < 8; i++) {
+            asd.children[i].style.backgroundColor = '';
+			asd.children[i].innerText = Number(asd.children[i].innerText) - 1
+        }
+        
+        var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
+        var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+        for (var i = 0; i < busy_time.length; i++) {
+            for (var ii = 1; ii < 8; ii++) {
+                if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+            }
+        }
+    }	
+}
+//End Время П
+
+if (window.location.href.indexOf('chat') !== -1) {
+	document.getElementById('id_type_for_chat').style.display = '';
+} else {
+	document.getElementById('id_type_for_chat').style.display = 'none';
 }
 
 const copyToClipboard = str => {
@@ -59,6 +114,7 @@ const copyToClipboard = str => {
 function inner_html() {
 /*<div style="display: flex;">
     <span style="cursor: -webkit-grab;">
+        <input id="id_type_for_chat" type="text" style="text-align: center; width: 72px; display: none;">
         <div style="margin: 10px;">
             <button style="width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" id="btn1_student">Info У</button>
         </div>
@@ -91,6 +147,23 @@ function inner_html() {
                 </span>
             </div>
             <div style="text-align: center; padding: 5px;" id="info_teacher_block"></div>
+            <div style="text-align: center; display: none;" id="table_time">
+                <table style="border-top: 1px solid black;">
+                    <tbody>
+                        <tr>
+                            <td style="cursor: pointer;">⬅</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">00</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">01</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">02</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">03</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">04</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">05</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">06</td>
+                            <td style="border-left: 1px solid black; cursor: pointer;">➡</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div style="display: none; margin: 7px 8px 7px 8px; display: none;">
             <button id="btn_copy">Copy</button>
@@ -104,7 +177,11 @@ function inner_html() {
 
 function get_info (type) {  
     if (type == 'student') {
-        var id = document.querySelectorAll('label > input[class="form-custom-field"]')[1].value.replace(/[^0-9]/g, "");
+        if (window.location.href.indexOf('chat') !== -1) {
+            var id = document.getElementById('id_type_for_chat').value;
+        } else {
+            var id = document.querySelectorAll('label > input[class="form-custom-field"]')[1].value.replace(/[^0-9]/g, "");
+        }
         if (id !== '') {
             document.getElementById('btn_hide').style.display = '';
 
@@ -129,6 +206,9 @@ function get_info (type) {
                     document.getElementById('info_status').title = response.comment;
                 } else { document.getElementById('info_status').title = 'Нет комментария'; };
                 document.getElementById('info_status').setAttribute('order_id', response.order);
+                chrome.runtime.sendMessage({name: "script_pack", question: 'get_Lazzy_TimeTable', id: response.order}, function(response) {
+                    document.getElementById('info_student_block').setAttribute('title', response.answer);
+                });
                 if (response.teacher !== '') {
                     document.getElementById('info_teacher_block').innerHTML = '';
                     document.getElementById('btn_login_teacher').style.display = '';
@@ -150,9 +230,43 @@ function get_info (type) {
                             copyToClipboard(response.answer.data.link);
                         });
                     }
+                    chrome.runtime.sendMessage({name: "script_pack", question: 'get_lessons_today', id: response.teacher}, function(response) {
+                        if (response.answer !== 0) {
+                            let lessons = '';
+                            for (let i = 0; i < response.answer.length; i++) {
+                                lessons = lessons + response.answer[i].startAt + ';';
+                            }
+                            document.getElementById('table_time').setAttribute('busy_time', lessons);
+                            document.getElementById('table_time').style.display = 'grid';
+                        } else { document.getElementById('table_time').style.display = 'none';}
+                    });
+    
+                    setTimeout( function () {
+                        if (document.getElementById('table_time').getAttribute('busy_time') !== undefined && document.getElementById('table_time').getAttribute('busy_time') !== null) {
+                            var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
+                            var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+                            for (var i = 0; i < busy_time.length; i++) {
+                                for (var ii = 1; ii < 8; ii++) {
+                                    if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+                                }
+                            }
+                        } else {
+                            console.log('Не бойся, у П просто нет уроков на сегодня, все ок');
+                        }
+                    }, 2000);
                 } else {
-                    document.getElementById('info_teacher_block').innerHTML = '';
-                    document.getElementById('teacher_status').style.display = 'none';
+                    //KGL
+                    if (response.group !== '') {
+                        document.getElementById('info_teacher_block').innerHTML = '<span><span style="margin-right: 3px;">Группа:</span><a href="https://crm.skyeng.ru/admin/group/edit?id=' + response.group + '">' + response.group + '</a><a style="margin-left: 10px; margin-right: 10px;" href="https://api.olympiad.skyeng.ru/crm/cards/' + id + '">Семья</a><a href="https://grouplessons-api.skyeng.ru/admin/student/view/' + id + '">Подписка</a></span>';
+                        chrome.runtime.sendMessage({name: "script_pack", question: 'get_group_student_info', id: id}, function(response) {
+                            let windt = document.createElement('div');
+                            document.getElementById('info_teacher_block').append(windt);
+                            windt.innerHTML = response.info
+                        },);
+                    } else {
+                        document.getElementById('info_teacher_block').innerHTML = '';
+                        document.getElementById('teacher_status').style.display = 'none';
+                    }
                 }
             });
             document.getElementById('student_login').onclick = function () {
@@ -162,7 +276,11 @@ function get_info (type) {
             }
         }     
     } else if (type == 'teacher') {
-        var id = document.querySelectorAll('label > input[class="form-custom-field"]')[0].value.replace(/[^0-9]/g, "");
+        if (window.location.href.indexOf('chat') !== -1) {
+            var id = document.getElementById('id_type_for_chat').value;
+        } else {
+            var id = document.querySelectorAll('label > input[class="form-custom-field"]')[0].value.replace(/[^0-9]/g, "");
+        }
         if (id !== '') {
             document.getElementById('btn_hide').style.display = '';
             document.getElementById('btn_login_teacher').style.display = '';
@@ -187,6 +305,26 @@ function get_info (type) {
             document.getElementById('teacher_edit').onclick = function () {
                 window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
             }
+            chrome.runtime.sendMessage({name: "script_pack", question: 'get_lessons_today', id: id}, function(response) {
+                if (response.answer !== 0) {
+                    let lessons = '';
+                    for (let i = 0; i < response.answer.length; i++) {
+                        lessons = lessons + response.answer[i].startAt + ';';
+                    }
+                    document.getElementById('table_time').setAttribute('busy_time', lessons);
+                    document.getElementById('table_time').style.display = 'grid';
+                } else { document.getElementById('table_time').style.display = 'none';}
+            });
+            
+            setTimeout( function () {
+                var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
+                var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+                for (var i = 0; i < busy_time.length; i++) {
+                    for (var ii = 1; ii < 8; ii++) {
+                        if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+                    }
+                }
+            }, 2000);
         }
     }
 }
