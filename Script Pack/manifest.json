@@ -1,6 +1,6 @@
 {
     "name": "Script Package",
-    "version": "0.2.2",
+    "version": "0.2.5",
     "description": "Сброрник всех скриптов",
     "manifest_version": 2,
     "options_page": "options.html",
@@ -26,7 +26,7 @@
         "matches": ["*://crm.skyeng.ru/admin/orderPriority/search?*"]
     },
     {
-        "js": ["chat_separate.js", "chat_crit.js", "chat_close.js", "ticket_easy_info_window.js"],
+        "js": ["chat_separate.js", "chat_crit.js", "chat_close.js", "ticket_easy_info_window.js","chat_new_ticket.js"],
         "matches": ["*://skyeng.omnidesk.ru/staff/cases/chat/*", "*://help.skyeng.ru/staff/cases/chat/*"]
     },
     {
@@ -44,6 +44,10 @@
     {
         "js": ["crm_group.js"],
         "matches": ["*://*.skyeng.ru/admin/group/edit?id=*"]
+    },
+    {
+        "js": ["chat_new_ticket.js"],
+        "matches": ["*://skyeng.omnidesk.ru/l_rus/*","*://*.skyeng.ru/l_rus/*"]
     }],
     "permissions": [
         "*://*.skyeng.ru/*", "*://skyeng.omnidesk.ru/*", "storage"

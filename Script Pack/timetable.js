@@ -133,48 +133,79 @@ function get_lessons_today(ID) {
             var obj = JSON.parse(xhr.responseText);
             
             if (obj[0].result[0].classes !== undefined) {
-                var total = obj[0].result[0].classes;
-                for (var i = 0; i < total.length; i++) {
-                    if (total[i].createdAt !== undefined) {
-                        let str = total[i].createdAt;
-                        total[i].createdAt = total[i].createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                var classes = obj[0].result[0].classes;
+                for (var i = 0; i < classes.length; i++) {
+                    if (classes[i].createdAt !== undefined) {
+                        let str = classes[i].createdAt;
+                        classes[i].createdAt = classes[i].createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
                     }
-                    if (total[i].endAt !== undefined) {
-                        let str = total[i].endAt;
-                        total[i].endAt = total[i].endAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                    if (classes[i].endAt !== undefined) {
+                        let str = classes[i].endAt;
+                        classes[i].endAt = classes[i].endAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
                     }
-                    if (total[i].startAt !== undefined) {
-                        total[i].startAt = String(Number(total[i].startAt.slice(11, 13)) + 3);
+                    if (classes[i].startAt !== undefined) {
+                        classes[i].startAt = String(Number(classes[i].startAt.slice(11, 13)) + 3);
                     }
-                    if (total[i].updatedAt !== undefined) {
-                        let str = total[i].updatedAt;
-                        total[i].updatedAt = total[i].updatedAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                    if (classes[i].updatedAt !== undefined) {
+                        let str = classes[i].updatedAt;
+                        classes[i].updatedAt = classes[i].updatedAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
                     }
-                    if (total[i].classStatus !== undefined) {
-                        if (total[i].classStatus.createdAt !== undefined) {
-                            let str = total[i].classStatus.createdAt;
-                            total[i].classStatus.createdAt = total[i].classStatus.createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                        }
+                    if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
+                        let str = classes[i].classStatus.createdAt;
+                        classes[i].classStatus.createdAt = classes[i].classStatus.createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
                     }
                 }
             }
 
             if (obj[0].result[0].classesRegular !== undefined) {
-                let class_reg = obj[0].result[0].classesRegular
-                var class_reg_fin = [];
-                if (data.getDay() == 0) { var date_day = 6; } else { var date_day = data.getDay() - 1; }
-                for (var i = 0; i < class_reg.length; i++) {
-                    class_reg[i].startAt = class_reg[i].startAt.split(':')[0].slice(1)
-                    class_reg[i].startAtDays = Math.floor( class_reg[i].startAt / 24);
-                    class_reg[i].startAt = class_reg[i].startAt - class_reg[i].startAtDays * 24 + 3;
+                let classes = obj[0].result[0].classesRegular;
+                var classes_regular = [];
+                if (data.getDay() == 0) { 
+                    var date_day = 6; 
+                } else { 
+                    var date_day = data.getDay() - 1; 
                 }
-                for (var i = 0; i < class_reg.length; i++) {
-                    if (class_reg[i].startAtDays == date_day) { class_reg_fin.push(class_reg[i]); }
+                for (var i = 0; i < classes.length; i++) {
+                    classes[i].startAt = classes[i].startAt.split(':')[0].slice(1)
+                    classes[i].startAtDays = Math.floor( classes[i].startAt / 24);
+                    classes[i].startAt = classes[i].startAt - classes[i].startAtDays * 24 + 3;
+                }
+                for (var i = 0; i < classes.length; i++) {
+                    if (classes[i].startAtDays == date_day) { 
+                        classes_regular.push(classes[i]); 
+                    }
                 }
             }
-            
-            var total_finish_super_last_one = total.concat(class_reg_fin)
-            console.log(total_finish_super_last_one)
+
+            if (classes && classes_regular) {
+                for (var i = 0; i < classes.length; i++) {
+                    if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
+                        if (classes[i].classRegularId !== undefined && classes[i].classRegularId !== '') {
+                            for (let c = 0; c < classes_regular.length; c++) {
+                                if (classes_regular[c].id == classes[i].classRegularId) {
+                                    classes_regular.splice(c,1);
+                                    c--;
+                                }
+                            }
+                        }
+                        classes.splice(i,1);
+                        i--;
+                    }
+                }
+            }
+
+            (classes) ? true : classes = '';
+            (classes_regular) ? true : classes_regular = '';
+            if (classes.length !== 0 && classes_regular.length !== 0) {
+                classes = classes.concat(classes_regular);
+                console.log(classes)
+            } else if (classes.length !== 0 && classes_regular.length == 0) {
+                console.log(classes)
+            } else if (classes.length == 0 && classes_regular.length !== 0) {
+                console.log(classes_regular)
+            } else {
+                console.log(null)
+            }
         }
     }
     xhr.open('POST', 'https://timetable.skyeng.ru/api/teachers/search', false)

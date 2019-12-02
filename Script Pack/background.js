@@ -37,222 +37,218 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
         }
         if (request.question == 'info_user_status') {
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                var page = document.createElement('html');
-                page.innerHTML = xhr.response;
-                var num = page.querySelector('div[class=short_comment] > table[class=b-order-table__status-cell] > tbody > tr').children[1].className.slice(-1);
-                if (num == "6") {
-                    answer = 'purple';
-                } else if (num == "5") {
-                    answer = 'green';
-                } else if (num == "4") {
-                    answer = 'lightblue';
-                } else if (num == "3") {
-                    answer = 'orange';
-                } else if (num == "2") {
-                    answer = 'pink';
-                } else {
-                    answer = 'grey';
-                };
-                var time = page.querySelector('td > div > small').innerText;
-                var teacher = page.querySelector('.teacher_select > option').value;
-                var order = page.querySelector('tbody > tr[data-order]').getAttribute('data-order');
-                var comment = page.querySelector('.order_extra_input > pre').innerText;
-                var group = '';
-                if ( page.querySelector('table > tbody > tr[data-order] > td > div[class="top-buffer"] > strong') !== null ) {
-                    group = page.querySelector('table > tbody > tr[data-order] > td > div[class="top-buffer"] > strong').innerText;
-                }
-
-                sendResponse({
-                    status: answer,
-                    time: time,
-                    teacher: teacher,
-                    order: order,
-                    comment: comment,
-                    group: group
+            (async () => {
+                let response = await fetch('https://cabinet.skyeng.ru/admin/orderPriority/search?user=' + request.id, {
+                    method: 'POST',	headers: {'content-type': 'application/x-www-form-urlencoded'}, async: true
                 });
-            }
-            xhr.open('POST', 'https://cabinet.skyeng.ru/admin/orderPriority/search?user=' + request.id, false)
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.withCredentials = true;
-            xhr.send();
+                let text = await response.text(); // прочитать тело ответа как текст
+                if (response.status == 200) {
+                    let page = document.createElement('html');
+                    page.innerHTML = text;
+
+                    if (page.querySelector('.order_container > span') !== null && page.querySelector('.order_container > span').innerText == "Нет подходящих заявок") {
+                        sendResponse({status: '', time: '', teacher: '', order: '', comment: '', group: '', type: 'crm1_user_not_found'});
+                        console.log('Status = Not Found')
+                    } else {
+                        let answer = {'6': 'purple', '5': 'green', '4': 'lightblue', '3': 'orange', '2': 'pink', '1': 'grey', '0': 'grey'};
+                        let group = (page.querySelector('table > tbody > tr[data-order] > td > div[class="top-buffer"] > strong') == null) ? '' : page.querySelector('table > tbody > tr[data-order] > td > div[class="top-buffer"] > strong').innerText;
+
+                        let responce = {
+                            status: answer[page.querySelector('div[class=short_comment] > table[class=b-order-table__status-cell] > tbody > tr').children[1].className.slice(-1)],
+                            time: page.querySelector('td > div > small').innerText,
+                            teacher: page.querySelector('.teacher_select > option').value,
+                            order: page.querySelector('tbody > tr[data-order]').getAttribute('data-order'),
+                            comment: page.querySelector('.order_extra_input > pre').innerText,
+                            group: group,
+                            type: 'crm1_normal'
+                        };
+                        sendResponse(responce);
+                    }
+                } else {
+                    console.log('Status != 200')
+                    sendResponse({status: '', time: '', teacher: '', order: '', comment: '', group: '', type: 'responce_status_error'});
+                }
+            })();
+            return true;
         }
         if (request.question == 'get_person_info') {
-            var xhr = new XMLHttpRequest();
-            xhr.onloadend = function () {
-                var page = document.createElement('html');
-                page.innerHTML = xhr.response;
-                var id = '',
-                    name = '',
-                    mail = '',
-                    phone = '',
-                    phoneD = '',
-                    skype = '',
-                    identity = '';
-                for (var i = 0; i < page.getElementsByTagName('tbody')[0].children.length; i++) {
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Id') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            id = 'ID: ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Имя' || page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Name') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            name = '<br>Name: ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Фамилия' || page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Surname') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            name = name + ' ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Почта' || page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Email') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            mail = '<br>eMail: ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Телефон' || page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Phone') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            phone = '<br><a href="tel:' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '">Phone</a>: ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Домашний телефон' || page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Home phone') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            phoneD = '<br><a href="tel:' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '">Phone2</a>: ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Skype') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            skype = '<br><a href="skype:' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText + '?chat">Skype</a>: ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                    if (page.getElementsByTagName('tbody')[0].children[i].firstElementChild.innerText == 'Legacy identity') {
-                        if (page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText !== '') {
-                            identity = '<br>Identity: ' + page.getElementsByTagName('tbody')[0].children[i].lastElementChild.innerText;
-                        }
-                    }
-                }
-                let info = id + name + mail + phone + phoneD + skype + identity;
-                sendResponse({
-                    status: answer,
-                    answer: info
+            (async () => {
+                let response = await fetch('https://id.skyeng.ru/admin/users/' + request.id, {
+                    method: 'GET',	headers: {'content-type': 'application/x-www-form-urlencoded'}, async: true
                 });
-            }
-            xhr.open('GET', 'https://id.skyeng.ru/admin/users/' + request.id, false)
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.withCredentials = true;
-            xhr.send();
+                let text = await response.text(); // прочитать тело ответа как текст
+                if (response.status == 200) {
+                    var page = document.createElement('a');
+                    page.innerHTML = text.toString();
+                    
+                    var id = '',    names = '',    mail = '',    phone = '',    phoneD = '',    skype = '',    identity = '', roles = false, roles_text = '', role = '';
+                    var sname = page.querySelectorAll('main > div > table > tbody > tr > th');
+                    var result = page.querySelectorAll('main > div > table > tbody > tr > td');
+
+                    for (var i = 0; i < sname.length; i++) {
+                        if (result[i].innerText !== '') {
+                            (sname[i].innerText == 'Id') ? id = 'ID: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Имя' || sname[i].innerText == 'Name') ? names = '<br>Name: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Фамилия' || sname[i].innerText == 'Surname') ? names = names + ' ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Почта' || sname[i].innerText == 'Email') ? mail = '<br>eMail: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Телефон' || sname[i].innerText == 'Phone') ? phone = '<br><a href="tel:' + result[i].innerText + '">Phone</a>: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Домашний телефон' || sname[i].innerText == 'Home phone') ? phoneD = '<br><a href="tel:' + result[i].innerText + '">Phone2</a>: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Skype') ? skype = '<br><a href="skype:' + result[i].innerText + '?chat">Skype</a>: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Legacy identity') ? identity = '<br>Identity: ' + result[i].innerText : false;
+							(sname[i].innerText == 'Все новые роли' || sname[i].innerText == 'All new roles') ? roles = result[i].innerText.trim() : false;
+                        }
+                    }
+
+                    if (roles) {
+						if (roles.indexOf('ROLE_OPERATOR') !== -1) { 
+                            role = 'operator';
+                            roles_text += 'Operator<br>';
+                        } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
+                            role = 'teacher';
+                            (roles.indexOf('ROLE_MATH_TEACHER') !== -1) ? roles_text += 'Teacher - <a style="color: darkblue; font-weight: 700;">Math</a><br>' : false;
+                        } else if (roles.indexOf('ROLE_VIMBOX_STUDENT') !== -1) {
+                            role = 'student';
+                            if (roles.indexOf('ROLE_GROUP_STUDENT') !== -1) {
+                                roles_text += 'Student - <a style="color: purple; font-weight: 700;">Group</a><br>';
+                            } else if (roles.indexOf('ROLE_MATH_STUDENT') !== -1) {
+                                roles_text += 'Student - <a style="color: darkblue; font-weight: 700;">Math</a><br>';
+                            };
+                        }
+                    }
+
+                    let stat = id + names + mail + phone + phoneD + skype + identity;
+                    sendResponse({
+                        status: roles_text,
+                        answer: stat,
+                        role: role
+                    });
+                };
+            })();
+            return true;
         }
         if (request.question == 'get_login_link') {
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                var obj = JSON.parse(xhr.responseText);
-                sendResponse({
-                    answer: obj
-                });
-            };
-            xhr.open('GET', 'https://crm.skyeng.ru/order/generateLoginLink?userId=' + request.id, false)
-            xhr.setRequestHeader('x-requested-with', 'XMLHttpRequest');
-            xhr.withCredentials = true;
-            xhr.send();
+            fetch('https://crm.skyeng.ru/order/generateLoginLink?userId=' + request.id, {headers: {'x-requested-with': 'XMLHttpRequest'}})
+                .then(response => response.json())
+                .then(json => { sendResponse({answer: json}) });
+            return true;
         }
         if (request.question == 'get_trm_id') {
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                var obj = JSON.parse(xhr.responseText);
-                sendResponse({
-                    answer: obj[0].id
-                });
-            }
-            xhr.open('GET', 'https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=' + request.id, false)
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.withCredentials = true;
-            xhr.send();
+            fetch('https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=' + request.id, {headers: {'content-type': 'application/x-www-form-urlencoded'}})
+                .then(response => response.json())
+                .then(json => { sendResponse({answer: json[0].id}) });
+            return true;
         }
         if (request.question == 'get_lessons_today') {
-            var data = new Date()
-            var xhr = new XMLHttpRequest();
-            var body = 'from=' + String(data.getDate() - 1) + '-' + String(data.getMonth() + 1) + '-' + String(data.getFullYear()) + ' 20:00:00&to=' + String(data.getDate()) + '-' + String(data.getMonth() + 1) + '-' + String(data.getFullYear()) + ' 20:00:00&offset=0&filters[teacherIds][]=' + String(request.id);
-            xhr.onloadend = function () {
-                if (xhr.responseText == undefined) {
-                    //console.log('Не могу найти такого П, вы уверены что ID верный?')
-                } else {
-                    var obj = JSON.parse(xhr.responseText);
-                    
-                    if (obj[0].result[0].classes !== undefined) {
-                        var total = obj[0].result[0].classes;
-                        for (var i = 0; i < total.length; i++) {
-                            if (total[i].createdAt !== undefined) {
-                                let str = total[i].createdAt;
-                                total[i].createdAt = total[i].createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                            }
-                            if (total[i].endAt !== undefined) {
-                                let str = total[i].endAt;
-                                total[i].endAt = total[i].endAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                            }
-                            if (total[i].startAt !== undefined) {
-                                total[i].startAt = String(Number(total[i].startAt.slice(11, 13)) + 3);
-                            }
-                            if (total[i].updatedAt !== undefined) {
-                                let str = total[i].updatedAt;
-                                total[i].updatedAt = total[i].updatedAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                            }
-                            if (total[i].classStatus !== undefined) {
-                                if (total[i].classStatus.createdAt !== undefined) {
-                                    let str = total[i].classStatus.createdAt;
-                                    total[i].classStatus.createdAt = total[i].classStatus.createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+            let data = new Date()
+            let body = 'from=' + String(data.getDate() - 1) + '-' + String(data.getMonth() + 1) + '-' + String(data.getFullYear()) + ' 20:00:00&to=' + String(data.getDate()) + '-' + String(data.getMonth() + 1) + '-' + String(data.getFullYear()) + ' 20:00:00&offset=0&filters[teacherIds][]=' + String(request.id);
+            fetch('https://timetable.skyeng.ru/api/teachers/search', { method: 'POST', headers: {'content-type': 'application/x-www-form-urlencoded'}, body: body })
+                .then(response => response.json())
+                    .then(obj => {
+                        if (obj[0].result[0].classes !== undefined) {
+                            var classes = obj[0].result[0].classes;
+                            for (var i = 0; i < classes.length; i++) {
+                                if (classes[i].createdAt !== undefined) {
+                                    let str = classes[i].createdAt;
+                                    classes[i].createdAt = classes[i].createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                                }
+                                if (classes[i].endAt !== undefined) {
+                                    let str = classes[i].endAt;
+                                    classes[i].endAt = classes[i].endAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                                }
+                                if (classes[i].startAt !== undefined) {
+                                    classes[i].startAt = String(Number(classes[i].startAt.slice(11, 13)) + 3);
+                                }
+                                if (classes[i].updatedAt !== undefined) {
+                                    let str = classes[i].updatedAt;
+                                    classes[i].updatedAt = classes[i].updatedAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                                }
+                                if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
+                                    let str = classes[i].classStatus.createdAt;
+                                    classes[i].classStatus.createdAt = classes[i].classStatus.createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
                                 }
                             }
                         }
-                    }
-
-                    if (obj[0].result[0].classesRegular !== undefined) {
-                        let class_reg = obj[0].result[0].classesRegular
-                        var class_reg_fin = [];
-                        if (data.getDay() == 0) { var date_day = 6; } else { var date_day = data.getDay() - 1; }
-                        for (var i = 0; i < class_reg.length; i++) {
-                            class_reg[i].startAt = class_reg[i].startAt.split(':')[0].slice(1)
-                            class_reg[i].startAtDays = Math.floor( class_reg[i].startAt / 24);
-                            class_reg[i].startAt = class_reg[i].startAt - class_reg[i].startAtDays * 24 + 3;
+    
+                        if (obj[0].result[0].classesRegular !== undefined) {
+                            let classes = obj[0].result[0].classesRegular;
+                            var classes_regular = [];
+                            if (data.getDay() == 0) { 
+                                var date_day = 6; 
+                            } else { 
+                                var date_day = data.getDay() - 1; 
+                            }
+                            for (var i = 0; i < classes.length; i++) {
+                                classes[i].startAt = classes[i].startAt.split(':')[0].slice(1)
+                                classes[i].startAtDays = Math.floor( classes[i].startAt / 24);
+                                classes[i].startAt = classes[i].startAt - classes[i].startAtDays * 24 + 3;
+                            }
+                            for (var i = 0; i < classes.length; i++) {
+                                if (classes[i].startAtDays == date_day) { 
+                                    classes_regular.push(classes[i]); 
+                                }
+                            }
                         }
-                        for (var i = 0; i < class_reg.length; i++) {
-                            if (class_reg[i].startAtDays == date_day) { class_reg_fin.push(class_reg[i]); }
+    
+                        if (classes && classes_regular) {
+                            for (var i = 0; i < classes.length; i++) {
+                                if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
+                                    if (classes[i].classRegularId !== undefined && classes[i].classRegularId !== '') {
+                                        for (let c = 0; c < classes_regular.length; c++) {
+                                            if (classes_regular[c].id == classes[i].classRegularId) {
+                                                classes_regular.splice(c,1);
+                                                c--;
+                                            }
+                                        }
+                                    }
+                                    classes.splice(i,1);
+                                    i--;
+                                }
+                            }
                         }
-                    }
-                    
-                    if (class_reg_fin.length !== 0) {
-                        var total_finish_super_last_one = total.concat(class_reg_fin)
-                        sendResponse({
-                            answer: total_finish_super_last_one
-                        });
-                    } else {
-                        sendResponse({
-                            answer: null
-                        });
-                    }
-                }
-            }
-            xhr.open('POST', 'https://timetable.skyeng.ru/api/teachers/search', false)
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.withCredentials = true;
-            xhr.send(body);
+    
+                        (classes) ? true : classes = '';
+                        (classes_regular) ? true : classes_regular = '';
+                        if (classes.length !== 0 && classes_regular.length !== 0) {
+                            classes = classes.concat(classes_regular);
+                            sendResponse({
+                                answer: classes
+                            });
+                        } else if (classes.length !== 0 && classes_regular.length == 0) {
+                            sendResponse({
+                                answer: classes
+                            });
+                        } else if (classes.length == 0 && classes_regular.length !== 0) {
+                            sendResponse({
+                                answer: classes_regular
+                            });
+                        } else {
+                            sendResponse({
+                                answer: null
+                            });
+                        }
+                    });
+            return true;
         }
         if (request.question == 'get_Lazzy_TimeTable') {
-            var xhr = new XMLHttpRequest();
-            xhr.onloadend = function () {
+            fetch('https://crm.skyeng.ru/order/lazyTimetable', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'x-requested-with': 'XMLHttpRequest'
+                },
+                body: 'order_id=' + '2310091'
+            })
+            .then(response => response.text())
+            .then(html => {
                 var page = document.createElement('html');
-                page.innerHTML = xhr.response;
+                page.innerHTML = html;
                 var asd = page.getElementsByClassName('col-md-6')[0].children[0].innerText.trim().replace(/\n/g, "");
                 asd = asd + '\n' + page.getElementsByClassName('col-md-6')[0].children[1].innerText.trim();
                 sendResponse({
                     answer: asd.replace(/\s+/g,' ').trim()
                 });
-            }
-            xhr.open('POST', 'https://crm.skyeng.ru/order/lazyTimetable' , false)
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            xhr.setRequestHeader('x-requested-with', 'XMLHttpRequest');
-            xhr.withCredentials = true;
-            xhr.send('order_id=' + String(request.id));
+            });
+            return true;
         }
         if (request.question == 'get_group_student_info') {
             console.log(request.id)
@@ -301,6 +297,26 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             xhr.withCredentials = true;
             xhr.send();
         }
+        if (request.question == 'get_user_comment') {
+            fetch('https://spreadsheets.google.com/feeds/list/1W_Ay8Mv3aOhcB4JT-6EOg1uqCTIKjEROzD1PvXacVuA/default/public/values?alt=json')
+                .then( response => response.json())
+                .then( json => {
+                        for (let i = json.feed.entry.length -1; i > 0; i--) {
+                            if (json.feed.entry[i]['gsx$id']['$t'] == request.id) {
+                                let test = [{
+                                    'id': json.feed.entry[i]['gsx$id']['$t'],
+                                    'ticket': json.feed.entry[i]['gsx$ticketid']['$t'],
+                                    'name': json.feed.entry[i]['gsx$name']['$t'],
+                                    'comment': json.feed.entry[i]['gsx$comment']['$t']
+                                }]
+                                sendResponse({answer: test});
+                                break;
+                            }
+                        }
+                        sendResponse({answer: []});
+                })
+            return true;
+        }
     }
 });
 
@@ -334,7 +350,7 @@ function get_lesson_info(ID, Hour, Day, Month, Year) {
             Year = String('20' + Year)
         }
 
-        var once = 0
+        var once = 0;
         var xhr = new XMLHttpRequest();
         let from = Number(Day) + '-' + Number(Month) + '-' + Number(Year) + ' ' + (Number(Hour) - 3),
             to = from;

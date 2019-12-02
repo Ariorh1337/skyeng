@@ -36,11 +36,13 @@ function change_time () {
 chrome.storage.local.get(['ticket_how_old_ticket'], function(result) {
     if (result['ticket_how_old_ticket'] === undefined) { chrome.storage.local.set({ticket_how_old_ticket: true}, function() {}); }
     if (result['ticket_how_old_ticket'] === true) {
-        var div = document.createElement('div')
-        document.getElementsByClassName('request-content-title-act')[0].appendChild(div);
-        div.outerHTML = '<div id="time_to_explode" class="request-status-open fl-right" style="color: black; background-color: silver; width: 60px; text-align: center;"></div>';
+        if (document.getElementsByClassName('request-content-title-act').length !== 0) {
+            var div = document.createElement('div')
+            document.getElementsByClassName('request-content-title-act')[0].appendChild(div);
+            div.outerHTML = '<div id="time_to_explode" class="request-status-open fl-right" style="color: black; background-color: silver; width: 60px; text-align: center;"></div>';
 
-        change_time ();
-        setInterval(change_time,20000);
+            change_time ();
+            setInterval(change_time,20000);
+        }
     }
 });
