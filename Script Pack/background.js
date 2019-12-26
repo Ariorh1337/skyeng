@@ -135,7 +135,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.question == 'get_trm_id') {
             fetch('https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=' + request.id, {headers: {'content-type': 'application/x-www-form-urlencoded'}})
                 .then(response => response.json())
-                .then(json => { sendResponse({answer: json[0].id}) });
+                .then(json => {
+                    if (request.type = 'trm_id') {
+                        sendResponse({answer: json[0].id})
+                    } else {
+                        sendResponse({answer: json[0].label})
+                    }
+                });
             return true;
         }
         if (request.question == 'get_lessons_today') {
@@ -236,7 +242,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                     'x-requested-with': 'XMLHttpRequest'
                 },
-                body: 'order_id=' + '2310091'
+                body: 'order_id=' + request.id
             })
             .then(response => response.text())
             .then(html => {
@@ -315,6 +321,44 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         }
                         sendResponse({answer: []});
                 })
+            return true;
+        }
+        if (request.question == 'info_user_search') {
+            fetch('https://id.skyeng.ru/admin/users?user_list_form%5Bidentity%5D=' + encodeURI(request.id))
+            .then(response => response.text())
+            .then(text => {
+                let html = document.createElement('html')
+                html.innerHTML = text;
+                var table = html.querySelector('tbody'), responce = [];
+
+                if (table && table !== null) {
+                    for (var i = 0; i < table.children.length; i++) {
+                        let c = {'id': table.children[i].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
+                        responce.push(c)
+                    }
+                }
+
+                sendResponse({answer: responce});
+            });
+            return true;
+        }
+        if (request.question == 'info_users_search') {
+            fetch('https://id.skyeng.ru/admin/users?user_list_form%5Bemail%5D=' + encodeURI(request.id))
+            .then(response => response.text())
+            .then(text => {
+                let html = document.createElement('html')
+                html.innerHTML = text;
+                var table = html.querySelector('tbody'), responce = [];
+
+                if (table && table !== null) {
+                    for (var i = 0; i < table.children.length; i++) {
+                        let c = {'id': table.children[i].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
+                        responce.push(c)
+                    }
+                }
+
+                sendResponse({answer: responce});
+            });
             return true;
         }
     }

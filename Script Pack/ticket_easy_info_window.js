@@ -1,6 +1,7 @@
 var win_html = `<div style="display: flex;">
     <span style="cursor: -webkit-grab;">
-        <input id="id_type_for_chat" type="text" style="text-align: center; width: 72px; display: none;">
+        <input id="id_type_for_chat" type="text" style="text-align: center; width: 72px; display: none;" onchange="this.value = this.value.replace(' ','')">
+        <datalist id="user_search"></datalist>
         <div style="margin: 10px;">
             <button style="width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" id="btn1_student">Info У</button>
         </div>
@@ -73,7 +74,7 @@ if (localStorage.getItem('winTop') == null) {
 
 let wint = document.createElement('div');
 document.body.append(wint);
-wint.style = 'min-height: 73px; max-height: 450px; min-width: 76px; max-width: 370px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56);';
+wint.style = 'min-height: 68px; max-height: 450px; min-width: 76px; max-width: 370px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56);';
 wint.innerHTML = win_html;
 
 let mscr = document.createElement('script');
@@ -154,7 +155,7 @@ document.getElementById('teacher_copy').onclick = function () {
     copyToClipboard(tcher) //.replace(/<br>/g,'\n')
 };
 document.getElementById('info_status').firstElementChild.children[2].onclick = function () {
-    let id = document.querySelectorAll('label > input[class="form-custom-field"]')[1].value.replace(/[^0-9]/g, "");
+    let id = document.getElementById('info_status').getAttribute('user_id');
     copyToClipboard('https://profile.skyeng.ru/profile/' + id + '/showcase');
 };
 
@@ -251,10 +252,41 @@ const copyToClipboard = str => {
     document.body.removeChild(el);
 };
 
+/*/
+function get_user_id(id) {
+    return new Promise(resolve => {
+        chrome.runtime.sendMessage({name: "script_pack", question: 'info_users_search', id: id}, function(response) {
+            resolve(response.role);
+        })
+    });
+}
+
+function get_role(id) {
+    return new Promise(resolve => {
+        chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id: id}, function(response) {
+            resolve(response.role);
+        })
+    });
+}
+/*/
+
+if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
+    document.getElementById('btn1_student').innerText = 'Info';
+    document.getElementById('btn1_teacher').style.display = 'none';
+}
+
 async function get_info(type) { //v.2
     let id;
     if (window.location.href.indexOf('chat') !== -1) {
         id = document.getElementById('id_type_for_chat').value;
+        /*/
+        if (isNaN(id) == true) {
+            let users = await get_user_id(id);
+            for (let i = 0; i < users.length; i++) {
+
+            }
+        }
+        /*/
     } else if (type == 'student') {
         id = document.querySelectorAll('label > input[class="form-custom-field"]')[1].value.replace(/[^0-9]/g, "");
     } else if (type == 'teacher') {
@@ -278,7 +310,8 @@ async function get_info(type) { //v.2
                 document.getElementById('info_status').lastElementChild.children[2].innerText = role;
                 document.getElementById('info_block').style.display = 'block';
                 document.getElementById('student_crm').style.visibility = 'hidden';
-                document.getElementById('info_student_status').style.display = '';
+                let info_student_status = document.getElementById('info_student_status');
+                info_student_status.style.display = '';
 
                 document.getElementById('student_edit').onclick = function () {
                     window.open('https://id.skyeng.ru/admin/users/' + id, '_blank');
@@ -286,21 +319,24 @@ async function get_info(type) { //v.2
 
                 chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
                     if (response.answer.length == 0) {
-                        document.getElementById('info_student_status').children[3].setAttribute('title','Нет заметок')
+                        info_student_status.children[3].setAttribute('title','Нет заметок')
                     } else {
-                        document.getElementById('info_student_status').children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace('~','\n'))
+                        info_student_status.children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+                        info_student_status.children[3].setAttribute('onClick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`)
                     }
                 });
             } else {
                 if (role == 'student') {
-                    document.getElementById('info_status').setAttribute('user_id', id);
+                    let info_status = document.getElementById('info_status');
+                    info_status.setAttribute('user_id', id);
                     document.getElementById('btn_hide').style.display = '';
                     document.getElementById('info_student_block').style.display = '';
-                    document.getElementById('info_status').style.display = '';
+                    info_status.style.display = '';
                     document.getElementById('info_student_block').innerHTML = value.status + value.answer; 
                     document.getElementById('info_block').style.display = 'block';
-                    document.getElementById('info_student_status').style.display = '';
-                    document.getElementById('info_status').lastElementChild.children[2].innerText = role;
+                    let info_student_status = document.getElementById('info_student_status');
+                    info_student_status.style.display = '';
+                    info_status.lastElementChild.children[2].innerText = role;
                     document.getElementById('student_edit').onclick = function () {
                         window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
                     }
@@ -313,9 +349,10 @@ async function get_info(type) { //v.2
 
                     chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
                         if (response.answer.length == 0) {
-                            document.getElementById('info_student_status').children[3].setAttribute('title','Нет заметок');
+                            info_student_status.children[3].setAttribute('title','Нет заметок');
                         } else if (response.answer.length !== 0) {
-                            document.getElementById('info_student_status').children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace('~','\n'));
+                            info_student_status.children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+                            info_student_status.children[3].setAttribute('onClick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`)
                         }
                     });
 
@@ -325,32 +362,33 @@ async function get_info(type) { //v.2
                                 window.open('https://crm.skyeng.ru/admin/orderPriority/search?page=1&user=' + id, '_blank');
                             }
                             document.getElementById('info_student_block').innerHTML += '<br>Time: ' + response.time; 
-                            document.getElementById('info_status').style.backgroundColor = response.status;
-                            document.getElementById('info_status').setAttribute('order_id', response.order);
+                            info_status.style.backgroundColor = response.status;
+                            info_status.setAttribute('order_id', response.order);
         
                             if (response.comment !== '') {
-                                document.getElementById('info_student_status').children[1].setAttribute('title', response.comment);
+                                info_student_status.children[1].setAttribute('title', response.comment);
                             } else {
-                                document.getElementById('info_student_status').children[1].setAttribute('title', 'Нет комментария'); 
+                                info_student_status.children[1].setAttribute('title', 'Нет комментария'); 
                             };
                             
                             chrome.runtime.sendMessage({name: "script_pack", question: 'get_Lazzy_TimeTable', id: response.order}, function(response) {
                                 let str_search = response.answer.indexOf('Разовые');
                                 let str_cut_left = response.answer.substring(0, str_search);
                                 let str_cut_right = response.answer.substring(str_search);
-                                document.getElementById('info_student_status').children[0].setAttribute('title', str_cut_left + '\n' + str_cut_right);
+                                info_student_status.children[0].setAttribute('title', str_cut_left + '\n' + str_cut_right);
                             });
 
                             if (response.teacher == '') {
                                 if (response.group !== '') {
-                                    document.getElementById('info_teacher_block').innerHTML = '<span><span style="margin-right: 3px;">Группа:</span><a href="https://crm.skyeng.ru/admin/group/edit?id=' + response.group + '">' + response.group + '</a><a style="margin-left: 10px; margin-right: 10px;" href="https://api.olympiad.skyeng.ru/crm/cards/' + id + '">Семья</a><a href="https://grouplessons-api.skyeng.ru/admin/student/view/' + id + '">Подписка</a></span>';
+                                    let info_teacher_block = document.getElementById('info_teacher_block');
+                                    info_teacher_block.innerHTML = '<span><span style="margin-right: 3px;">Группа:</span><a href="https://crm.skyeng.ru/admin/group/edit?id=' + response.group + '">' + response.group + '</a><a style="margin-left: 10px; margin-right: 10px;" href="https://api.olympiad.skyeng.ru/crm/cards/' + id + '">Семья</a><a href="https://grouplessons-api.skyeng.ru/admin/student/view/' + id + '">Подписка</a></span>';
                                     chrome.runtime.sendMessage({name: "script_pack", question: 'get_group_student_info', id: id}, function(response) {
                                         let windt = document.createElement('div');
-                                        document.getElementById('info_teacher_block').append(windt);
+                                        info_teacher_block.append(windt);
                                         windt.innerHTML = response.info;
                                     });
-                                    document.getElementById('info_teacher_block').style.display = '';
-                                    document.getElementById('info_teacher_block').style.marginTop = '';
+                                    info_teacher_block.style.display = '';
+                                    info_teacher_block.style.marginTop = '';
                                 } else {
                                     document.getElementById('info_teacher_block').innerHTML = '';
                                     document.getElementById('teacher_status').style.display = 'none';
@@ -388,14 +426,15 @@ async function get_info(type) { //v.2
 }
 
 function teacher_draw(id) {
-    document.getElementById('teacher_status').setAttribute('user_id', id);
+    let teacher_status = document.getElementById('teacher_status');
+    teacher_status.setAttribute('user_id', id);
     document.getElementById('btn_hide').style.display = '';
     document.getElementById('info_teacher_block').style.display = '';
     document.getElementById('info_block').style.display = 'block';
-    document.getElementById('teacher_status').style.display = '';
+    teacher_status.style.display = '';
     document.getElementById('info_teacher_status').style.display = '';    
 
-    chrome.runtime.sendMessage({name: "script_pack", question: 'get_trm_id', id: id}, function(response) {
+    chrome.runtime.sendMessage({name: "script_pack", question: 'get_trm_id', id: id, type: 'trm_id'}, function(response) {
         document.getElementById('teacher_trm').onclick = function () {
             window.open('https://tramway.skyeng.ru/teacher/' + response.answer + '/show', '_blank'); 
         }
@@ -410,10 +449,12 @@ function teacher_draw(id) {
     }
     
     chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
+        let teacher_status = document.getElementById('info_teacher_status');
         if (response.answer.length == 0) {
-            document.getElementById('info_teacher_status').children[3].setAttribute('title','Нет заметок')
+            teacher_status.children[3].setAttribute('title','Нет заметок')
         } else {
-            document.getElementById('info_teacher_status').children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace('~','\n'))
+            teacher_status.children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+            teacher_status.children[3].setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
         }
     });
     
