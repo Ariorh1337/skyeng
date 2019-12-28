@@ -1,6 +1,6 @@
 {
     "name": "Script Package",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "description": "Сброрник всех скриптов",
     "manifest_version": 2,
     "options_page": "options.html",
