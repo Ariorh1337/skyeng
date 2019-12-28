@@ -19,7 +19,7 @@ document.onreadystatechange = () => {
         let email = document.querySelector('.info_fields > p > a[href][target]').innerText; //email
         let id = await get_id(email);
         let role = await get_info(id);
-        let item = document.createElement('p');
+        let item = document.createElement('div');
         item.innerHTML = `Role: ${role}  <br>ID: <span><a href="https://id.skyeng.ru/admin/users/${id}" target="blank">${id}</a></span>`;
         let before = document.querySelector('.info_fields > h6');
         document.querySelector('.info_fields').insertBefore(item,before);
