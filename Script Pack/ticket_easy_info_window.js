@@ -24,10 +24,57 @@ var win_html = `<div style="display: flex;">
                 </span>
             </div>
             <div style="text-align: center; border-bottom: 1px black solid; cursor: help; display: none;" id="info_student_status">
-                <span style="float: left; padding-left: 4px; padding-right: 8px; border-right: solid black 1px;" title="">schedule</span>
-                <span title="">order notes</span>
-                <span style="float: right; padding-right: 4px; padding-left: 6px; cursor: pointer;">📝</span>
-                <span style="float: right; padding-left: 4px; padding-right: 8px; padding-left: 8px; border-right: solid black 1px; border-left: solid black 1px;" title="Loading...">marks</span>
+                <span style="float: left; padding: 0px 1px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px;" title="">
+                    <svg width="18px" height="18px" viewBox="0 0 36 36" style="margin: -7px 0px;">
+                        <g>
+                            <path d="M30.224,3.948h-1.098V2.75c0-1.517-1.197-2.75-2.67-2.75c-1.474,0-2.67,1.233-2.67,2.75v1.197h-2.74V2.75    c0-1.517-1.197-2.75-2.67-2.75c-1.473,0-2.67,1.233-2.67,2.75v1.197h-2.74V2.75c0-1.517-1.197-2.75-2.67-2.75    c-1.473,0-2.67,1.233-2.67,2.75v1.197H6.224c-2.343,0-4.25,1.907-4.25,4.25v24c0,2.343,1.907,4.25,4.25,4.25h24    c2.344,0,4.25-1.907,4.25-4.25v-24C34.474,5.855,32.567,3.948,30.224,3.948z M25.286,2.75c0-0.689,0.525-1.25,1.17-1.25    c0.646,0,1.17,0.561,1.17,1.25v4.896c0,0.689-0.524,1.25-1.17,1.25c-0.645,0-1.17-0.561-1.17-1.25V2.75z M17.206,2.75    c0-0.689,0.525-1.25,1.17-1.25s1.17,0.561,1.17,1.25v4.896c0,0.689-0.525,1.25-1.17,1.25s-1.17-0.561-1.17-1.25V2.75z M9.125,2.75    c0-0.689,0.525-1.25,1.17-1.25s1.17,0.561,1.17,1.25v4.896c0,0.689-0.525,1.25-1.17,1.25s-1.17-0.561-1.17-1.25V2.75z     M31.974,32.198c0,0.965-0.785,1.75-1.75,1.75h-24c-0.965,0-1.75-0.785-1.75-1.75v-22h27.5V32.198z"></path>
+                            <rect x="12.857" y="14.626" width="4.596" height="4.089"></rect>
+                            <rect x="18.995" y="14.626" width="4.595" height="4.089"></rect>
+                            <rect x="25.128" y="14.626" width="4.596" height="4.089"></rect>
+                            <rect x="6.724" y="20.084" width="4.595" height="4.086"></rect>
+                            <rect x="12.857" y="20.084" width="4.596" height="4.086"></rect>
+                            <rect x="18.995" y="20.084" width="4.595" height="4.086"></rect>
+                            <rect x="25.128" y="20.084" width="4.596" height="4.086"></rect>
+                            <rect x="6.724" y="25.54" width="4.595" height="4.086"></rect>
+                            <rect x="12.857" y="25.54" width="4.596" height="4.086"></rect>
+                            <rect x="18.995" y="25.54" width="4.595" height="4.086"></rect>
+                        </g>
+                    </svg>
+                </span>
+                <span title="" style="float: left; border-bottom: 1px solid black; border-right: 1px solid black; height: 23px">
+                    <svg viewBox="0 0 512 512" height="18px" width="18px" style=" margin: -7px 0px;">
+                        <path d="M421.054,414.843c-4.142,0-7.5,3.358-7.5,7.5v70.514c0,2.283-1.858,4.141-4.141,4.141h-40.317V349.301    c0-4.142-3.358-7.5-7.5-7.5c-4.142,0-7.5,3.358-7.5,7.5v147.698h-81.185l23.543-25.9c2.572-2.83,3.785-6.861,3.244-10.787    c-0.01-0.076-0.022-0.152-0.035-0.228L277.24,327.617l6.041-9.094c3.34,2.372,5.913,4.656,10.738,4.656    c4.908,0,9.497-2.747,11.755-7.269v-0.001l23.65-47.4l53.876,20.865c1.949,0.836,30.252,13.582,30.252,47.238v50.73    c-0.001,4.141,3.357,7.5,7.5,7.5c4.142,0,7.5-3.358,7.5-7.5v-50.73c0-44.344-37.969-60.463-39.585-61.128    c-0.047-0.02-0.095-0.039-0.143-0.057l-89.668-34.726v-21.03c14.242-11.076,24.117-27.495,26.596-46.227    c7.101-0.5,13.69-3.152,19.071-7.779c7.027-6.043,11.059-14.838,11.059-24.126c0-7.708-2.781-15.068-7.737-20.803V92.953    C348.144,41.699,306.446,0,255.192,0c-51.254,0-92.952,41.699-92.952,92.953v28.511c-5.009,5.677-7.733,12.665-7.733,20.074    c0,9.291,4.03,18.085,11.059,24.129c5.377,4.625,11.962,7.274,19.061,7.775c2.499,19.083,12.662,36.114,28.117,47.339v19.92    l-89.571,34.725c-0.047,0.018-0.094,0.037-0.141,0.056c-1.617,0.665-39.585,16.784-39.585,61.128v156.245    c0,10.555,8.587,19.142,19.142,19.142h71.457c4.142,0,7.5-3.358,7.5-7.5c0-4.142-3.358-7.5-7.5-7.5h-16.137V349.301    c0-4.142-3.358-7.5-7.5-7.5c-4.142,0-7.5,3.358-7.5,7.5v147.698h-40.319c-2.283,0-4.141-1.858-4.141-4.141V336.611    c0-33.769,28.493-46.486,30.243-47.234l53.834-20.87l23.652,47.402c2.263,4.533,6.858,7.27,11.756,7.27    c4.801,0,7.349-2.249,10.738-4.656l6.041,9.094l-22.421,132.468c-0.013,0.075-0.024,0.15-0.035,0.226    c-0.542,3.924,0.671,7.957,3.244,10.789l23.543,25.9h-29.995c-4.142,0-7.5,3.358-7.5,7.5s3.358,7.5,7.5,7.5h200.365    c10.555,0,19.142-8.588,19.142-19.142v-70.514C428.554,418.201,425.196,414.843,421.054,414.843z M315.375,263.069l-22.049,44.19    c-0.548-0.389-12.233-8.691-26.517-18.834c6.198-7.651-1.053,1.299,27.235-33.617L315.375,263.069z M271.043,309.833l-5.718,8.607    h-18.703l-5.718-8.607l15.07-10.703L271.043,309.833z M227.743,243.121v-14.036c9.112,3.673,18.85,5.376,28.36,5.376    c9.833,0,19.476-2.096,28.052-5.846v14.567l-28.181,34.785L227.743,243.121z M340.881,141.539    c-0.001,4.913-2.129,9.562-5.839,12.753c-2.453,2.11-5.416,3.459-8.661,3.987v-33.477    C335.001,126.202,340.881,133.352,340.881,141.539z M184.007,158.279c-8.718-1.415-14.5-8.623-14.5-16.741    c0-8.018,6.647-14.544,14.5-16.359V158.279z M184.41,109.896c-2.389,0.274-5.127,0.921-7.168,1.615V92.953    c0-42.983,34.968-77.952,77.951-77.952c42.983,0,77.951,34.969,77.951,77.952v18.043c-2.18-0.663-4.441-1.101-6.762-1.307    c0-7.237,0.063-5.841-23.612-31.294c-4.354-4.678-11.556-5.658-17.037-2.077c-26.13,17.069-58.005,25.644-87.415,23.532    C191.867,99.367,185.991,103.616,184.41,109.896z M199.008,164.184v-46.792v-2.465c32.375,1.896,66.318-7.722,93.739-25.283    c10.858,11.658,16.738,17.773,18.634,20.099c0,5.884,0,47.705,0,54.44c0,30.447-24.826,55.276-55.277,55.276    C221.91,219.46,199.008,192.934,199.008,164.184z M218.623,307.259l-22.049-44.19l21.293-8.247l27.241,33.625    C231.255,298.284,219.88,306.366,218.623,307.259z M227.228,461.702l21.709-128.263h14.071l21.709,128.263l-28.744,31.623    L227.228,461.702z"></path>
+                    </svg>
+                </span>
+
+                <span id="add_note_student" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px solid black; height: 23px; width: 15px;" title="Добавить заметку">
+                    <svg viewBox="0 0 381 381" height="18px" width="18px" style="margin: -7px;">
+                        <path d="m370.589844 230.964844c-5.523438 0-10 4.476562-10 10v88.792968c-.019532 16.558594-13.4375 29.980469-30 30h-280.589844c-16.5625-.019531-29.980469-13.441406-30-30v-260.589843c.019531-16.5625 13.4375-29.980469 30-30h88.789062c5.523438 0 10-4.476563 10-10 0-5.523438-4.476562-10-10-10h-88.789062c-27.601562.03125-49.96875 22.398437-50 50v260.589843c.03125 27.601563 22.398438 49.96875 50 50h280.589844c27.601562-.03125 49.96875-22.398437 50-50v-88.789062c0-5.523438-4.476563-10.003906-10-10.003906zm0 0"></path>
+                        <path d="m156.367188 178.34375 146.011718-146.015625 47.089844 47.089844-146.011719 146.015625zm0 0"></path>
+                        <path d="m132.542969 249.257812 52.039062-14.414062-37.625-37.625zm0 0"></path>
+                        <path d="m362.488281 7.578125c-9.769531-9.746094-25.585937-9.746094-35.355469 0l-10.605468 10.605469 47.089844 47.089844 10.605468-10.605469c9.75-9.769531 9.75-25.585938 0-35.355469zm0 0"></path>
+                    </svg>
+                </span>
+                <span id="read_note_student" style="float: right; padding: 0px 4px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px; width: 15px;" title="Loading...">
+                    <svg viewBox="0 0 60 60" height="18px" width="16px" style="margin: -7px;">
+                        <path d="M40,0H5v65h50V14.0L42,0z M40,3.5L50.0,14H40V4z M8.5,58V2h29v14h14v42H8.5z"></path>
+                    </svg>
+                </span>
+
+                <span id="add_history_student" style="float: right; padding: 0px 4px; border-left: solid black 1px; border-right: solid black 1px; border-bottom: 1px solid black;height: 23px;width: 15px;" title="Добавить в историю">
+                    <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
+                        <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
+                        <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z"></path>
+                        <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: rotateZ(-180deg);"></path>
+                    </svg>
+                </span>
+                <span id="read_history_student" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px solid black; border-left: solid black 1px; height: 23px; width: 15px;" title="Читать историю">
+                    <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
+                        <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
+                        <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: translate(0%, 8%) rotateZ(-45deg);"></path>
+                    </svg>
+                </span>
+
             </div>
             <div style="text-align: center; padding: 5px;" id="info_student_block"></div>
             <div style="font-weight: bold; text-align: center; padding: 5px; border-top: 1px black solid; border-bottom: 1px solid black; display: none; cursor: pointer;" id="teacher_status">
@@ -40,12 +87,30 @@ var win_html = `<div style="display: flex;">
                 </span>
             </div>
             <div style="text-align: center; cursor: help; display: none;" id="info_teacher_status">
-                <span style="float: left; padding-left: 4px; padding-right: 8px; border-right: solid black 1px; visibility: hidden;" title="">schedule</span>
-                <span style="visibility: hidden;" title="">order notes</span>
-                <span style="float: right; padding-right: 4px; padding-left: 6px; cursor: pointer; border-bottom: 1px black solid;">📝</span>
-                <span style="float: right; padding-left: 4px; padding-right: 8px; padding-left: 8px; border-right: solid black 1px; border-left: solid black 1px; border-bottom: 1px black solid;" title="Loading...">marks</span>
+                <span id="add_note_teacher" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px black solid; height: 23px; width: 15px;" title="Добавить заметку">
+                    <svg height="18px" viewBox="0 0 381 381" width="18px" style="margin: -7px;"><path d="m370.589844 230.964844c-5.523438 0-10 4.476562-10 10v88.792968c-.019532 16.558594-13.4375 29.980469-30 30h-280.589844c-16.5625-.019531-29.980469-13.441406-30-30v-260.589843c.019531-16.5625 13.4375-29.980469 30-30h88.789062c5.523438 0 10-4.476563 10-10 0-5.523438-4.476562-10-10-10h-88.789062c-27.601562.03125-49.96875 22.398437-50 50v260.589843c.03125 27.601563 22.398438 49.96875 50 50h280.589844c27.601562-.03125 49.96875-22.398437 50-50v-88.789062c0-5.523438-4.476563-10.003906-10-10.003906zm0 0"></path><path d="m156.367188 178.34375 146.011718-146.015625 47.089844 47.089844-146.011719 146.015625zm0 0"></path><path d="m132.542969 249.257812 52.039062-14.414062-37.625-37.625zm0 0"></path><path d="m362.488281 7.578125c-9.769531-9.746094-25.585937-9.746094-35.355469 0l-10.605468 10.605469 47.089844 47.089844 10.605468-10.605469c9.75-9.769531 9.75-25.585938 0-35.355469zm0 0"></path></svg>
+                </span>
+                <span id="read_note_teacher" style="float: right; padding: 0px 4px; border-right: solid black 1px; border-bottom: 1px black solid; height: 23px; width: 15px;" title="Loading...">
+                    <svg viewBox="0 0 60 60" height="18px" width="16px" style="margin: -7px;">
+                        <path d="M40,0H5v65h50V14.0L42,0z M40,3.5L50.0,14H40V4z M8.5,58V2h29v14h14v42H8.5z"></path>
+                    </svg>
+                </span>
+
+                <span id="add_history_teacher" style="float: right; padding: 0px 4px; border-left: solid black 1px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px;width: 15px;" title="Добавить в историю">
+                    <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
+                        <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
+                        <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z"></path>
+                        <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: rotateZ(-180deg);"></path>
+                    </svg>
+                </span>
+                <span id="read_history_teacher" style="float: right;padding: 0px 4px;cursor: pointer;border-bottom: 1px solid black;border-left: solid black 1px;height: 23px;width: 15px;" title="Читать историю">
+                    <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
+                        <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
+                        <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: translate(0%, 8%) rotateZ(-45deg);"></path>
+                    </svg>
+                </span>
             </div>
-            <div style="text-align: center; padding: 5px; margin-top: -20px; display: none;" id="info_teacher_block"></div>
+            <div style="text-align: center; padding: 5px; display: none;" id="info_teacher_block"></div>
             <div style="text-align: center; display: none;" id="table_time">
                 <table style="border-top: 1px solid black;">
                     <tbody>
@@ -79,8 +144,9 @@ wint.innerHTML = win_html;
 
 let mscr = document.createElement('script');
 document.body.append(mscr);
-let send_comment_js = `let my_name = document.getElementById('top_avatar').setAttribute('my_name', window.intercomSettings.name);
-document.getElementById('info_student_status').children[2].addEventListener( "click" , () => {
+let send_comment_js = `
+let my_name = document.getElementById('top_avatar').setAttribute('my_name', window.intercomSettings.name);
+document.getElementById('add_note_student').addEventListener( "click" , () => {
     let id = document.getElementById('info_status').getAttribute('user_id');
     let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
     if (msg !== '' && msg !== null) {
@@ -98,7 +164,7 @@ document.getElementById('info_student_status').children[2].addEventListener( "cl
         });
     }
 });
-document.getElementById('info_teacher_status').children[2].addEventListener( "click" , () => {
+document.getElementById('add_note_teacher').addEventListener( "click" , () => {
     let id = document.getElementById('teacher_status').getAttribute('user_id');
     let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
     if (msg !== '' && msg !== null) {
@@ -115,7 +181,9 @@ document.getElementById('info_teacher_status').children[2].addEventListener( "cl
             body: body
         });
     }
-});`;
+});
+
+`;
 mscr.innerHTML = send_comment_js;
 
 let mstl = document.createElement('style');
@@ -237,7 +305,9 @@ asd.children[0].onclick = function () {
 }
 //End Время П
 
-if (window.location.href.indexOf('chat') !== -1) {
+if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
+    document.getElementById('add_history_teacher').style.display = 'none';
+    document.getElementById('add_history_student').style.display = 'none';
 	document.getElementById('id_type_for_chat').style.display = '';
 } else {
 	document.getElementById('id_type_for_chat').style.display = 'none';
@@ -318,11 +388,22 @@ async function get_info(type) { //v.2
                 }
 
                 chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
+                    let student_status = document.getElementById('read_note_student');
                     if (response.answer.length == 0) {
-                        info_student_status.children[3].setAttribute('title','Нет заметок')
+                        student_status.style.display = 'none';
+                    } else if (response.answer.length !== 0) {
+                        student_status.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+                        student_status.setAttribute('onClick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
+                    }
+                });
+
+                chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
+                    let history_student = document.getElementById('read_history_student');
+                    if (response.answer.length == 0) {
+                        history_student.style.display = 'none';
                     } else {
-                        info_student_status.children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-                        info_student_status.children[3].setAttribute('onClick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`)
+                        //history_student.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+                        //history_student.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
                     }
                 });
             } else {
@@ -348,11 +429,22 @@ async function get_info(type) { //v.2
                     };
 
                     chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
+                        let student_status = document.getElementById('read_note_student');
                         if (response.answer.length == 0) {
-                            info_student_status.children[3].setAttribute('title','Нет заметок');
+                            student_status.style.display = 'none';
                         } else if (response.answer.length !== 0) {
-                            info_student_status.children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-                            info_student_status.children[3].setAttribute('onClick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`)
+                            student_status.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+                            student_status.setAttribute('onClick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`)
+                        }
+                    });
+
+                    chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
+                        let history_student = document.getElementById('read_history_student');
+                        if (response.answer.length == 0) {
+                            history_student.style.display = 'none';
+                        } else {
+                            //history_student.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+                            //history_student.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
                         }
                     });
 
@@ -449,12 +541,22 @@ function teacher_draw(id) {
     }
     
     chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
-        let teacher_status = document.getElementById('info_teacher_status');
+        let teacher_status = document.getElementById('read_note_teacher');
         if (response.answer.length == 0) {
-            teacher_status.children[3].setAttribute('title','Нет заметок')
+            teacher_status.style.display = 'none';
         } else {
-            teacher_status.children[3].setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-            teacher_status.children[3].setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
+            teacher_status.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+            teacher_status.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
+        }
+    });
+
+    chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
+        let history_teacher = document.getElementById('read_history_teacher');
+        if (response.answer.length == 0) {
+            history_teacher.style.display = 'none';
+        } else {
+            //history_teacher.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
+            //history_teacher.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
         }
     });
     
@@ -484,4 +586,22 @@ function teacher_draw(id) {
         }
     }, 2000);
     //Easy timetable end            
+}
+
+function get_ticket_history(id) {
+    var get_ticket_history = new Promise( (resolve) => {
+        chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
+            resolve(response);
+        })
+    });
+    return get_ticket_history;
+}
+
+function put_ticket_history(id, ticket) {
+    var put_ticket_history = new Promise( (resolve) => {
+        chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id, ticket: ticket}, function(response) {
+            resolve(response);
+        })
+    });
+    return put_ticket_history;
 }

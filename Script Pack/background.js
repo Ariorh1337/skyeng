@@ -361,6 +361,24 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
             return true;
         }
+        if (request.question == 'get_ticket_history') {
+            fetch(`https://hayley.skarsgard.ru/api/tickets-list/?id=${request.id}`, {
+                method: 'GET',
+                headers: { 'content-type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.text())
+            .then( text => {
+                text = JSON.parse(text.replace(/\(/g,'{').replace(/\)/g,'}').replace(/\'/g,'"'))
+                sendResponse({answer: text});
+            })
+            return true;
+        }
+        if (request.question == 'put_ticket_history') {
+            fetch(`https://hayley.skarsgard.ru/api/tickets-list/?id=${request.id}&ticket=${request.ticket}`, {
+                method: 'GET',
+                headers: { 'content-type': 'application/x-www-form-urlencoded' }
+            });
+        }
     }
 });
 
