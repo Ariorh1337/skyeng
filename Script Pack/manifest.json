@@ -1,6 +1,6 @@
 {
     "name": "Script Package",
-    "version": "0.2.9",
+    "version": "0.3.2",
     "description": "Сброрник всех скриптов",
     "manifest_version": 2,
     "options_page": "options.html",
@@ -14,7 +14,7 @@
         "matches": ["*://timetable.skyeng.ru/*"]
     },
     {
-        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js", "ticket_input_label.js", "ticket_easy_info_window.js", "ticket_reminds_of.js", "ticket_who_creator.js"],
+        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js", "ticket_input_label.js", "ticket_easy_info_window.js", "ticket_reminds_of.js", "ticket_who_creator.js", "ticket_dark_css.js"],
         "matches": ["*://help.skyeng.ru/staff/cases/record/*","*://skyeng.omnidesk.ru/staff/cases/record/*"]
     },
     {
@@ -54,6 +54,6 @@
         "matches": ["*://skyeng.autofaq.ai/tickets/assigned/*"]
     }],
     "permissions": [
-        "*://*.skyeng.ru/*", "*://skyeng.omnidesk.ru/*", "storage"
+        "*://*.skyeng.ru/*", "*://skyeng.omnidesk.ru/*", "*://hayley.skarsgard.ru/api/*", "storage"
     ]
 }

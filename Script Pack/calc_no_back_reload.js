@@ -12,7 +12,7 @@ chrome.storage.local.get(['calc_no_back_reload'], function(result) {
             function MouseMove (event) {
                 $new_event = new Date();
                 if (($new_event - $last_event) > 180000) {
-                    document.location.reload(true);
+                    window.location.href = "https://qie.glitch.me/";
                 }
             }
             document.onmousemove = MouseMove;

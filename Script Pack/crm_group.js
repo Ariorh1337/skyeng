@@ -1,6 +1,4 @@
-console.log('Attached');
 window.onload = function (e) {
-	console.log('Ready');
 	let style = document.createElement('style');
 	document.body.append(style);
 	style.innerHTML = "td:hover {	background		: #ffffff;	/*необходимо для IE6*/	text-decoration	: none;}td.toooltip span {	display			: none; 	padding			: 2px 3px; 	margin-left		: 8px; 	max-width: 400px; padding: 2px; padding-right: 6px; padding-left: 6px;}td.toooltip:hover span {	display			: inline; 	position		: absolute; 	background		: #ffffff; 	border			: 1px solid #cccccc; 	color			: #6c6c6c;}";
@@ -27,7 +25,6 @@ window.onload = function (e) {
 				}
 			}
 
-			console.log(id)
 			//Подписка
 			let wint = document.createElement('th');
 			wint.append(response.subscribe);
@@ -59,7 +56,18 @@ window.onload = function (e) {
 			
 		},);		
 	}
+
+	(() => {
+		var list = document.querySelectorAll('div[class="row"] > div[class="col-md-12"] > div:not([class])');
+		if (list.length > 1) {
+			for (let i = 0; i < list.length; i++) {
+				var name = list[i].innerText.split(/:[0-9][0-9]/)[1];
+				if (name) {
+					chrome.runtime.sendMessage({name: "script_pack", question: 'get_teacher_by_name', fullname: name.trim()}, function(response) {
+						list[i].innerText = list[i].innerText.replace(list[i].innerText.split(/:[0-9][0-9]/)[1].trim(), response.answer.full_name);
+					})
+				}
+			}
+		}
+	})();
 }
-
-
-

@@ -47,7 +47,7 @@ var win_html = `<div style="display: flex;">
                     </svg>
                 </span>
 
-                <span id="add_note_student" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px solid black; height: 23px; width: 15px;" title="Добавить заметку">
+                <span id="add_note_student" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px solid black; height: 23px; width: 15px; margin-left: -1px; border-left: 1px solid black;" title="Добавить заметку">
                     <svg viewBox="0 0 381 381" height="18px" width="18px" style="margin: -7px;">
                         <path d="m370.589844 230.964844c-5.523438 0-10 4.476562-10 10v88.792968c-.019532 16.558594-13.4375 29.980469-30 30h-280.589844c-16.5625-.019531-29.980469-13.441406-30-30v-260.589843c.019531-16.5625 13.4375-29.980469 30-30h88.789062c5.523438 0 10-4.476563 10-10 0-5.523438-4.476562-10-10-10h-88.789062c-27.601562.03125-49.96875 22.398437-50 50v260.589843c.03125 27.601563 22.398438 49.96875 50 50h280.589844c27.601562-.03125 49.96875-22.398437 50-50v-88.789062c0-5.523438-4.476563-10.003906-10-10.003906zm0 0"></path>
                         <path d="m156.367188 178.34375 146.011718-146.015625 47.089844 47.089844-146.011719 146.015625zm0 0"></path>
@@ -55,20 +55,20 @@ var win_html = `<div style="display: flex;">
                         <path d="m362.488281 7.578125c-9.769531-9.746094-25.585937-9.746094-35.355469 0l-10.605468 10.605469 47.089844 47.089844 10.605468-10.605469c9.75-9.769531 9.75-25.585938 0-35.355469zm0 0"></path>
                     </svg>
                 </span>
-                <span id="read_note_student" style="float: right; padding: 0px 4px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px; width: 15px;" title="Loading...">
+                <span id="read_note_student" style="float: right; padding: 0px 4px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px; width: 15px; margin-left: -1px; border-left: 1px solid black;" title="Loading...">
                     <svg viewBox="0 0 60 60" height="18px" width="16px" style="margin: -7px;">
                         <path d="M40,0H5v65h50V14.0L42,0z M40,3.5L50.0,14H40V4z M8.5,58V2h29v14h14v42H8.5z"></path>
                     </svg>
                 </span>
 
-                <span id="add_history_student" style="float: right; padding: 0px 4px; border-left: solid black 1px; border-right: solid black 1px; border-bottom: 1px solid black;height: 23px;width: 15px;" title="Добавить в историю">
+                <span id="add_history_student" style="float: right; padding: 0px 4px; margin-left: -1px; border-left: solid black 1px; border-right: solid black 1px; border-bottom: 1px solid black;height: 23px;width: 15px;" title="Добавить в историю">
                     <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
                         <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
                         <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z"></path>
                         <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: rotateZ(-180deg);"></path>
                     </svg>
                 </span>
-                <span id="read_history_student" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px solid black; border-left: solid black 1px; height: 23px; width: 15px;" title="Читать историю">
+                <span id="read_history_student" style="float: right; padding: 0px 4px; cursor: pointer; border-right: 1px solid black; border-bottom: 1px solid black; border-left: solid black 1px; height: 23px; width: 15px;" title="Читать историю">
                     <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
                         <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
                         <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: translate(0%, 8%) rotateZ(-45deg);"></path>
@@ -76,7 +76,7 @@ var win_html = `<div style="display: flex;">
                 </span>
 
             </div>
-            <div style="text-align: center; padding: 5px;" id="info_student_block"></div>
+            <div style="text-align: center; padding: 7px;" id="info_student_block"></div>
             <div style="font-weight: bold; text-align: center; padding: 5px; border-top: 1px black solid; border-bottom: 1px solid black; display: none; cursor: pointer;" id="teacher_status">
                 <span>
                     <button class="win_btn" style="float: left;" id="teacher_copy">Copy</button>
@@ -87,30 +87,30 @@ var win_html = `<div style="display: flex;">
                 </span>
             </div>
             <div style="text-align: center; cursor: help; display: none;" id="info_teacher_status">
-                <span id="add_note_teacher" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px black solid; height: 23px; width: 15px;" title="Добавить заметку">
+                <span id="add_note_teacher" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px black solid; height: 23px; width: 15px; margin-left: -1px; border-left: 1px solid black;" title="Добавить заметку">
                     <svg height="18px" viewBox="0 0 381 381" width="18px" style="margin: -7px;"><path d="m370.589844 230.964844c-5.523438 0-10 4.476562-10 10v88.792968c-.019532 16.558594-13.4375 29.980469-30 30h-280.589844c-16.5625-.019531-29.980469-13.441406-30-30v-260.589843c.019531-16.5625 13.4375-29.980469 30-30h88.789062c5.523438 0 10-4.476563 10-10 0-5.523438-4.476562-10-10-10h-88.789062c-27.601562.03125-49.96875 22.398437-50 50v260.589843c.03125 27.601563 22.398438 49.96875 50 50h280.589844c27.601562-.03125 49.96875-22.398437 50-50v-88.789062c0-5.523438-4.476563-10.003906-10-10.003906zm0 0"></path><path d="m156.367188 178.34375 146.011718-146.015625 47.089844 47.089844-146.011719 146.015625zm0 0"></path><path d="m132.542969 249.257812 52.039062-14.414062-37.625-37.625zm0 0"></path><path d="m362.488281 7.578125c-9.769531-9.746094-25.585937-9.746094-35.355469 0l-10.605468 10.605469 47.089844 47.089844 10.605468-10.605469c9.75-9.769531 9.75-25.585938 0-35.355469zm0 0"></path></svg>
                 </span>
-                <span id="read_note_teacher" style="float: right; padding: 0px 4px; border-right: solid black 1px; border-bottom: 1px black solid; height: 23px; width: 15px;" title="Loading...">
+                <span id="read_note_teacher" style="float: right; padding: 0px 4px; border-right: solid black 1px; border-bottom: 1px black solid; height: 23px; width: 15px; margin-left: -1px; border-left: 1px solid black;" title="Loading...">
                     <svg viewBox="0 0 60 60" height="18px" width="16px" style="margin: -7px;">
                         <path d="M40,0H5v65h50V14.0L42,0z M40,3.5L50.0,14H40V4z M8.5,58V2h29v14h14v42H8.5z"></path>
                     </svg>
                 </span>
 
-                <span id="add_history_teacher" style="float: right; padding: 0px 4px; border-left: solid black 1px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px;width: 15px;" title="Добавить в историю">
+                <span id="add_history_teacher" style="float: right; padding: 0px 4px; margin-left: -1px; border-left: solid black 1px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px;width: 15px;" title="Добавить в историю">
                     <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
                         <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
                         <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z"></path>
                         <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: rotateZ(-180deg);"></path>
                     </svg>
                 </span>
-                <span id="read_history_teacher" style="float: right;padding: 0px 4px;cursor: pointer;border-bottom: 1px solid black;border-left: solid black 1px;height: 23px;width: 15px;" title="Читать историю">
+                <span id="read_history_teacher" style="float: right; padding: 0px 4px; cursor: pointer; border-right: 1px solid black; border-bottom: 1px solid black; border-left: solid black 1px; height: 23px; width: 15px;" title="Читать историю">
                     <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
                         <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
                         <path d="M352.402,241.001h-81.399v-81.4c0-8.284-6.716-15-15-15s-15,6.716-15,15v96.4c0,8.284,6.716,15,15,15h96.399    c8.284,0,15-6.716,15-15S360.686,241.001,352.402,241.001z" style="transform-origin: center;transform: translate(0%, 8%) rotateZ(-45deg);"></path>
                     </svg>
                 </span>
             </div>
-            <div style="text-align: center; padding: 5px; display: none;" id="info_teacher_block"></div>
+            <div style="text-align: center; padding: 7px; display: none;" id="info_teacher_block"></div>
             <div style="text-align: center; display: none;" id="table_time">
                 <table style="border-top: 1px solid black;">
                     <tbody>
@@ -132,64 +132,11 @@ var win_html = `<div style="display: flex;">
     </span>
 </div>`;
 
-if (localStorage.getItem('winTop') == null) {
-    localStorage.setItem('winTop', '120');
-    localStorage.setItem('winLeft', '295');
-}
-
-let wint = document.createElement('div');
-document.body.append(wint);
-wint.style = 'min-height: 68px; max-height: 450px; min-width: 76px; max-width: 370px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56);';
-wint.innerHTML = win_html;
-
-let mscr = document.createElement('script');
-document.body.append(mscr);
-let send_comment_js = `
-let my_name = document.getElementById('top_avatar').setAttribute('my_name', window.intercomSettings.name);
-document.getElementById('add_note_student').addEventListener( "click" , () => {
-    let id = document.getElementById('info_status').getAttribute('user_id');
-    let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
-    if (msg !== '' && msg !== null) {
-        let person_name = document.getElementById('top_avatar').getAttribute('my_name');
-        let ticket_id = window.location.pathname.match(/\\/[0-9-]+\\//g);
-
-        var body = 'entry.1187522179=' + id + '&entry.540704615=' + ticket_id + '&entry.988274120=' + encodeURI(person_name) + '&entry.1693454835=' + encodeURI(msg);
-        fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLScInTRTD5AZLEcufsz6SQkMHYu_jCqGUZZ-G2MrsmJbnOSDZQ/formResponse', {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded'
-            },
-            body: body
-        });
-    }
-});
-document.getElementById('add_note_teacher').addEventListener( "click" , () => {
-    let id = document.getElementById('teacher_status').getAttribute('user_id');
-    let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
-    if (msg !== '' && msg !== null) {
-        let person_name = document.getElementById('top_avatar').getAttribute('my_name');
-        let ticket_id = window.location.pathname.match(/\\/[0-9-]+\\//g);
-
-        var body = 'entry.1187522179=' + id + '&entry.540704615=' + ticket_id + '&entry.988274120=' + encodeURI(person_name) + '&entry.1693454835=' + encodeURI(msg);
-        fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLScInTRTD5AZLEcufsz6SQkMHYu_jCqGUZZ-G2MrsmJbnOSDZQ/formResponse', {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded'
-            },
-            body: body
-        });
-    }
-});
-
-`;
-mscr.innerHTML = send_comment_js;
-
+//Добавляем стили
 let mstl = document.createElement('style');
 document.body.append(mstl);
 var style = `.win_btn {
-	background-color: #768d87;
+    background-color: #768d87;
     border-radius: 10px;
     border: 1px solid #566963;
     color: #ffffff;
@@ -199,119 +146,181 @@ var style = `.win_btn {
 }`
 mstl.innerHTML = style;
 
-var listener = function(e , a) {
-    wint.style.left = Number(e.clientX - myX) + "px";
-    wint.style.top = Number(e.clientY - myY) + "px";
-    localStorage.setItem('winTop', String(Number(e.clientY - myY)));
-    localStorage.setItem('winLeft', String(Number(e.clientX - myX)));
-};
-wint.firstElementChild.firstElementChild.onmousedown = function (a) {
-    window.myX = a.layerX; 
-    window.myY = a.layerY; 
-    document.addEventListener('mousemove', listener);
-}
-wint.onmouseup = function () {document.removeEventListener('mousemove', listener);}
-document.getElementById('btn1_student').onclick = function () {get_info ("student");};
-document.getElementById('btn1_teacher').onclick = function () {get_info ("teacher");};
-
-document.getElementById('student_copy').onclick = function () {
-    let stdnt = document.getElementById('info_student_block').innerText;
-    copyToClipboard(stdnt) //.replace(/<br>/g,'\n')
-};
-document.getElementById('teacher_copy').onclick = function () {
-    let tcher = document.getElementById('info_teacher_block').innerText;
-    copyToClipboard(tcher) //.replace(/<br>/g,'\n')
-};
-document.getElementById('info_status').firstElementChild.children[2].onclick = function () {
-    let id = document.getElementById('info_status').getAttribute('user_id');
-    copyToClipboard('https://profile.skyeng.ru/profile/' + id + '/showcase');
-};
-
-document.getElementById('btn_hide').onclick = function () {
-	document.getElementById('btn_hide').style.display = 'none';
-	document.getElementById('info_block').style.display = 'none';
-	document.getElementById('info_status').style.display = 'none';
-	document.getElementById('info_student_block').innerHTML = '';
-    document.getElementById('info_student_status').style.display = 'none';
-    document.getElementById('teacher_status').style.display = 'none';
-    document.getElementById('info_teacher_block').style.display = 'none';
-    document.getElementById('info_teacher_block').innerHTML = '';
-    document.getElementById('info_teacher_status').style.display = 'none';
-    document.getElementById('table_time').style.display = 'none';
+//Сохранение позиции окна
+if (localStorage.getItem('winTop') == null) {
+    localStorage.setItem('winTop', '120');
+    localStorage.setItem('winLeft', '295');
 }
 
-//Время П
-var dat = new Date()
-var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+// Создаем само окно
+let wint = document.createElement('div');
+document.body.append(wint);
+wint.style = 'min-height: 68px; max-height: 450px; min-width: 76px; max-width: 370px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56); color: black;';
+wint.setAttribute('id' ,'main_easy_win');
+wint.innerHTML = win_html;
 
-if (dat.getHours() >= 20) {
-	tab.children[1].innerText = 20 - 3;
-	tab.children[2].innerText = 20 - 2;
-	tab.children[3].innerText = 20 - 1;
-	tab.children[4].innerText = 20;
-	tab.children[5].innerText = 20 + 1;
-	tab.children[6].innerText = 20 + 2;
-	tab.children[7].innerText = 20 + 3;
-} else if (dat.getHours() <= 3) {
-	tab.children[1].innerText = 3 - 3;
-	tab.children[2].innerText = 3 - 2;
-	tab.children[3].innerText = 3 - 1;
-	tab.children[4].innerText = 3;
-	tab.children[5].innerText = 3 + 1;
-	tab.children[6].innerText = 3 + 2;
-	tab.children[7].innerText = 3 + 3;
-} else {
-	tab.children[1].innerText = dat.getHours() - 3
-	tab.children[2].innerText = dat.getHours() - 2
-	tab.children[3].innerText = dat.getHours() - 1
-	tab.children[4].innerText = dat.getHours()
-	tab.children[5].innerText = dat.getHours() + 1
-	tab.children[6].innerText = dat.getHours() + 2
-	tab.children[7].innerText = dat.getHours() + 3
-};
+//Добавляем имя сотрудника в страницу
+let mscr = document.createElement('script');
+document.body.append(mscr);
+let send_comment_js = `document.getElementById('top_avatar').setAttribute('my_name', window.intercomSettings.name);`;
+mscr.innerHTML = send_comment_js;
 
-var asd = document.querySelector('div[id=table_time] > table > tbody > tr');
-asd.children[8].onclick = function () {
-	if (asd.children[7].innerText < 23) {
-		for (var i = 1; i < 8; i++) {
-            asd.children[i].style.backgroundColor = '';
-			asd.children[i].innerText = Number(asd.children[i].innerText) + 1
+function move_again() {
+    let wint = document.getElementById('main_easy_win');
+
+    //Перемещение окна
+    var listener = function(e , a) {
+        wint.style.left = Number(e.clientX - myX) + "px";
+        wint.style.top = Number(e.clientY - myY) + "px";
+        localStorage.setItem('winTop', String(Number(e.clientY - myY)));
+        localStorage.setItem('winLeft', String(Number(e.clientX - myX)));
+    };
+    wint.firstElementChild.firstElementChild.onmousedown = function (a) {
+        window.myX = a.layerX; 
+        window.myY = a.layerY; 
+        document.addEventListener('mousemove', listener);
+    }
+    wint.onmouseup = function () {document.removeEventListener('mousemove', listener);}
+
+    //События на главные кнопки
+    document.getElementById('btn1_student').onclick = function () {get_info ("student");};
+    document.getElementById('btn1_teacher').onclick = function () {get_info ("teacher");};
+    document.getElementById('student_copy').onclick = function () {
+        let stdnt = document.getElementById('info_student_block').innerText;
+        copyToClipboard(stdnt) //.replace(/<br>/g,'\n')
+    };
+    document.getElementById('teacher_copy').onclick = function () {
+        let tcher = document.getElementById('info_teacher_block').innerText;
+        copyToClipboard(tcher) //.replace(/<br>/g,'\n')
+    };
+    document.getElementById('info_status').firstElementChild.children[2].onclick = function () {
+        let id = document.getElementById('info_status').getAttribute('user_id');
+        copyToClipboard('https://profile.skyeng.ru/profile/' + id + '/showcase');
+        document.getElementById('info_status').firstElementChild.children[2].setAttribute('title','click to copy link\nto the lesson');
+    };
+    document.getElementById('btn_hide').onclick = function () {
+        document.getElementById('main_easy_win').innerHTML = win_html;
+        move_again();
+        teacher_easy_timetable();
+    }
+
+    document.getElementById('add_note_student').addEventListener( "click" , () => {
+        let id = document.getElementById('info_status').getAttribute('user_id');
+        let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
+        if (msg !== '' && msg !== null) {
+            let person_name = document.getElementById('top_avatar').getAttribute('my_name');
+            let ticket_id = window.location.pathname.match(/\/[0-9-]+\//g);
+    
+            let body = 'entry.1187522179=' + id + '&entry.540704615=' + ticket_id + '&entry.988274120=' + encodeURI(person_name) + '&entry.1693454835=' + encodeURI(msg);
+            fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLScInTRTD5AZLEcufsz6SQkMHYu_jCqGUZZ-G2MrsmJbnOSDZQ/formResponse', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'content-type': 'application/x-www-form-urlencoded'
+                },
+                body: body
+            });
         }
-        
-        var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
-        var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
-        for (var i = 0; i < busy_time.length; i++) {
-            for (var ii = 1; ii < 8; ii++) {
-                if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+    });
+    document.getElementById('add_note_teacher').addEventListener( "click" , () => {
+        let id = document.getElementById('teacher_status').getAttribute('user_id');
+        let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
+        if (msg !== '' && msg !== null) {
+            let person_name = document.getElementById('top_avatar').getAttribute('my_name');
+            let ticket_id = window.location.pathname.match(/\/[0-9-]+\//g);
+    
+            let body = 'entry.1187522179=' + id + '&entry.540704615=' + ticket_id + '&entry.988274120=' + encodeURI(person_name) + '&entry.1693454835=' + encodeURI(msg);
+            fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLScInTRTD5AZLEcufsz6SQkMHYu_jCqGUZZ-G2MrsmJbnOSDZQ/formResponse', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'content-type': 'application/x-www-form-urlencoded'
+                },
+                body: body
+            });
+        }
+    });
+
+    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
+        document.getElementById('add_history_teacher').style.display = 'none';
+        document.getElementById('add_history_student').style.display = 'none';
+
+        document.getElementById('id_type_for_chat').style.display = '';
+        document.getElementById('btn1_student').innerText = 'Info';
+        document.getElementById('btn1_teacher').style.display = 'none';
+    } else {
+        document.getElementById('id_type_for_chat').style.display = 'none';
+    }
+}
+
+move_again();
+
+function teacher_easy_timetable() {//Время П
+    var dat = new Date()
+    var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+
+    if (dat.getHours() >= 20) {
+        tab.children[1].innerText = 20 - 3;
+        tab.children[2].innerText = 20 - 2;
+        tab.children[3].innerText = 20 - 1;
+        tab.children[4].innerText = 20;
+        tab.children[5].innerText = 20 + 1;
+        tab.children[6].innerText = 20 + 2;
+        tab.children[7].innerText = 20 + 3;
+    } else if (dat.getHours() <= 3) {
+        tab.children[1].innerText = 3 - 3;
+        tab.children[2].innerText = 3 - 2;
+        tab.children[3].innerText = 3 - 1;
+        tab.children[4].innerText = 3;
+        tab.children[5].innerText = 3 + 1;
+        tab.children[6].innerText = 3 + 2;
+        tab.children[7].innerText = 3 + 3;
+    } else {
+        tab.children[1].innerText = dat.getHours() - 3
+        tab.children[2].innerText = dat.getHours() - 2
+        tab.children[3].innerText = dat.getHours() - 1
+        tab.children[4].innerText = dat.getHours()
+        tab.children[5].innerText = dat.getHours() + 1
+        tab.children[6].innerText = dat.getHours() + 2
+        tab.children[7].innerText = dat.getHours() + 3
+    };
+
+    var asd = document.querySelector('div[id=table_time] > table > tbody > tr');
+    asd.children[8].onclick = function () {
+        if (asd.children[7].innerText < 23) {
+            for (var i = 1; i < 8; i++) {
+                asd.children[i].style.backgroundColor = '';
+                asd.children[i].innerText = Number(asd.children[i].innerText) + 1
             }
-        }
-    }	
-}
-asd.children[0].onclick = function () {
-	if (asd.children[1].innerText > 0) {
-		for (var i = 1; i < 8; i++) {
-            asd.children[i].style.backgroundColor = '';
-			asd.children[i].innerText = Number(asd.children[i].innerText) - 1
-        }
-        
-        var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
-        var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
-        for (var i = 0; i < busy_time.length; i++) {
-            for (var ii = 1; ii < 8; ii++) {
-                if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+            
+            var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
+            var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+            for (var i = 0; i < busy_time.length; i++) {
+                for (var ii = 1; ii < 8; ii++) {
+                    if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+                }
             }
-        }
-    }	
+        }	
+    }
+    asd.children[0].onclick = function () {
+        if (asd.children[1].innerText > 0) {
+            for (var i = 1; i < 8; i++) {
+                asd.children[i].style.backgroundColor = '';
+                asd.children[i].innerText = Number(asd.children[i].innerText) - 1
+            }
+            
+            var busy_time = document.getElementById('table_time').getAttribute('busy_time').split(';')
+            var tab = document.getElementById('table_time').firstElementChild.firstElementChild.firstElementChild;
+            for (var i = 0; i < busy_time.length; i++) {
+                for (var ii = 1; ii < 8; ii++) {
+                    if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+                }
+            }
+        }	
+    }
 }
-//End Время П
 
-if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
-    document.getElementById('add_history_teacher').style.display = 'none';
-    document.getElementById('add_history_student').style.display = 'none';
-	document.getElementById('id_type_for_chat').style.display = '';
-} else {
-	document.getElementById('id_type_for_chat').style.display = 'none';
-}
+teacher_easy_timetable();
 
 const copyToClipboard = str => {
     const el = document.createElement('textarea');
@@ -322,32 +331,9 @@ const copyToClipboard = str => {
     document.body.removeChild(el);
 };
 
-/*/
-function get_user_id(id) {
-    return new Promise(resolve => {
-        chrome.runtime.sendMessage({name: "script_pack", question: 'info_users_search', id: id}, function(response) {
-            resolve(response.role);
-        })
-    });
-}
-
-function get_role(id) {
-    return new Promise(resolve => {
-        chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id: id}, function(response) {
-            resolve(response.role);
-        })
-    });
-}
-/*/
-
-if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
-    document.getElementById('btn1_student').innerText = 'Info';
-    document.getElementById('btn1_teacher').style.display = 'none';
-}
-
 async function get_info(type) { //v.2
     let id;
-    if (window.location.href.indexOf('chat') !== -1) {
+    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
         id = document.getElementById('id_type_for_chat').value;
         /*/
         if (isNaN(id) == true) {
@@ -362,6 +348,10 @@ async function get_info(type) { //v.2
     } else if (type == 'teacher') {
         id = document.querySelectorAll('label > input[class="form-custom-field"]')[0].value.replace(/[^0-9]/g, "");
     }
+
+    var btns = document.querySelectorAll('#main_easy_win > div > span > div[style="margin: 10px;"]');
+    btns[0].style.display = 'none', btns[1].style.display = 'none';
+    document.getElementById('btn_hide').style.display = '';
 
     if (id) {
         var get_person_info = new Promise( (resolve) => {
@@ -398,12 +388,21 @@ async function get_info(type) { //v.2
                 });
 
                 chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
-                    let history_student = document.getElementById('read_history_student');
                     if (response.answer.length == 0) {
-                        history_student.style.display = 'none';
+                        document.getElementById('read_history_student').style.display = 'none';
                     } else {
-                        //history_student.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-                        //history_student.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
+                        let attr = '', attr2 = '';
+
+                        for (let i = 0; i < response.answer.length; i++) {
+                            attr += "window.open('" + window.location.origin + "/staff/cases/record" + response.answer[i].ticket + "','_blank'); ";
+                            attr2 += response.answer[i].ticket + '\n';
+                            if (response.answer[i].ticket == window.location.pathname.match(/\/[0-9-]+\//g)) {
+                                document.getElementById('add_history_student').style.display = 'none';
+                            }
+                        }
+                        
+                        document.getElementById('read_history_student').setAttribute('onclick', attr);
+                        document.getElementById('read_history_student').setAttribute('title', 'click to open\n' + attr2);                    
                     }
                 });
             } else {
@@ -439,12 +438,21 @@ async function get_info(type) { //v.2
                     });
 
                     chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
-                        let history_student = document.getElementById('read_history_student');
                         if (response.answer.length == 0) {
-                            history_student.style.display = 'none';
+                            document.getElementById('read_history_student').style.display = 'none';
                         } else {
-                            //history_student.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-                            //history_student.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
+                            let attr = '', attr2 = '';
+
+                            for (let i = 0; i < response.answer.length; i++) {
+                                attr += "window.open('" + window.location.origin + "/staff/cases/record" + response.answer[i].ticket + "','_blank'); ";
+                                attr2 += response.answer[i].ticket + '\n';
+                                if (response.answer[i].ticket == window.location.pathname.match(/\/[0-9-]+\//g)) {
+                                    document.getElementById('add_history_student').style.display = 'none';
+                                }
+                            }
+                            
+                            document.getElementById('read_history_student').setAttribute('onclick', attr);
+                            document.getElementById('read_history_student').setAttribute('title', 'click to open\n' + attr2);     
                         }
                     });
 
@@ -551,12 +559,21 @@ function teacher_draw(id) {
     });
 
     chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
-        let history_teacher = document.getElementById('read_history_teacher');
         if (response.answer.length == 0) {
-            history_teacher.style.display = 'none';
+            document.getElementById('read_history_teacher').style.display = 'none';
         } else {
-            //history_teacher.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-            //history_teacher.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
+            let attr = '', attr2 = '';
+
+            for (let i = 0; i < response.answer.length; i++) {
+                attr += "window.open('" + window.location.origin + "/staff/cases/record" + response.answer[i].ticket + "','_blank'); ";
+                attr2 += response.answer[i].ticket + '\n';
+                if (response.answer[i].ticket == window.location.pathname.match(/\/[0-9-]+\//g)) {
+                    document.getElementById('add_history_teacher').style.display = 'none';
+                }
+            }
+            
+            document.getElementById('read_history_teacher').setAttribute('onclick', attr);
+            document.getElementById('read_history_teacher').setAttribute('title', 'click to open\n' + attr2);    
         }
     });
     
@@ -597,11 +614,37 @@ function get_ticket_history(id) {
     return get_ticket_history;
 }
 
-function put_ticket_history(id, ticket) {
-    var put_ticket_history = new Promise( (resolve) => {
-        chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id, ticket: ticket}, function(response) {
-            resolve(response);
+/*/
+function get_user_id(id) {
+    return new Promise(resolve => {
+        chrome.runtime.sendMessage({name: "script_pack", question: 'info_users_search', id: id}, function(response) {
+            resolve(response.role);
         })
     });
-    return put_ticket_history;
 }
+
+function get_role(id) {
+    return new Promise(resolve => {
+        chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id: id}, function(response) {
+            resolve(response.role);
+        })
+    });
+}
+/*/
+
+(function put_ticket_history() {
+    document.getElementById('add_history_student').addEventListener( "click" , () => {
+        let id = document.getElementById('info_status').getAttribute('user_id');
+        let ticket = window.location.pathname.match(/\/[0-9-]+\//g);
+        fetch('https://hayley.skarsgard.ru/api/tickets-list/?id=' + id + '&ticket=' + ticket, {
+            method: 'GET', headers: { 'content-type': 'application/x-www-form-urlencoded' }
+        });
+    });
+    document.getElementById('add_history_teacher').addEventListener( "click" , () => {
+        let id = document.getElementById('teacher_status').getAttribute('user_id');
+        let ticket = window.location.pathname.match(/\/[0-9-]+\//g);
+        fetch('https://hayley.skarsgard.ru/api/tickets-list/?id=' + id + '&ticket=' + ticket, {
+            method: 'GET', headers: { 'content-type': 'application/x-www-form-urlencoded' }
+        });
+    });
+})();

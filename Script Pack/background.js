@@ -379,6 +379,27 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 headers: { 'content-type': 'application/x-www-form-urlencoded' }
             });
         }
+        if (request.question == 'get_teacher_by_name') {
+            fetch(`https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=${request.fullname}`, { 
+                method: 'GET', headers: { 'content-type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.json())
+            .then(json => { 
+                json.forEach((a) => {
+                    var logic = true;
+                    request.fullname.split(' ').forEach((b) => {
+                        if (a.name.indexOf(b) == -1) {
+                            logic = false;
+                        }
+                    })
+            
+                    if (logic == true) {
+                        sendResponse({answer: { trm: a.id, name: a.name, full_name: a.label}});
+                    }
+                })
+            });
+            return true;
+        }
     }
 });
 

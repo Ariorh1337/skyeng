@@ -13,7 +13,7 @@ function comment_my_box () {
                 const tex = document.createElement('span');
                 document.getElementsByClassName('req-inf-cont')[i].parentElement.append(tex);
                 tex.setAttribute('name','comment');
-                tex.style = 'color: darkslategrey;text-align: center;border-bottom: 1px solid grey;padding: 2px 2000px 2px 5px;margin-left: -77px;';
+                tex.style = 'text-align: center; border-bottom: 1px solid grey; padding: 2px 2000px 2px 5px; margin-left: -77px;';
                 tex.innerText = time[i].innerText.replace(/(\r\n|\n|\r)/gm,"").slice(12, 24) + ' ~~~ ' + text[i].innerText.replace(/(\r\n|\n|\r)/gm,"");
                 box[i].children[0].style.height = '36px';
                 box[i].children[1].style.height = '36px';
