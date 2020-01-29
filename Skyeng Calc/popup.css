@@ -1,0 +1,54 @@
+.container {
+    min-width: 140px;
+    height: 100px;
+    float:left;
+    text-align:center;
+}
+.button {
+    display: inline-table;
+    margin: 2%;
+    text-align:center;
+    cursor: pointer;
+    width: 5%;
+    background-color:green;
+}
+h3 {
+    display: block;
+    font-size: 1.17em;
+    text-align: center;
+    margin-top: 0%;
+    margin-bottom: 2%;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+}
+table {
+    text-align: center;
+    font-size: 14px;
+    display: inline-table;
+    margin: 5%;
+}
+.delete{
+    background-color:red;
+    cursor: pointer;
+}
+#big_menu, #small_menu {
+    text-align: center;
+}
+#reset_button {
+    margin-bottom: 5%;
+}
+#total_crit, #total_crit2 {
+    background-color: red;
+}
+#total_high {
+    background-color: orange;
+}
+#big_menu, #medium_menu, #small_menu {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -khtml-user-select: none;    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge */
+    user-select: none;           /* Non-prefixed version, currently not supported by any browser */
+  }

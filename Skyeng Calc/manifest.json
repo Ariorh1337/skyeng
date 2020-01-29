@@ -1,8 +1,8 @@
 {
 	"manifest_version":2,
 	"name": "Tech Calc Skyeng",
-	"description": "1st line support calculator",
-	"version": "1.3.6",
+	"description": "1st line tech support calculator KPI",
+	"version": "1.3.7",
 	"browser_action": {
 		"default_popup": "popup.html"
 	},
@@ -11,23 +11,18 @@
 		"48": "calc.png",
 		"128": "calc.png"
 	},
-	"permissions": [
-		  "storage"
-        ],
 	"background": {
-		"scripts": [
-			"background.js"
-		]
+		"scripts": ["background.js"]
     },
 	"content_scripts": [
 		{
-        "js": ["content-script.js"],
-		"matches": ["https://help.skyeng.ru/staff/cases/record/*"]
+        	"js": ["content-script.js"],
+			"matches": ["*://help.skyeng.ru/staff/cases/record/*", "*://skyeng.omnidesk.ru/staff/cases/record/*"]
 		},
 		{
-			"js": ["content-script.js"],
-			"matches": ["https://skyeng.omnidesk.ru/staff/cases/record/*"]
+			"js": ["chat-script.js"],
+			"matches": ["*://help.skyeng.ru/staff/cases/chat/*", "*://skyeng.omnidesk.ru/staff/cases/chat/*"]
 		}
 	],
-    "web_accessible_resources": ["script.js"]
+	"permissions": ["storage"]
 }

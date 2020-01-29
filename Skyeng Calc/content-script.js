@@ -1,87 +1,96 @@
-var s = document.createElement('script');
-s.src = chrome.extension.getURL('script.js');
-(document.head||document.documentElement).appendChild(s);
+//Добавляем ID юзера в страницу
+/* let mscr = document.createElement('script');
+document.body.append(mscr);
+let send_comment_js = `document.getElementById('top_avatar').setAttribute('my_staff_id', window.CurrentStaffId);`;
+mscr.innerHTML = send_comment_js; */
+//let name = document.querySelector(`#case_staff_id > option[value="${document.getElementById('top_avatar').getAttribute('my_staff_id')}"]`).innerText;
 
-s.onload = function() {
-	s.parentNode.removeChild(s);
-	
-	var prior = document.getElementById('priority_select_chosen').firstElementChild.firstElementChild.innerText;
-	sessionStorage.setItem('prior', prior);
-	var group = document.getElementById('case_group_id_chosen').firstElementChild.firstElementChild.innerText;
-	sessionStorage.setItem('group', group);
-	var my_name = document.getElementsByTagName('img')[0].parentElement.getAttribute('data-staff-name');
-	var first_msg = document.getElementsByClassName('added-answer-area')[0];
-	var send_btn = document.getElementsByClassName('alpha3_mod_wrap')[1];
-	var cmnt_btn = document.getElementsByClassName('_save_note_button')[0];
-	var box = document.getElementById('response_answer_area');
+document.addEventListener('readystatechange', () => {
+	if (document.readyState == 'complete') {
+		var prior = document.getElementById('priority_select_chosen').firstElementChild.firstElementChild.innerText;
+		sessionStorage.setItem('prior', prior);
+		var group = document.getElementById('case_group_id_chosen').firstElementChild.firstElementChild.innerText;
+		sessionStorage.setItem('group', group);
+		var my_name = document.getElementsByTagName('img')[0].parentElement.getAttribute('data-staff-name');
+		var first_msg = document.getElementsByClassName('added-answer-area')[0];
+		var send_btn = document.getElementsByClassName('alpha3_mod_wrap')[1];
+		var cmnt_btn = document.getElementsByClassName('_save_note_button')[0];
+		var box = document.getElementById('response_answer_area');
 
-	var on_msg_tool = function () {
-		send_msg('event');
-	};
-
-	send_btn.onclick = function (event) {
-		on_msg_tool();
-	};
-	cmnt_btn.onclick = function (event) {
-		send_msg('event');
-	};
-
-	box.addEventListener("keydown", function(event) {
-		if (event.key == 'Enter' && event.ctrlKey == true) {
-			if (event.target.attributes.placeholder.nodeValue) {
-				send_msg('event');
-    		};
-	    };
-	});
-
-	//Если есть первый ответ
-	if (first_msg) {
-		var first_msg_name = first_msg.getElementsByTagName('img')[0].alt;
-		if (first_msg_name) {
-			//Это мой первый ответ?
-			if (my_name == first_msg_name) {
-				//это точно не дочерка?
-				var request = document.getElementsByClassName('request-area')[0]
-				if (request.className.indexOf('added-note-area') == -1) {
-					var first_msg_time = first_msg.getElementsByClassName('request-date-time')[0].innerText;
-					var time = { hours: Number(first_msg_time.split(',')[0].split(':')[0]), minutes: Number(first_msg_time.split(',')[0].split(':')[1]), day: Number(first_msg_time.split(',')[1].split('.')[0]), month: Number(first_msg_time.split(',')[1].split('.')[1]) - 1, year: Number(first_msg_time.split(',')[1].split('.')[2])};
-					//Давай спросим есть ли у нас этот тикет
-					if (group == 'Техподдержка: 1-я линия') {
-						send_msg('assign', prior, time);
-						// Мы зашли в свой тикет? Может хотим его перебросить на 2ю линию, нужно проверить
-						setInterval(check_group, 10);
-					} else if (group == 'Техподдержка: 2-я линия') {
-						send_msg('handover', prior, time);
-					};
-				} else {
-					console.log('Это дочерка, она мне не нравится. Я не буду ее считать :Р')
-				}
-			};
-		} else {
-			console.log('первый ответ есть но я его не вижу, очень много сообщений в тикете?')
-		}
-	} else {
-		//Нет первого ответа???
-		send_msg('enter');
-
-		//Участок кода Защити и сохрани
-		var my_interval = null;
-		sessionStorage.setItem('my_interval', 'null');
-		if (document.getElementById('redactor-uuid-0') == null) {
-			var text_block_msg = document.getElementsByClassName('redactor-box')[0].children[2];
-			text_block_msg.setAttribute('id', 'redactor-uuid-0');
-		} else {
-			var text_block_msg = document.getElementById('redactor-uuid-0');
-		};
-		setInterval(check_prior, 10);
-		//Конец Защити и сохрани
-		
 		var on_msg_tool = function () {
-			send_msg('assign', prior);
 			send_msg('event');
 		};
-	};
-};
+
+		send_btn.onclick = function (event) {
+			if (document.querySelector('input[class="btn btn-element btn-green case_update_button alpha3_mod_btn"][value="Отправить"]').parentElement.style.display !== 'none') {
+				on_msg_tool();
+			}
+		};
+		cmnt_btn.onclick = function (event) {
+			send_msg('event');
+		};
+
+		box.addEventListener("keydown", function(event) {
+			if (event.key == 'Enter' && event.ctrlKey == true) {
+				if (event.target.attributes.placeholder.nodeValue) {
+					send_msg('event');
+				};
+			};
+		});
+
+		//Если есть первый ответ
+		if (first_msg) {
+			if (first_msg.id !== '') {
+				var first_msg_name = first_msg.getElementsByTagName('img')[0].alt;
+				if (first_msg_name) {
+					//Это мой первый ответ?
+					if (my_name == first_msg_name) {
+						//это точно не дочерка?
+						var request = document.getElementsByClassName('request-area')[0]
+						if (request.className.indexOf('added-note-area') == -1) {
+							var first_msg_time = first_msg.getElementsByClassName('request-date-time')[0].innerText;
+							var time = { hours: Number(first_msg_time.split(',')[0].split(':')[0]), minutes: Number(first_msg_time.split(',')[0].split(':')[1]), day: Number(first_msg_time.split(',')[1].split('.')[0]), month: Number(first_msg_time.split(',')[1].split('.')[1]) - 1, year: Number(first_msg_time.split(',')[1].split('.')[2])};
+							//Давай спросим есть ли у нас этот тикет
+							if (group == 'Техподдержка: 1-я линия') {
+								send_msg('assign', prior, time);
+								// Мы зашли в свой тикет? Может хотим его перебросить на 2ю линию, нужно проверить
+								setInterval(check_group, 10);
+							} else if (group == 'Техподдержка: 2-я линия') {
+								send_msg('handover', prior, time);
+							};
+						} else {
+							console.log('Это дочерка, она мне не нравится. Я не буду ее считать :Р')
+						}
+					} else {
+						console.log('Первый ответ не мой, не считаю')
+					};
+				} else {
+					console.log('первый ответ есть но я его не вижу, очень много сообщений в тикете?')
+				}
+			}
+		} else {
+			//Нет первого ответа???
+			send_msg('enter');
+
+			//Участок кода Защити и сохрани
+			var my_interval = null;
+			sessionStorage.setItem('my_interval', 'null');
+			if (document.getElementById('redactor-uuid-0') == null) {
+				var text_block_msg = document.getElementsByClassName('redactor-box')[0].children[2];
+				text_block_msg.setAttribute('id', 'redactor-uuid-0');
+			} else {
+				var text_block_msg = document.getElementById('redactor-uuid-0');
+			};
+			setInterval(check_prior, 10);
+			//Конец Защити и сохрани
+			
+			var on_msg_tool = function () {
+				send_msg('assign', prior);
+				send_msg('event');
+			};
+		};
+	}
+});
 
 function check_prior () {
 	var text_block_msg = document.getElementById('redactor-uuid-0');
@@ -128,10 +137,13 @@ function send_msg(types , prioritet = 'Низкий', enterTime = {hours: new Da
 	} else {
 		var info = {ticket: document.getElementsByClassName('omni_custom_tooltip')[2].innerText.slice(0,10), time: enterTime, prior : prioritet};
 	}
+	chrome.runtime.sendMessage({ name: "ticket_calc", type: types , data: info });
+}
 
-	chrome.runtime.sendMessage({name: "ariorh", type: types , data: info }, function(response) {
-		if (response.answer === "tell me my name") {
-			console.log(response.answer);
-		}
-	});
+function week_calculation (date) { //тут не много магии дат, результат: "гггг-мм-дд/гггг-мм-дд"
+	(typeof date == 'object') ? true : date = new Date(date);
+	(date.getDay() == 0) ? date.setDate(date.getDate() - 6) : date.setDate(date.getDate() - (date.getDay() - 1));
+	let result = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+	date.setDate(date.getDate() + 6);
+	return result += `/${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }

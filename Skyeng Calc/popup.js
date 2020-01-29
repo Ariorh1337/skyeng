@@ -1,10 +1,10 @@
-if (localStorage.getItem ('start') == null | localStorage.getItem ('start') == 'null') {
-	localStorage.setItem ('start', true);
-	var qwe = [];
-	chrome.storage.local.set({'watching' : qwe});
-	chrome.storage.local.set({'assign' : qwe});
-	chrome.storage.local.set({'handover' : qwe});	
-	chrome.storage.local.set({'event' : qwe});
+function storage_ask(type) { //await storage_ask('watching') - [{...},{...},...]
+	var store = new Promise((resolve) => {
+		chrome.storage.local.get(type, function(result){
+			resolve(result[type]);
+		});
+	});
+	return store;
 }
 
 Date.daysBetween = function( date1 ) {
@@ -45,471 +45,205 @@ Date.daysWeek = function( date1 ) {
 	return Math.round(difference_ms/one_day);
 }
 
-chrome.storage.local.get('event', function(result){
-	var days = 0, weeks = 0, months = 0;
-	for (var i = 0; i < result.event.length; i++) {
-		var res = result.event[i].time
-		var dat = new Date(res.year,res.month,res.day)
-		if (Date.daysBetween(dat) < 1) {
-			days += 1;
+async function calculate(event, time) { //await calculate('watching', 0) - {count: 0, crit: 0, high: 0}
+    let data = await storage_ask(event);
+	let days = 0, weeks = 0, months = 0, Dhigh = 0, Dcrit = 0, Whigh = 0, Wcrit = 0, Mhigh = 0, Mcrit = 0, result;
+    
+    if (event == 'assign') {
+        for (let i = 0; i < data.length; i++) {
+            let res = data[i].time, prior = data[i].prior, dat = new Date(res.year,res.month,res.day), now = new Date();
+            if (Date.daysBetween(dat) < 1) {
+                days += 1;
+                if (prior == 'Высокий') { Dhigh += 1; };
+                if (prior == 'Критический') { Dcrit += 1; };
+            }
+            if (Date.daysWeek(dat) < 7) {
+                weeks += 1;
+                if (prior == 'Высокий') { Whigh += 1; };
+                if (prior == 'Критический') { Wcrit += 1; };
+            }
+            if (now.getMonth() == res.month) {
+                months += 1;
+                if (prior == 'Высокий') { Mhigh += 1; };
+                if (prior == 'Критический') { Mcrit += 1; };
+            }
         }
-		if (Date.daysWeek(dat) < 7) {
-			weeks += 1;
+    } else {
+        for (let i = 0; i < data.length; i++) {
+            let res = data[i].time, dat = new Date(res.year,res.month,res.day), now = new Date();
+            (Date.daysBetween(dat) < 1) ? days += 1 : false;
+            (Date.daysWeek(dat) < 7) ? weeks += 1 : false;
+            (now.getMonth() == res.month) ? months += 1 : false;
         }
-		var now = new Date()
-		if (now.getMonth() == res.month) {
-			months += 1;
-		}
     }
 
-	document.getElementById("actions").innerText = days;
-	document.getElementById("actions2").innerText = weeks;
-	document.getElementById("actions3").innerText = months;
-});
-
-chrome.storage.local.get('watching', function(result){
-	var days = 0, weeks = 0, months = 0;
-	for (var i = 0; i < result.watching.length; i++) {
-		var res = result.watching[i].time
-		var dat = new Date(res.year,res.month,res.day)
-		if (Date.daysBetween(dat) < 1) {
-			days += 1;
-        }
-		if (Date.daysWeek(dat) < 7) {
-			weeks += 1;
-        }
-		var now = new Date()
-		if (now.getMonth() == res.month) {
-			months += 1;
-		}
+    if (time == 0) {
+        result = { count: days, crit: Dcrit, high: Dhigh };
+    } else if (time == 1) {
+        result = { count: weeks, crit: Wcrit, high: Whigh };
+    } else if (time == 2) {
+        result = { count: months, crit: Mcrit, high: Mhigh };
     }
-
-	document.getElementById("looked").innerText = days;
-	document.getElementById("looked2").innerText = weeks;
-	document.getElementById("looked3").innerText = months;
-});
-
-chrome.storage.local.get('assign', function(result){
-	var days = 0, weeks = 0, months = 0, Dhigh = 0, Dcrit = 0, Whigh = 0, Wcrit = 0, Mhigh = 0, Mcrit = 0;
-	for (var i = 0; i < result.assign.length; i++) {
-		var res = result.assign[i].time
-		var prior = result.assign[i].prior
-		var dat = new Date(res.year,res.month,res.day)
-		if (Date.daysBetween(dat) < 1) {
-			days += 1;
-			if (prior == 'Высокий') { Dhigh += 1; };
-			if (prior == 'Критический') { Dcrit += 1; };
-    }
-		if (Date.daysWeek(dat) < 7) {
-			weeks += 1;
-			if (prior == 'Высокий') { Whigh += 1; };
-			if (prior == 'Критический') { Wcrit += 1; };
-    }
-		var now = new Date()
-		if (now.getMonth() == res.month) {
-			months += 1;
-			if (prior == 'Высокий') { Mhigh += 1; };
-			if (prior == 'Критический') { Mcrit += 1; };
-		}
-  }
-
-	document.getElementById("first").innerText = days;
-	localStorage.setItem ('first', days);
-	document.getElementById("first2").innerText = weeks;
-	localStorage.setItem ('first2', weeks);
-	document.getElementById("first3").innerText = months;
-	localStorage.setItem ('first3', months);
-	document.getElementById("total_crit").innerText = Dcrit;
-	document.getElementById("total_high").innerText = Dhigh;
-	document.getElementById("total_crit2").innerText = Wcrit;
-	document.getElementById("total_high2").innerText = Whigh;
-	document.getElementById("total_crit3").innerText = Mcrit;
-	document.getElementById("total_high3").innerText = Mhigh;
-});
-
-chrome.storage.local.get('handover', function(result){
-	var days = 0, weeks = 0, months = 0;
-	for (var i = 0; i < result.handover.length; i++) {
-		var res = result.handover[i].time
-		var dat = new Date(res.year,res.month,res.day)
-		if (Date.daysBetween(dat) < 1) {
-			days += 1;
-        }
-		if (Date.daysWeek(dat) < 7) {
-			weeks += 1;
-        }
-		var now = new Date()
-		if (now.getMonth() == res.month) {
-			months += 1;
-		}
-  }
-
-	document.getElementById("second").innerText = days;
-	localStorage.setItem ('second', days);
-	document.getElementById("second2").innerText = weeks;
-	localStorage.setItem ('second2', weeks);
-	document.getElementById("second3").innerText = months;
-	localStorage.setItem ('second3', months);
-});
-
-function count_total() {
-	if (localStorage['first'] !== 0) {
-		if (localStorage['second'] !== 0) {
-			document.getElementById("total").innerText = Number(localStorage['first']) + Number(localStorage['second'])
-		} else {
-			document.getElementById("total").innerText = localStorage['first'];
-		}
-	} else {
-		if (localStorage['second'] !== 0) {
-			document.getElementById("total").innerText = localStorage['second'];
-		} else {
-			document.getElementById("total").innerText = 0;
-		}
-	}
-	if (localStorage['first2'] !== 0) {
-		if (localStorage['second2'] !== 0) {
-			document.getElementById("total2").innerText = Number(localStorage['first2']) + Number(localStorage['second2'])
-		} else {
-			document.getElementById("total2").innerText = localStorage['first2'];
-		}
-	} else {
-		if (localStorage['second2'] !== 0) {
-			document.getElementById("total2").innerText = localStorage['second2'];
-		} else {
-			document.getElementById("total2").innerText = 0;
-		}
-	}
-	if (localStorage['first3'] !== 0) {
-		if (localStorage['second3'] !== 0) {
-			document.getElementById("total3").innerText = Number(localStorage['first3']) + Number(localStorage['second3'])
-		} else {
-			document.getElementById("total3").innerText = localStorage['first3'];
-		}
-	} else {
-		if (localStorage['second3'] !== 0) {
-			document.getElementById("total3").innerText = localStorage['second3'];
-		} else {
-			document.getElementById("total3").innerText = 0;
-		}
-	}
+    return result;
 }
 
-setTimeout(count_total, 50);
-
-window.onload = function(){
-	var myticket = document.getElementById('left_1');
-	myticket.addEventListener('click', function(){
-		document.getElementById('block_1').setAttribute('style','display: none;');
-		document.getElementById('block_3').setAttribute('style','');
+async function draw_stat (time) {
+	document.getElementById('big_edit').style.width = '145px';
+	let watching = await calculate('watching', Number(time));
+    let event = await calculate('event', Number(time));
+    let assign = await calculate('assign', Number(time));
+	let handover = await calculate('handover', Number(time));
+	let chat_event = await calculate('chat_event', Number(time));
+	let chat_assign = await calculate('chat_assign', Number(time));
+    let text = (time == 0) ? 'Сегодня' : (time == 1) ? 'Неделя' : (time == 2) ? 'Месяц' : false;
+    document.getElementById('big_edit').innerHTML = `
+    <div id="small_menu">
+        <span class="button">⬅</span>
+        <span style="font-size: 12px;">${text}</span>
+        <span class="button">➡</span>
+    </div>
+    <table border="1" style="width: 132px;">
+        <tbody>
+            <tr><td colspan="3">Просмотрено: </td><td style="min-width: 13px;">${watching.count}</td></tr>
+            <tr><td colspan="3">Действия: </td><td>${event.count}</td></tr>
+            <tr><td colspan="3">Тикеты 1Л: </td><td>${assign.count}</td></tr>
+            <tr><td colspan="3">Тикеты 2Л: </td><td>${handover.count}</td></tr>
+            <tr>
+                <td>Всего: </td>
+                <td id="total_crit">${assign.crit}</td>
+                <td id="total_high">${assign.high}</td>
+                <td>${assign.count + handover.count}</td>
+			</tr>
+			<tr><td colspan="3">Действия чаты: </td><td>${chat_event.count}</td></tr>
+			<tr>
+                <td colspan="2">Чаты: </td>
+                <td id="total_crit2">${chat_assign.crit}</td>
+                <td>${chat_assign.count}</td>
+			</tr>
+        </tbody>
+    </table>
+    <button id="reset_button">сброс</button>`;
+    document.getElementById('small_menu').firstElementChild.addEventListener('click', () => {
+        (small_menu == 0) ? small_menu = 2 : (small_menu == 1) ? small_menu = 0 : (small_menu == 2) ? small_menu = 1 : false;
+        draw_stat(small_menu);
+    });
+    document.getElementById('small_menu').lastElementChild.addEventListener('click', () => {
+        (small_menu == 0) ? small_menu = 1 : (small_menu == 1) ? small_menu = 2 : (small_menu == 2) ? small_menu = 0 : false;
+        draw_stat(small_menu);
 	});
-
-	var myticket2 = document.getElementById('right_1');
-	myticket2.addEventListener('click', function(){
-		document.getElementById('block_1').setAttribute('style','display: none;');
-		document.getElementById('block_2').setAttribute('style','');
+	document.getElementById('reset_button').addEventListener('click', () => {
+		chrome.storage.local.set({'watching' : []});
+		chrome.storage.local.set({'assign' : []});
+		chrome.storage.local.set({'handover' : []});	
+		chrome.storage.local.set({'event' : []});
+		chrome.storage.local.set({'chat_event' : []});
+		chrome.storage.local.set({'chat_assign' : []});
 	});
+}
 
-	var myticket3 = document.getElementById('left_2');
-	myticket3.addEventListener('click', function(){
-		document.getElementById('block_2').setAttribute('style','display: none;');
-		document.getElementById('block_1').setAttribute('style','');
-	});
+async function text_history(event, time) {
+    (event == 0) ? event = 'assign' : (event == 1) ? event = 'handover' : (event == 2) ? event = 'chat_assign' : false;
 
-	var myticket4 = document.getElementById('right_2');
-	myticket4.addEventListener('click', function(){
-		document.getElementById('block_2').setAttribute('style','display: none;');
-		document.getElementById('block_3').setAttribute('style','');
-	});
+    let data = await storage_ask(event);
+	let hist1_today = '', hist1_week = '', hist1_month = '', result;
+    for (var i = 0; i < data.length; i++) {
+        var res = data[i].time, qwe = Number(res.month) + 1, dat = new Date(res.year,res.month,res.day), now = new Date();
+        if (Date.daysBetween(dat) < 1) {
+            hist1_today = hist1_today + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + data[i].ticket + '/">' + data[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
+        };
+        if (Date.daysWeek(dat) < 7) {
+            hist1_week = hist1_week + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + data[i].ticket + '/">' + data[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
+        }
+        if (now.getMonth() == res.month) {
+            hist1_month = hist1_month + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + data[i].ticket + '/">' + data[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
+        }
+    };
 
-	var myticket5 = document.getElementById('left_3');
-	myticket5.addEventListener('click', function(){
-		document.getElementById('block_3').setAttribute('style','display: none;');
-		document.getElementById('block_2').setAttribute('style','');
-	});
+    if (time == 0) {
+        result = hist1_today;
+    } else if (time == 1) {
+        result = hist1_week;
+    } else if (time == 2) {
+        result = hist1_month;
+    }
+    return result;
+}
 
-	var myticket6 = document.getElementById('right_3');
-	myticket6.addEventListener('click', function(){
-		document.getElementById('block_3').setAttribute('style','display: none;');
-		document.getElementById('block_1').setAttribute('style','');
-	});
+async function draw_history(medium_menu, small_menu) {
+	let html = await text_history(medium_menu, small_menu);
+	document.getElementById('big_edit').style.width = '190px';
+	let small_text = (small_menu == 0) ? 'Сегодня' : (small_menu == 1) ? 'Неделя' : (small_menu == 2) ? 'Месяц' : false;
+	let medium_text = (medium_menu == 0) ? '1 Линия' : (medium_menu == 1) ? '2 Линия' : (medium_menu == 2) ? 'Чаты' : false;
+    document.getElementById('big_edit').innerHTML = `
+    <div id="medium_menu">
+        <span id="hist0_left_2" class="button">⬅</span>
+        <span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">${medium_text}</span>
+        <span id="hist0_right_2" class="button">➡</span>
+    </div>
 
-	var myticket7 = document.getElementById('reset_button');
-	myticket7.addEventListener('click', function(){
-		var qwe = [];
-		chrome.storage.local.set({'watching' : qwe});
-		chrome.storage.local.set({'assign' : qwe});
-		chrome.storage.local.set({'handover' : qwe});
-		chrome.storage.local.set({'event' : qwe});
-	});
+    <div id="small_menu">
+        <span id="hist2_left_2" class="button">⬅</span>
+        <span style="text-align: center; margin: 0%; margin-bottom: 5%; font-size: 10px;">${small_text}</span>
+        <span id="hist2_right_2" class="button">➡</span>
+    </div>
 
+    <table border="1">
+        <tbody>
+            ${html}
+        </tbody>
+    </table>`;
+    document.getElementById('medium_menu').firstElementChild.addEventListener('click', () => {
+        (medium_menu == 0) ? medium_menu = 2 : (medium_menu == 1) ? medium_menu = 0 : (medium_menu == 2) ? medium_menu = 1 : false;
+        draw_history(medium_menu, small_menu);
+    });
+    document.getElementById('medium_menu').lastElementChild.addEventListener('click', () => {
+        (medium_menu == 1) ? medium_menu = 2 : (medium_menu == 2) ? medium_menu = 0 : (medium_menu == 0) ? medium_menu = 1 : false;
+        draw_history(medium_menu, small_menu);
+    });
+    document.getElementById('small_menu').firstElementChild.addEventListener('click', () => {
+        (small_menu == 0) ? small_menu = 2 : (small_menu == 1) ? small_menu = 0 : (small_menu == 2) ? small_menu = 1 : false;
+        draw_history(medium_menu, small_menu);
+    });
+    document.getElementById('small_menu').lastElementChild.addEventListener('click', () => {
+        (small_menu == 0) ? small_menu = 1 : (small_menu == 1) ? small_menu = 2 : (small_menu == 2) ? small_menu = 0 : false;
+        draw_history(medium_menu, small_menu);
+    });
 
-	var dfg = document.getElementById('menu_left_1');
-	var dfg2 = document.getElementById('menu_right_1');
-	dfg.onclick = function () {
-		set_history();
-	}
-	dfg2.onclick = function () {
-		set_history();
-	}
-
-	var dfg3 = document.getElementById('menu_left_2');
-	var dfg4 = document.getElementById('menu_right_2');
-	dfg3.onclick = function () {
-		rem_history();
-	}
-	dfg4.onclick = function () {
-		rem_history();
-	}
-
-	var dfg5 = document.getElementById('hist1_right_1');
-	dfg5.onclick = function () {
-		document.getElementById('history_menu1').setAttribute('style','display: none');
-		document.getElementById('history_menu2').setAttribute('style','');
-		document.getElementById('hist1_today').setAttribute('style','display: none');
-		document.getElementById('hist1_week').setAttribute('style','');
-	};
-
-	var dfg6 = document.getElementById('hist1_left_1');
-	dfg6.onclick = function () {
-		document.getElementById('history_menu1').setAttribute('style','display: none');
-		document.getElementById('history_menu3').setAttribute('style','');
-		document.getElementById('hist1_today').setAttribute('style','display: none');
-		document.getElementById('hist1_month').setAttribute('style','');
-	};
-
-	var dfg7 = document.getElementById('hist1_right_2');
-	dfg7.onclick = function () {
-		document.getElementById('history_menu2').setAttribute('style','display: none');
-		document.getElementById('history_menu3').setAttribute('style','');
-		document.getElementById('hist1_week').setAttribute('style','display: none');
-		document.getElementById('hist1_month').setAttribute('style','');
-	};
-
-	var dfg8 = document.getElementById('hist1_left_2');
-	dfg8.onclick = function () {
-		document.getElementById('history_menu2').setAttribute('style','display: none');
-		document.getElementById('history_menu1').setAttribute('style','');
-		document.getElementById('hist1_week').setAttribute('style','display: none');
-		document.getElementById('hist1_today').setAttribute('style','');
-	};
-
-	var dfg9 = document.getElementById('hist1_right_3');
-	dfg9.onclick = function () {
-		document.getElementById('history_menu3').setAttribute('style','display: none');
-		document.getElementById('history_menu1').setAttribute('style','');
-		document.getElementById('hist1_month').setAttribute('style','display: none');
-		document.getElementById('hist1_today').setAttribute('style','');
-	};
-
-	var dfg10 = document.getElementById('hist1_left_3');
-	dfg10.onclick = function () {
-		document.getElementById('history_menu3').setAttribute('style','display: none');
-		document.getElementById('history_menu2').setAttribute('style','');
-		document.getElementById('hist1_month').setAttribute('style','display: none');
-		document.getElementById('hist1_week').setAttribute('style','');
-	};
-
-	var dfg11 = document.getElementById('hist2_right_1');
-	dfg11.onclick = function () {
-		document.getElementById('history_menu4').setAttribute('style','display: none');
-		document.getElementById('history_menu5').setAttribute('style','');
-		document.getElementById('hist2_today').setAttribute('style','display: none');
-		document.getElementById('hist2_week').setAttribute('style','');
-	};
-
-	var dfg12 = document.getElementById('hist2_left_1');
-	dfg12.onclick = function () {
-		document.getElementById('history_menu4').setAttribute('style','display: none');
-		document.getElementById('history_menu6').setAttribute('style','');
-		document.getElementById('hist2_today').setAttribute('style','display: none');
-		document.getElementById('hist2_month').setAttribute('style','');
-	};
-
-	var dfg13 = document.getElementById('hist2_right_2');
-	dfg13.onclick = function () {
-		document.getElementById('history_menu5').setAttribute('style','display: none');
-		document.getElementById('history_menu6').setAttribute('style','');
-		document.getElementById('hist2_week').setAttribute('style','display: none');
-		document.getElementById('hist2_month').setAttribute('style','');
-	};
-
-	var dfg14 = document.getElementById('hist2_left_2');
-	dfg14.onclick = function () {
-		document.getElementById('history_menu5').setAttribute('style','display: none');
-		document.getElementById('history_menu4').setAttribute('style','');
-		document.getElementById('hist2_week').setAttribute('style','display: none');
-		document.getElementById('hist2_today').setAttribute('style','');
-	};
-
-	var dfg15 = document.getElementById('hist2_right_3');
-	dfg15.onclick = function () {
-		document.getElementById('history_menu6').setAttribute('style','display: none');
-		document.getElementById('history_menu4').setAttribute('style','');
-		document.getElementById('hist2_month').setAttribute('style','display: none');
-		document.getElementById('hist2_today').setAttribute('style','');
-	};
-
-	var dfg16 = document.getElementById('hist2_left_3');
-	dfg16.onclick = function () {
-		document.getElementById('history_menu6').setAttribute('style','display: none');
-		document.getElementById('history_menu5').setAttribute('style','');
-		document.getElementById('hist2_month').setAttribute('style','display: none');
-		document.getElementById('hist2_week').setAttribute('style','');
-	};
-
-	var dfg17 = document.getElementById('hist0_right_1');
-	dfg17.onclick = function () {
-		document.getElementById('history_menu0').setAttribute('style','display: none');
-			document.getElementById('history_menu1').setAttribute('style','display: none');
-			document.getElementById('history_menu2').setAttribute('style','display: none');
-			document.getElementById('history_menu3').setAttribute('style','display: none');
-			document.getElementById('history_menu4').setAttribute('style','');
-		document.getElementById('history_menu00').setAttribute('style','');
-			document.getElementById('hist1_today').setAttribute('style','display: none');
-			document.getElementById('hist1_week').setAttribute('style','display: none');
-			document.getElementById('hist1_month').setAttribute('style','display: none');
-			document.getElementById('hist2_today').setAttribute('style','');
-	};
-
-	var dfg18 = document.getElementById('hist0_left_1');
-	dfg18.onclick = function () {
-		document.getElementById('history_menu0').setAttribute('style','display: none');
-			document.getElementById('history_menu1').setAttribute('style','display: none');
-			document.getElementById('history_menu2').setAttribute('style','display: none');
-			document.getElementById('history_menu3').setAttribute('style','display: none');
-			document.getElementById('history_menu4').setAttribute('style','');
-		document.getElementById('history_menu00').setAttribute('style','');
-			document.getElementById('hist1_today').setAttribute('style','display: none');
-			document.getElementById('hist1_week').setAttribute('style','display: none');
-			document.getElementById('hist1_month').setAttribute('style','display: none');
-			document.getElementById('hist2_today').setAttribute('style','');
-	};
-
-	var dfg19 = document.getElementById('hist0_right_2');
-	dfg19.onclick = function () {
-			document.getElementById('history_menu1').setAttribute('style','');
-			document.getElementById('history_menu4').setAttribute('style','display: none');
-			document.getElementById('history_menu5').setAttribute('style','display: none');
-			document.getElementById('history_menu6').setAttribute('style','display: none');
-		document.getElementById('history_menu00').setAttribute('style','display: none');
-		document.getElementById('history_menu0').setAttribute('style','');
-			document.getElementById('hist2_today').setAttribute('style','display: none');
-			document.getElementById('hist2_week').setAttribute('style','display: none');
-			document.getElementById('hist2_month').setAttribute('style','display: none');
-			document.getElementById('hist1_today').setAttribute('style','');
-	};
-
-	var dfg20 = document.getElementById('hist0_left_2');
-	dfg20.onclick = function () {
-			document.getElementById('history_menu1').setAttribute('style','');
-			document.getElementById('history_menu4').setAttribute('style','display: none');
-			document.getElementById('history_menu5').setAttribute('style','display: none');
-			document.getElementById('history_menu6').setAttribute('style','display: none');
-		document.getElementById('history_menu00').setAttribute('style','display: none');
-		document.getElementById('history_menu0').setAttribute('style','');
-			document.getElementById('hist2_today').setAttribute('style','display: none');
-			document.getElementById('hist2_week').setAttribute('style','display: none');
-			document.getElementById('hist2_month').setAttribute('style','display: none');
-			document.getElementById('hist1_today').setAttribute('style','');
-	};
-};
-
-
-
-function set_history () {
-	document.getElementsByClassName('container')[0].setAttribute('style','min-width: 170px;');
-	document.getElementById('menu_1').setAttribute('style','display: none;');
-	document.getElementById('block_1').setAttribute('style','display: none;');
-	document.getElementById('block_2').setAttribute('style','display: none;');
-	document.getElementById('block_3').setAttribute('style','display: none;');
-	document.getElementById('reset_button').setAttribute('style','display: none;');
-	document.getElementById('menu_2').removeAttribute('style');
-	document.getElementById('history').setAttribute('style','width: 180;');
-	document.getElementById('hist1_today').removeAttribute('style');
-
-	var asd = document.getElementById("history_table");
-	chrome.storage.local.get('assign', function(result){
-		var days = 0, weeks = 0, months = 0, Dhigh = 0, Dcrit = 0, Whigh = 0, Wcrit = 0, Mhigh = 0, Mcrit = 0;
-		var hist1_today = '', hist1_week = '', hist1_month = '';
-		for (var i = 0; i < result.assign.length; i++) {
-			var res = result.assign[i].time;
-			var qwe = Number(res.month) + 1;
-			var dat = new Date(res.year,res.month,res.day);
-			if (Date.daysBetween(dat) < 1) {
-				hist1_today = hist1_today + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + result.assign[i].ticket + '/">' + result.assign[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
-			};
-			if (Date.daysWeek(dat) < 7) {
-				hist1_week = hist1_week + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + result.assign[i].ticket + '/">' + result.assign[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
-			}
-			var now = new Date()
-			if (now.getMonth() == res.month) {
-				hist1_month = hist1_month + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + result.assign[i].ticket + '/">' + result.assign[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
-			}
-		};
-		asd.children[0].innerHTML = hist1_today;
-		asd.children[1].innerHTML = hist1_week;
-		asd.children[2].innerHTML = hist1_month;
-	});
-
-	chrome.storage.local.get('handover', function(result){
-		var days = 0, weeks = 0, months = 0, Dhigh = 0, Dcrit = 0, Whigh = 0, Wcrit = 0, Mhigh = 0, Mcrit = 0;
-		var hist1_today = '', hist1_week = '', hist1_month = '';
-		for (var i = 0; i < result.handover.length; i++) {
-			var res = result.handover[i].time;
-			var qwe = Number(res.month) + 1;
-			var dat = new Date(res.year,res.month,res.day);
-			if (Date.daysBetween(dat) < 1) {
-				hist1_today = hist1_today + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + result.handover[i].ticket + '/">' + result.handover[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
-			};
-			if (Date.daysWeek(dat) < 7) {
-				hist1_week = hist1_week + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + result.handover[i].ticket + '/">' + result.handover[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
-			}
-			var now = new Date()
-			if (now.getMonth() == res.month) {
-				hist1_month = hist1_month + '<tr><td><a href="https://help.skyeng.ru/staff/cases/record/' + result.handover[i].ticket + '/">' + result.handover[i].ticket + '</a></td><td>' + res.hours + ':' + res.minutes + ' ' + res.day + '/' + qwe + '</td><td class="delete">X</td></tr>';
-			}
-		};
-		asd.children[3].innerHTML = hist1_today;
-		asd.children[4].innerHTML = hist1_week;
-		asd.children[5].innerHTML = hist1_month;
-
-		var remove = document.getElementsByClassName('delete')
-		for (var q = 0; q < remove.length; q++) {
-			var rem = remove[q];
-			rem.onclick = function () {
-				this.parentElement.setAttribute('style','background-color:red;');
-				var data1 = {data : {ticket: this.parentElement.children[0].innerText}}
-				chrome.storage.local.get('assign', function(result){
-					var find = null;
-					var temp = result.assign;
-					for (var i = 0; i < temp.length; i++) {
-						if (temp[i].ticket == data1.data.ticket) {
-							find = i;
-						}
+	document.querySelectorAll('td[class="delete"]').forEach((item) => {
+		item.addEventListener('click', (a) => {
+			let element = a.toElement.parentElement
+			element.style = 'background-color: red;';
+			let ticket = element.firstElementChild.innerText;
+			let medium_text = (medium_menu == 0) ? 'assign' : (medium_menu == 1) ? 'handover' : false;
+			storage_ask(medium_text).then((data) => {
+				for (let i = 0; i < data.length; i++) {
+					if (data[i].ticket == ticket) {
+						data.splice( i, 1);
+                    	chrome.storage.local.set({[medium_text] : data});
 					}
-					if (find !== null) {
-						temp.splice(find,1);
-						chrome.storage.local.set({'assign' : temp});
-					};
-				});
-			}
-		}
+				}
+			})
+		});
 	});
 }
 
-function rem_history () {
-	document.getElementsByClassName('container')[0].removeAttribute('style');
-	document.getElementById('menu_1').removeAttribute('style');
-	document.getElementById('block_1').removeAttribute('style');
-	document.getElementById('reset_button').removeAttribute('style');
-	document.getElementById('menu_2').setAttribute('style','display: none;');
-	document.getElementById('history').setAttribute('style','display: none;');
+function move_big_menu() {
+    (big_menu == 0) ? big_menu = 1: big_menu = 0;
 
-	var asd = document.getElementById("history_table");
-	asd.children[0].innerHTML = '';
-	asd.children[1].innerHTML = '';
-	asd.children[2].innerHTML = '';
-	asd.children[3].innerHTML = '';
-	asd.children[4].innerHTML = '';
-	asd.children[5].innerHTML = '';
+    if (big_menu == 0) {
+		document.getElementById('big_menu').children[1].innerText = 'Статистика';
+        draw_stat(small_menu);
+    } else if (big_menu == 1) {
+		document.getElementById('big_menu').children[1].innerText = 'История';
+        draw_history(medium_menu, small_menu);
+    }
 }
+
+var big_menu = 0, medium_menu = 0, small_menu = 0;
+//big_menu кнопки
+document.addEventListener('DOMContentLoaded', () => {
+	document.getElementById('big_menu').firstElementChild.addEventListener('click', move_big_menu);
+	document.getElementById('big_menu').lastElementChild.addEventListener('click', move_big_menu);
+
+	draw_stat(small_menu);
+});
