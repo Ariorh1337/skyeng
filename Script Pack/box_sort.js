@@ -3,7 +3,7 @@
 
 
 function new_elm() {
-	var list = document.getElementById('records_list_sorting_chosen').lastElementChild.lastElementChild;
+	var list = document.getElementById('records_list_sorting_chosen').lastElementChild.lastElementChild.firstElementChild;
     var listElm1 = document.createElement('li');
     list.insertBefore(listElm1 , list.firstElementChild);
     listElm1.outerHTML = '<li class="active-result" style="" data-option-array-index="9">действию (старые в начале)</li>';

@@ -1,8 +1,13 @@
 {
     "name": "Script Package",
-    "version": "0.3.2",
-    "description": "Сброрник всех скриптов",
+    "version": "0.3.3",
+    "description": "Сборник всех скриптов для сотрудников Skyeng. По проблемам обратитесь в канал Slack: #tech-extensions",
     "manifest_version": 2,
+    "icons": {
+		"16": "script-pack.png",
+		"48": "script-pack.png",
+		"128": "script-pack.png"
+	},
     "options_page": "options.html",
     "background": {
         "scripts": ["background.js"],
@@ -54,6 +59,6 @@
         "matches": ["*://skyeng.autofaq.ai/tickets/assigned/*"]
     }],
     "permissions": [
-        "*://*.skyeng.ru/*", "*://skyeng.omnidesk.ru/*", "*://hayley.skarsgard.ru/api/*", "storage"
+        "*://*.skyeng.ru/*","*://skyeng.omnidesk.ru/*","*://hayley.skarsgard.ru/api/*","storage"
     ]
 }

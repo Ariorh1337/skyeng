@@ -9,10 +9,14 @@ chrome.storage.local.get(['calc_no_back_reload'], function(result) {
             }, 10000);
         
             $last_event = new Date();
+            $is_reload = false;
             function MouseMove (event) {
                 $new_event = new Date();
                 if (($new_event - $last_event) > 180000) {
-                    window.location.href = "https://qie.glitch.me/";
+                    if ( $is_reload == false ) { 
+                        window.location.href = "https://qie.glitch.me/";
+                        $is_reload = true;
+                    }
                 }
             }
             document.onmousemove = MouseMove;

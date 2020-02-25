@@ -236,23 +236,48 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         }
         if (request.question == 'get_Lazzy_TimeTable') {
-            fetch('https://crm.skyeng.ru/order/lazyTimetable', {
-                method: 'POST',
+            
+            fetch('https://crm.skyeng.ru/orderV2/ajaxLessonsHistoryTab/id/' + request.id, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                     'x-requested-with': 'XMLHttpRequest'
-                },
-                body: 'order_id=' + request.id
+                }
             })
             .then(response => response.text())
             .then(html => {
                 var page = document.createElement('html');
                 page.innerHTML = html;
-                var asd = page.getElementsByClassName('col-md-6')[0].children[0].innerText.trim().replace(/\n/g, "");
-                asd = asd + '\n' + page.getElementsByClassName('col-md-6')[0].children[1].innerText.trim();
-                sendResponse({
-                    answer: asd.replace(/\s+/g,' ').trim()
-                });
+                if (page.querySelector('#lesson-planned-container').lastElementChild.innerText.trim() !== "Запланированных уроков нет") {
+                    document.body.prepend(page);
+					let str = Array(), str2 = Array();
+                    page.querySelector('#lesson-planned-container').innerText.split('\n').forEach((elm) => {
+                        if (elm.trim() !== '') {
+                            str.push(elm);
+                        }
+                    });
+                    str.splice(0,3);
+
+                    str.forEach((elm) => {
+                        let cut = elm.split('	');
+
+						(cut[0].indexOf("Mon") !== -1) ? cut[0] = cut[0].replace('Mon','ПН') : false;
+                        (cut[0].indexOf("Tue") !== -1) ? cut[0] = cut[0].replace('Tue','ВТ') : false;
+                        (cut[0].indexOf("Wed") !== -1) ? cut[0] = cut[0].replace('Wed','СР') : false;
+                        (cut[0].indexOf("Thu") !== -1) ? cut[0] = cut[0].replace('Thu','ЧТ') : false;
+                        (cut[0].indexOf("Fri") !== -1) ? cut[0] = cut[0].replace('Fri','ПТ') : false;
+                        (cut[0].indexOf("Sat") !== -1) ? cut[0] = cut[0].replace('Sat','СБ') : false;
+                        (cut[0].indexOf("Sun") !== -1) ? cut[0] = cut[0].replace('Sun','ВС') : false;
+
+                        str2.push(`${cut[0]} | ${cut[1].match(/#[0-9]*/i)[0]} | ${cut[3] == "Английский язык" ? "Англ" : "Math"} | ${cut[4] == "Регулярный" ? "reg" : "one"}`);
+                    });
+                    str2 = str2.join('\n');
+					page.remove();
+
+                    sendResponse({ answer: str2 });
+                } else {
+                    sendResponse({ answer: 'Нет уроков' });
+                }
             });
             return true;
         }
@@ -398,6 +423,83 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     }
                 })
             });
+            return true;
+        }
+        if (request.question == 'is_crm1') {
+            fetch('https://backend.skyeng.ru/api/call-center/persons/?id=' + request.id, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'x-requested-with': 'XMLHttpRequest'
+                }	
+            }).then(text => text.json()).then(json => {
+                sendResponse({answer: json.data[0].isFromCrm1});
+            })
+            return true;
+        }
+        if (request.question == 'crm2_status') {
+            fetch(`https://backend.skyeng.ru/api/persons/${request.id}/education-services/`, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'x-requested-with': 'XMLHttpRequest'
+                }	
+            }).then(text => text.json()).then(json => {
+                let result = [];
+
+                for (let i = 0; i < json.data.length; i++) {
+                    let color = '', balance = json.data[i].balance, subject = '', teacher = '', payment = { "id": '', "name": ''};
+
+                    if (json.data[i].stage == "lost") {
+                        color = "purple";
+                    } else if (json.data[i].stage == "before_call") {
+                        color = "pink";
+                    } else if (json.data[i].stage == "after_trial") {
+                        color = "lightblue";
+                    } else if (json.data[i].stage == "regular_lessons") {
+                        color = "green";
+                    }
+
+                    if (json.data[i].subject == "english") {
+                        subject = "ENG"
+                    } else if (json.data[i].subject == "mathematics") {
+                        subject = "MATH"
+                    }
+
+                    if (json.data[i].teacher == null) {
+                        teacher = null;
+                    } else {
+                        teacher = json.data[i].teacher.general.id;
+                    }
+
+                    (json.data[i].paymentAgreement.person.general.id) ? payment['id'] = json.data[i].paymentAgreement.person.general.id : false;
+                    (json.data[i].paymentAgreement.person.general.name) ? payment['name'] = json.data[i].paymentAgreement.person.general.name : false;
+
+                    result.push({"color": color, "balance": balance, "subject": subject, "teacher": teacher, "payment": payment})
+                }
+
+                sendResponse({answer: result});
+            })
+
+            return true;
+        }
+        if (request.question == 'crm2_no_responce') {
+            console.log(request.ticket_id, request.id)
+            var body = `log=Тикет ТП omnidesk: ${request.ticket_id} ~ не удалось связаться`;
+            fetch(`https://backend.skyeng.ru/api/persons/${request.id}/log-any-interaction/`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'x-requested-with': 'XMLHttpRequest'
+                },
+                body: body	
+            }).then( responce => {
+                if (responce.status == 204) {
+                    sendResponse({answer: 'done'});
+                } else {
+                    sendResponse({answer: 'error'});
+                }
+            })
             return true;
         }
     }
