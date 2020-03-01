@@ -9,7 +9,7 @@ var win_html = `<div style="display: flex;">
             <button style="width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" id="btn1_teacher">Info П</button>
         </div>
         <div style="margin: 10px;">
-            <button style="padding-left: 1px; width: 55px; height: 22px; background-color: rgb(118, 141, 135); border-radius: 5px; border: 1px solid rgb(86, 105, 99); color: rgb(255, 255, 255); display: none;" id="btn_hide">Скрыть</button>
+            <button style="padding-left: 1px; width: 55px; height: 22px; background-color: rgb(118, 141, 135); border-radius: 5px; border: 1px solid rgb(86, 105, 99); color: rgb(255, 255, 255); display: none;" id="btn_hide" disabled>Скрыть</button>
         </div>
     </span>
     <span style="border-left: solid black 1px;">
@@ -155,7 +155,7 @@ if (localStorage.getItem('winTop') == null) {
 // Создаем само окно
 let wint = document.createElement('div');
 document.body.append(wint);
-wint.style = 'min-height: 68px; max-height: 450px; min-width: 76px; max-width: 370px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56); color: black;';
+wint.style = 'min-height: 68px; max-height: 750px; min-width: 76px; max-width: 370px; background: wheat; top: ' + localStorage.getItem('winTop') + 'px; left: ' + localStorage.getItem('winLeft') + 'px; font-size: 14px; z-index: 20; position: fixed; border: 1px solid rgb(56, 56, 56); color: black;';
 wint.setAttribute('id' ,'main_easy_win');
 wint.innerHTML = win_html;
 
@@ -202,6 +202,7 @@ function move_again() {
         document.getElementById('main_easy_win').innerHTML = win_html;
         move_again();
         teacher_easy_timetable();
+        document.getElementById('btn_hide').setAttribute('disabled','');
     }
 
     document.getElementById('add_note_student').addEventListener( "click" , () => {
@@ -349,6 +350,11 @@ async function get_info(type) { //v.2
         id = document.querySelectorAll('label > input[class="form-custom-field"]')[0].value.replace(/[^0-9]/g, "");
     }
 
+    if (id == '') {
+        console.log('Нет ID');
+        return 0;
+    }
+
     var btns = document.querySelectorAll('#main_easy_win > div > span > div[style="margin: 10px;"]');
     btns[0].style.display = 'none', btns[1].style.display = 'none';
     document.getElementById('btn_hide').style.display = '';
@@ -362,6 +368,7 @@ async function get_info(type) { //v.2
         
         get_person_info.then( (value) => {
             var role = value.role;
+            var is_kgl = (value.status.indexOf('Group') !== -1) ? true : false;
 
             if (role == 'operator') {
                 document.getElementById('info_status').setAttribute('user_id', id);
@@ -463,7 +470,7 @@ async function get_info(type) { //v.2
                                     document.getElementById('student_crm').onclick = function () {
                                         window.open('https://crm.skyeng.ru/admin/orderPriority/search?page=1&user=' + id, '_blank');
                                     }
-                                    document.getElementById('info_student_block').innerHTML += '<br>Time: ' + response.time; 
+
                                     info_status.style.backgroundColor = response.status;
                                     info_status.setAttribute('order_id', response.order);
                 
@@ -517,6 +524,20 @@ async function get_info(type) { //v.2
 
                             no_responce(id);
 
+                            if (is_kgl === true) {
+                                chrome.runtime.sendMessage({name: "script_pack", question: 'get_group_student_info', id: id}, function(response) {
+                                    let info_teacher_block = document.getElementById('info_teacher_block');
+                                    info_teacher_block.innerHTML = '<span><span style="margin-right: 3px;">Группа:</span>' + response.group + '<a style="margin-left: 10px; margin-right: 10px;" href="https://api.olympiad.skyeng.ru/crm/cards/' + id + '">Семья</a><a href="https://grouplessons-api.skyeng.ru/admin/student/view/' + id + '">Подписка</a></span>';
+    
+                                    let windt = document.createElement('div');
+                                    info_teacher_block.append(windt);
+                                    windt.innerHTML = response.info;
+
+                                    info_teacher_block.style.display = '';
+                                    info_teacher_block.style.marginTop = '';
+                                });         
+                            }
+
                             chrome.runtime.sendMessage({name: "script_pack", question: 'crm2_status', id: id}, function(response) {
                                 if (response.answer.length > 0) {
                                     response.answer.forEach((element) => {
@@ -537,10 +558,6 @@ async function get_info(type) { //v.2
                                     });
                                 }                                
                             });
-
-                            
-                            //document.querySelectorAll('crm-education-service-item > div > div > div > crm-row > main > crm-user-info > span') //Teachers
-                            //document.querySelectorAll('crm-education-service-item > div > div > div')[0].firstElementChild.lastElementChild //order_id
                         }
                     })
                 }
@@ -554,6 +571,10 @@ async function get_info(type) { //v.2
             }
         });
     }
+
+    setInterval(() => {
+        document.getElementById('btn_hide').removeAttribute('disabled');
+    }, 5000);
 }
 
 function teacher_draw(id) {
@@ -645,8 +666,6 @@ function get_ticket_history(id) {
     return get_ticket_history;
 }
 
-//chrome.runtime.sendMessage({name: "script_pack", question: 'is_crm1', id: id}, function(response) { response.answer });
-
 async function is_crm1(id) {
     return new Promise(resolve => {
         chrome.runtime.sendMessage({name: "script_pack", question: 'is_crm1', id: id}, function(response) {
@@ -655,36 +674,18 @@ async function is_crm1(id) {
     });
 }
 
-/*/
-function get_user_id(id) {
-    return new Promise(resolve => {
-        chrome.runtime.sendMessage({name: "script_pack", question: 'info_users_search', id: id}, function(response) {
-            resolve(response.role);
-        })
-    });
-}
-
-function get_role(id) {
-    return new Promise(resolve => {
-        chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id: id}, function(response) {
-            resolve(response.role);
-        })
-    });
-}
-/*/
-
 (function put_ticket_history() {
     document.getElementById('add_history_student').addEventListener( "click" , () => {
         let id = document.getElementById('info_status').getAttribute('user_id');
         let ticket = window.location.pathname.match(/\/[0-9-]+\//g);
-        fetch('https://hayley.skarsgard.ru/api/tickets-list/?id=' + id + '&ticket=' + ticket, {
+        fetch('https://datsy.ru/api/tickets-list/?id=' + id + '&ticket=' + ticket, {
             method: 'GET', headers: { 'content-type': 'application/x-www-form-urlencoded' }
         });
     });
     document.getElementById('add_history_teacher').addEventListener( "click" , () => {
         let id = document.getElementById('teacher_status').getAttribute('user_id');
         let ticket = window.location.pathname.match(/\/[0-9-]+\//g);
-        fetch('https://hayley.skarsgard.ru/api/tickets-list/?id=' + id + '&ticket=' + ticket, {
+        fetch('https://datsy.ru/api/tickets-list/?id=' + id + '&ticket=' + ticket, {
             method: 'GET', headers: { 'content-type': 'application/x-www-form-urlencoded' }
         });
     });
@@ -726,29 +727,15 @@ function crm2_teacher_draw(id) {
     </div>
     <div style="text-align: center; padding: 7px; display: none;" id="info_teacher_block_${id}"></div>
     <div style="text-align: center; display: none;" id="table_time_${id}">
-        <table style="border-top: 1px solid black;">
-            <tbody>
-                <tr>
-                    <td style="cursor: pointer;">⬅</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">00</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">01</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">02</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">03</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">04</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">05</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">06</td>
-                    <td style="border-left: 1px solid black; cursor: pointer;">➡</td>
-                </tr>
-            </tbody>
-        </table>
+        
     </div>`;
     let elm = document.createElement('div');
     document.getElementById('info_block').append(elm);
     elm.outerHTML = html;
 
-    document.getElementById('teacher_copy').onclick = function () {
-        let tcher = document.getElementById('info_teacher_block').innerText;
-        copyToClipboard(tcher) //.replace(/<br>/g,'\n')
+    document.getElementById(`teacher_copy_${id}`).onclick = function () {
+        let tcher = document.getElementById(`info_teacher_block_${id}`).innerText;
+        copyToClipboard(tcher); //.replace(/<br>/g,'\n')
     };
     document.getElementById('add_note_teacher').addEventListener( "click" , () => {
         let id = document.getElementById('teacher_status').getAttribute('user_id');
@@ -821,20 +808,34 @@ function crm2_teacher_draw(id) {
     });
     
     //Easy timetable start
-    teacher_easy_timetable_crm2(id)
     chrome.runtime.sendMessage({name: "script_pack", question: 'get_lessons_today', id: id}, function(response) {
         if (response.answer !== 0 && response.answer !== null) {
+            let html = `<table style="border-top: 1px solid black;">
+                            <tbody>
+                                <tr>
+                                    <td style="cursor: pointer;">⬅</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">00</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">01</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">02</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">03</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">04</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">05</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">06</td>
+                                    <td style="border-left: 1px solid black; cursor: pointer;">➡</td>
+                                </tr>
+                            </tbody>
+                        </table>`;
+            document.getElementById(`table_time_${id}`).innerHTML = html;
+
             let lessons = '';
             for (let i = 0; i < response.answer.length; i++) {
                 lessons += response.answer[i].startAt + ';';
             }
             document.getElementById(`table_time_${id}`).setAttribute('busy_time', lessons);
             //document.getElementById(`table_time_${id}`).style.display = 'grid';
-        } else { document.getElementById(`table_time_${id}`).style.display = 'none';}
-    });
-    
-    setTimeout( function () {
-        if (document.getElementById(`table_time_${id}`).getAttribute('busy_time') !== undefined && document.getElementById(`table_time_${id}`).getAttribute('busy_time') !== null) {
+
+            teacher_easy_timetable_crm2(id);
+
             var busy_time = document.getElementById(`table_time_${id}`).getAttribute('busy_time').split(';')
             var tab = document.getElementById(`table_time_${id}`).firstElementChild.firstElementChild.firstElementChild;
             for (var i = 0; i < busy_time.length; i++) {
@@ -842,10 +843,11 @@ function crm2_teacher_draw(id) {
                     if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
                 }
             }
-        } else {
+        } else { 
+            document.getElementById(`table_time_${id}`).style.display = 'none';
             console.log('у П нет уроков на сегодня');
         }
-    }, 4000);
+    });
 }
 
 function crm2_status_draw(id, color, balance, subject, payment, blank = true) {
@@ -884,6 +886,8 @@ function crm2_status_draw(id, color, balance, subject, payment, blank = true) {
     let elm = document.createElement('div');
     document.getElementById('info_block').append(elm);
     elm.outerHTML = html;
+
+    document.getElementById('btn_hide').removeAttribute('disabled');
 }
 
 function teacher_easy_timetable_crm2(id) {//Время П
@@ -924,11 +928,14 @@ function teacher_easy_timetable_crm2(id) {//Время П
                 asd.children[i].innerText = Number(asd.children[i].innerText) + 1
             }
             
-            var busy_time = document.getElementById(`table_time_${id}`).getAttribute('busy_time').split(';')
-            var tab = document.getElementById(`table_time_${id}`).firstElementChild.firstElementChild.firstElementChild;
-            for (var i = 0; i < busy_time.length; i++) {
-                for (var ii = 1; ii < 8; ii++) {
-                    if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+            var busy_time = document.getElementById(`table_time_${id}`).getAttribute('busy_time');
+            if (busy_time !== null) {
+                busy_time = busy_time.split(';');
+                var tab = document.getElementById(`table_time_${id}`).firstElementChild.firstElementChild.firstElementChild;
+                for (var i = 0; i < busy_time.length; i++) {
+                    for (var ii = 1; ii < 8; ii++) {
+                        if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+                    }
                 }
             }
         }	
@@ -940,11 +947,14 @@ function teacher_easy_timetable_crm2(id) {//Время П
                 asd.children[i].innerText = Number(asd.children[i].innerText) - 1
             }
             
-            var busy_time = document.getElementById(`table_time_${id}`).getAttribute('busy_time').split(';')
-            var tab = document.getElementById(`table_time_${id}`).firstElementChild.firstElementChild.firstElementChild;
-            for (var i = 0; i < busy_time.length; i++) {
-                for (var ii = 1; ii < 8; ii++) {
-                    if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+            var busy_time = document.getElementById(`table_time_${id}`).getAttribute('busy_time');
+            if (busy_time !== null) {
+                busy_time = busy_time.split(';');
+                var tab = document.getElementById(`table_time_${id}`).firstElementChild.firstElementChild.firstElementChild;
+                for (var i = 0; i < busy_time.length; i++) {
+                    for (var ii = 1; ii < 8; ii++) {
+                        if ( busy_time[i] == tab.children[ii].innerText || busy_time[i] == '0' + tab.children[ii].innerText ) {  tab.children[ii].style.backgroundColor = 'lightblue';}
+                    }
                 }
             }
         }	

@@ -81,7 +81,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     var page = document.createElement('a');
                     page.innerHTML = text.toString();
                     
-                    var id = '',    names = '',    mail = '',    phone = '',    phoneD = '',    skype = '',    identity = '', roles = false, roles_text = '', role = '';
+                    var id = '',    names = '',    mail = '',    phone = '',    phoneD = '',    skype = '',    identity = '', roles = false, roles_text = '', role = '', time = '';
                     var sname = page.querySelectorAll('main > div > table > tbody > tr > th');
                     var result = page.querySelectorAll('main > div > table > tbody > tr > td');
 
@@ -95,6 +95,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             (sname[i].innerText == 'Домашний телефон' || sname[i].innerText == 'Home phone') ? phoneD = '<br><a href="tel:' + result[i].innerText + '">Phone2</a>: ' + result[i].innerText : false;
                             (sname[i].innerText == 'Skype') ? skype = '<br><a href="skype:' + result[i].innerText + '?chat">Skype</a>: ' + result[i].innerText : false;
                             (sname[i].innerText == 'Legacy identity') ? identity = '<br>Identity: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Смещение UTC') ? time = `<br>Время: ${makeUTCGreatAgain(result[i].innerText)}` : false;
 							(sname[i].innerText == 'Все новые роли' || sname[i].innerText == 'All new roles') ? roles = result[i].innerText.trim() : false;
                         }
                     }
@@ -116,7 +117,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         }
                     }
 
-                    let stat = id + names + mail + phone + phoneD + skype + identity;
+                    let stat = id + names + mail + phone + phoneD + skype + identity + time;
                     sendResponse({
                         status: roles_text,
                         answer: stat,
@@ -313,12 +314,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         result += info.split('#')[o -1].slice(0, -5).slice(-8) + ' ' + info.split('#')[o].slice(int, int2) + '</div><div>';
                     }
 
+                    //Группа
+                    var group = page.querySelector("h6 > a:nth-child(2)");
+
                     sendResponse({
                         from: from,
                         to: to,
                         subscribe: subscribe,
                         sub: sub,
-                        info: result
+                        info: result,
+                        group: group
                     });
                     console.log(result);
                 }
@@ -387,7 +392,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         }
         if (request.question == 'get_ticket_history') {
-            fetch(`https://hayley.skarsgard.ru/api/tickets-list/?id=${request.id}`, {
+            fetch(`https://datsy.ru/api/tickets-list/?id=${request.id}`, {
                 method: 'GET',
                 headers: { 'content-type': 'application/x-www-form-urlencoded' }
             })
@@ -399,7 +404,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         }
         if (request.question == 'put_ticket_history') {
-            fetch(`https://hayley.skarsgard.ru/api/tickets-list/?id=${request.id}&ticket=${request.ticket}`, {
+            fetch(`https://datsy.ru/api/tickets-list/?id=${request.id}&ticket=${request.ticket}`, {
                 method: 'GET',
                 headers: { 'content-type': 'application/x-www-form-urlencoded' }
             });
@@ -454,6 +459,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         color = "purple";
                     } else if (json.data[i].stage == "before_call") {
                         color = "pink";
+                    } else if (json.data[i].stage == "after_call") {
+                        color = "pink";
                     } else if (json.data[i].stage == "after_trial") {
                         color = "lightblue";
                     } else if (json.data[i].stage == "regular_lessons") {
@@ -474,7 +481,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
                     (json.data[i].paymentAgreement.person.general.id) ? payment['id'] = json.data[i].paymentAgreement.person.general.id : false;
                     (json.data[i].paymentAgreement.person.general.name) ? payment['name'] = json.data[i].paymentAgreement.person.general.name : false;
-
+                    (balance == null) ? balance = 0 : false;
+                    
                     result.push({"color": color, "balance": balance, "subject": subject, "teacher": teacher, "payment": payment})
                 }
 
@@ -484,7 +492,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         }
         if (request.question == 'crm2_no_responce') {
-            console.log(request.ticket_id, request.id)
             var body = `log=Тикет ТП omnidesk: ${request.ticket_id} ~ не удалось связаться`;
             fetch(`https://backend.skyeng.ru/api/persons/${request.id}/log-any-interaction/`, {
                 method: "POST",
@@ -643,4 +650,11 @@ function get_lessons_info(ID, Day, Count, Month, Year) {
         xhr.send(body);
         return info1
     }
+}
+
+function makeUTCGreatAgain(time) {
+    time = (Number(time) / 3600);
+    (String(time).indexOf('-') == -1) ? time = '+' + time : false;
+    (time !== '+3') ? time = `<b style="color: #FF5733;">${time}UTC</b>` : time = `<b>${time}UTC</b>`;
+    return time;
 }
