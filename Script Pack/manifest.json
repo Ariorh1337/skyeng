@@ -1,6 +1,6 @@
 {
     "name": "Script Package",
-    "version": "0.3.4",
+    "version": "0.4.0",
     "description": "Сборник всех скриптов для сотрудников Skyeng. По проблемам обратитесь в канал Slack: #tech-extensions",
     "manifest_version": 2,
     "icons": {
@@ -19,7 +19,7 @@
         "matches": ["*://timetable.skyeng.ru/*"]
     },
     {
-        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js", "ticket_input_label.js", "ticket_easy_info_window.js", "ticket_reminds_of.js", "ticket_who_creator.js", "ticket_dark_css.js", "ticket_help_notify.js"],
+        "js": ["ticket_quote.js", "ticket_how_old_ticket.js", "ticket_how_old_reply.js", "ticket_big_notes.js", "ticket_input_label.js", "ticket_easy_info_window.js", "ticket_reminds_of.js", "ticket_who_creator.js", "ticket_dark_css.js", "ticket_help_notify.js", "ticket_help_ids.js"],
         "matches": ["*://help.skyeng.ru/staff/cases/record/*","*://skyeng.omnidesk.ru/staff/cases/record/*"]
     },
     {
@@ -39,10 +39,6 @@
         "matches": ["*://help.skyeng.ru/staff/cases/list/*"]
     },
     {
-        "js": ["calc_date_text.js","calc_no_back_reload.js","calc_download_events.js","calc_backup.js"],
-        "matches": ["*://qie.glitch.me/*"]
-    },
-    {
         "js": ["workbook.js"],
         "matches": ["*://*.skyeng.ru/workbook/*"]
     },
@@ -55,10 +51,10 @@
         "matches": ["*://skyeng.omnidesk.ru/l_rus/*","*://*.skyeng.ru/l_rus/*"]
     },
     {
-        "js": ["ticket_easy_info_window.js"],
-        "matches": ["*://skyeng.autofaq.ai/tickets/assigned/*"]
+        "js": ["ticket_easy_info_window.js", "autofaq_people_list.js", "autofaq_colorfull_status.js"],
+        "matches": ["*://skyeng.autofaq.ai/*"]
     }],
     "permissions": [
-        "*://*.skyeng.ru/*","*://skyeng.omnidesk.ru/*","*://datsy.ru/api/*","storage"
+        "cookies", "*://*.skyeng.ru/*","*://skyeng.omnidesk.ru/*","*://datsy.ru/api/*","storage"
     ]
 }

@@ -51,8 +51,8 @@ chrome.storage.local.get(['chat_create'], function(result) {
                 cr_btn.innerHTML = '<a style="float: left; margin-right: 15px; margin-top: 10px; color: darkviolet; cursor: pointer;" onclick="ticket_btn();">Ticket</a>';
             })();
             function ticket_btn () {
-                const name = document.querySelector('#info_user_info_panel > div[class="info_fields"] > p').innerText;
-                const email = document.querySelector('#info_user_info_panel > div[class="info_fields"] > p > a[href][target]').innerText;
+                const name = document.querySelector('#info_user_info_panel > .info_fields > p').innerText;
+                const email = document.querySelector('#info_user_info_panel > .info_fields > p > a[href][target]').innerText;
                 const text = document.querySelector('#current_subject > span').innerText.replace(/[ ]/g, '%20');
                 window.open('/l_rus/?name=' + name + '&email=' + email + '&text=' + text,'_blank');
             }`

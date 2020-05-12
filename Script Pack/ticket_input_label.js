@@ -2,7 +2,7 @@ function input_label () {
     let menu = document.querySelector('.footer-toolbar-inner > div[class=fl-right]');
     let inpt = document.createElement('input');
     menu.append(inpt);
-    inpt.style = "width: 90px; margin-right: 20px; margin-top: 4px;"
+    inpt.style = "width: 90px; margin-right: 20px; margin-top: 4px; color: black;"
     inpt.classList = 'js_omni_redactor_container';
     inpt.onblur = function () {
         let text = this.value;

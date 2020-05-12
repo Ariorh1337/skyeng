@@ -1,6 +1,6 @@
 var win_html = `<div style="display: flex;">
     <span style="cursor: -webkit-grab;">
-        <input id="id_type_for_chat" autocomplete="off" type="text" style="text-align: center; width: 72px; display: none;" onchange="this.value = this.value.replace(' ','')">
+        <input id="id_type_for_chat" autocomplete="off" type="text" style="text-align: center; width: 72px; color: black; display: none; margin-left: 1px;" onchange="this.value = this.value.replace(' ','')">
         <datalist id="user_search"></datalist>
         <div style="margin: 10px;">
             <button style="width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" id="btn1_student">Info У</button>
@@ -242,7 +242,7 @@ function move_again() {
         }
     });
 
-    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
+    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('skyeng.autofaq.ai') !== -1) {
         document.getElementById('add_history_teacher').style.display = 'none';
         document.getElementById('add_history_student').style.display = 'none';
 
@@ -334,7 +334,7 @@ const copyToClipboard = str => {
 
 async function get_info(type) { //v.2
     let id;
-    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('tickets/assigned') !== -1) {
+    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('skyeng.autofaq.ai') !== -1) {
         id = document.getElementById('id_type_for_chat').value;
         /*/
         if (isNaN(id) == true) {
@@ -361,7 +361,7 @@ async function get_info(type) { //v.2
 
     if (id) {
         var get_person_info = new Promise( (resolve) => {
-            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id: id}, function(response) {
+            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v2', id: id}, function(response) {
                 resolve(response);
             })
         });
@@ -502,7 +502,7 @@ async function get_info(type) { //v.2
                                         }
                                     } else {
                                         var get_person_info2 = new Promise( (resolve) => {
-                                            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id: response.teacher}, function(response) {
+                                            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v2', id: response.teacher}, function(response) {
                                                 resolve(response);
                                             })
                                         });
@@ -545,7 +545,7 @@ async function get_info(type) { //v.2
                                             crm2_status_draw(id, element.color, element.balance, element.subject, element.payment, false);
                                             crm2_teacher_draw(element.teacher);
                                             var get_person_info2 = new Promise( (resolve) => {
-                                                chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id: element.teacher}, function(response) {
+                                                chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v2', id: element.teacher}, function(response) {
                                                     resolve(response);
                                                 })
                                             });

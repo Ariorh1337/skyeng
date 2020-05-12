@@ -18,11 +18,14 @@ chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id
     console.log(response.answer);
 });
 */
+var JWT_token = '', test_teacher_id = '';
+checkJWT()
 
 //Получаю request со страницы скрипта
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     //Проверяем что это наш запрос:
     if (request.name === "script_pack") {
+        checkJWT()
         let answer;
         if (request.question == 'get_lesson_info') {
             answer = get_lesson_info(request.id, request.hour, request.day, request.month, request.year);
@@ -509,6 +512,63 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             })
             return true;
         }
+        if (request.question == 'get_person_info_v2') {
+            chrome.storage.local.get(['JWT_token'], (r) => {
+                fetch("https://api.profile.skyeng.ru/api/v1/students/" + request.id + "/base-data", {
+                    "headers": {
+                        "Authorization": 'Bearer ' + r['JWT_token']
+                    },
+                    "credentials": "omit"
+                })
+                    .then(re => {
+                        if (re.status == 200) {
+                            return re.json();
+                        } else {
+                            getJWT(test_teacher_id);
+                        }
+                    })
+                    .then(response => {
+                        if (response.data.success == true) {
+                            let info = response.data.result;
+                            let id = `ID: ${info.id}`;
+                            let names = (info.name !== null || info.surname !== null) ? `<br>Name: ${(info.name !== null) ? info.name : ''} ${(info.surname !== null) ? info.surname : ''}`: '';
+                            let mail = (info.email !== null) ? `<br>eMail: ${info.email}` : '';
+                            let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: ${info.phone}` : '';
+                            let phoneD = (info.homePhone !== null) ? `<br><a href="tel:${info.homePhone}">Phone2</a>: ${info.homePhone}` : '';
+                            let skype = (info.skype !== null) ? `<br><a href="skype:${info.skype}?chat">Skype</a>: ${info.skype}` : '';
+                            let identity = (info.identity !== null) ? `<br>Identity: ${info.identity}` : '';
+                            let roles_text = '', role = '';
+                            let roles = (info.roles) ? info.roles.join(' ').trim() : false;
+                            let time = (info.utcOffset) ? `<br>Время: ${makeUTCGreatAgain(info.utcOffset)}` : ``; 
+                            
+                            if (roles) {
+                                if (roles.indexOf('ROLE_OPERATOR') !== -1) { 
+                                    role = 'operator';
+                                    roles_text += 'Operator<br>';
+                                } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
+                                    role = 'teacher';
+                                    (roles.indexOf('ROLE_MATH_TEACHER') !== -1) ? roles_text += 'Teacher - <a style="color: darkblue; font-weight: 700;">Math</a><br>' : false;
+                                } else if (roles.indexOf('ROLE_VIMBOX_STUDENT') !== -1) {
+                                    role = 'student';
+                                    if (roles.indexOf('ROLE_GROUP_STUDENT') !== -1) {
+                                        roles_text += 'Student - <a style="color: purple; font-weight: 700;">Group</a><br>';
+                                    } else if (roles.indexOf('ROLE_MATH_STUDENT') !== -1) {
+                                        roles_text += 'Student - <a style="color: darkblue; font-weight: 700;">Math</a><br>';
+                                    };
+                                }
+                            }
+                            
+                            let stat = id + names + mail + phone + phoneD + skype + identity + time;
+                            sendResponse({
+                                status: roles_text,
+                                answer: stat,
+                                role: role
+                            });
+                        }
+                    });
+            });            
+            return true;
+        }
     }
 });
 
@@ -657,4 +717,88 @@ function makeUTCGreatAgain(time) {
     (String(time).indexOf('-') == -1) ? time = '+' + time : false;
     (time !== '+3') ? time = `<b style="color: #FF5733;">${time}UTC</b>` : time = `<b>${time}UTC</b>`;
     return time;
+}
+
+function getJWT(teacher = '2314498') {
+    fetch('https://crm.skyeng.ru/order/generateLoginLink?userId=' + teacher, { headers: { 'x-requested-with': 'XMLHttpRequest' } })
+        .then(response => response.text())
+        .then((response) => {
+            if (response !== 'Login required') {
+                return JSON.parse(response);
+            } else {
+                window.open('https://id.skyeng.ru/login');
+            }
+        })
+        .then(link => {
+            if (link) {
+                //Сохраняем текущие куки
+                var save = new Array();
+                chrome.cookies.getAll({ domain: ".skyeng.ru" }, (e) => {
+                    e.forEach((c) => {
+                        if (c.domain == ".skyeng.ru") save.push(c);
+                    });
+                });
+                chrome.cookies.remove({
+                    "url": "https://crm.skyeng.ru",
+                    "name": "session_global"
+                });
+                    
+                //Логинимся по ссылке логинеру в аккаунт П
+                fetch(link.data.link, { "credentials": "include"})
+                    .then(r => r.text)
+                    .then(r => {
+                        //Запрашиваем генерацию JWT токена
+                        fetch("https://id.skyeng.ru/user-api/v1/auth/jwt", {
+                            "body": null,
+                            "method": "POST",
+                            "credentials": "include"
+                        })
+                            .then(a => {
+                                //Сохраняем полученый токен из cookie
+                                chrome.cookies.getAll({ domain: ".skyeng.ru", name: "token_global" }, (e) => {
+                                    e.forEach((c) => {
+                                        if (c.domain == ".skyeng.ru") {
+                                            chrome.storage.local.set({ 'JWT_token': c.value });
+                                        }
+                                    });
+                                });
+
+                                //Возвращаем куки обратно на место
+                                save.forEach((c) => {
+                                    c.url = "https://id.skyeng.ru";
+                                    delete c.hostOnly;
+                                    delete c.session;
+                                    chrome.cookies.set(c);
+                                });
+                            })
+                            .then(() => {
+                                chrome.storage.local.get(['JWT_token'], (r) => {
+                                    JWT_token = r['JWT_token'];
+                                })
+                            });
+                    });
+            }
+        });
+}
+
+function checkJWT() {
+    chrome.storage.local.get('test-teacher_id', (r) => {
+        if (r['test-teacher_id'] == undefined) {
+            chrome.storage.local.set({ 'test-teacher_id': '2314498' });
+            test_teacher_id = '2314498';
+        } else {
+            if (r['test-teacher_id'] !== test_teacher_id) {
+                test_teacher_id = r['test-teacher_id'];
+                getJWT(test_teacher_id);
+            }
+        }
+    })
+
+    chrome.storage.local.get('JWT_token', (r) => {
+        if (r['JWT_token'] == undefined) {
+            getJWT(test_teacher_id);
+        } else {
+            JWT_token = r['JWT_token'];
+        }
+    })
 }
