@@ -1,7 +1,7 @@
 {
     "name": "Script Package",
-    "version": "0.4.0",
-    "description": "Сборник всех скриптов для сотрудников Skyeng. По проблемам обратитесь в канал Slack: #tech-extensions",
+    "version": "0.4.1",
+    "description": "Сборник скриптов для быстрого доступа к ресурсам: ://.skyeng.ru/* , ://datsy.ru/, ://skyeng.autofaq.ai/, ://skyeng.omnidesk.ru/* , для авторизированных пользователей школы Skyeng. По проблемам обратитесь в канал Slack: #tech-extensions",
     "manifest_version": 2,
     "icons": {
 		"16": "script-pack.png",

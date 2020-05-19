@@ -1,52 +1,15 @@
-let AutoFaqCookie = document.cookie.match(/jwt=(.*)/)[1];
-
-function get_state() {
-    let result = new Promise(function (resolve, reject) {
-        fetch("https://skyeng.autofaq.ai/api/operators/statistic/currentState", {
-            "headers": {
-                'Content-Type': 'application/json',
-                'cookie': `jwt=${AutoFaqCookie};`
-            }
-        })
-            .then(r => r.json())
-            .then(response => {
-                resolve(response.rows);
-            });
-    });
-
-    return result.then((array) => {
-		return array;
-	});
-}
-
-let person = (name, count, state) => `<li class="ant-menu-item" role="people" style="padding-left: 32px;">
+const AutoFaqCookie = document.cookie.match(/jwt=(.*)/)[1];
+const person = (name, count, state) => `<li class="ant-menu-item" role="people" style="padding-left: 32px;">
 <a class="app-left_menu-item">
     <span style="border-inline-start: 16px dotted ${(state !== 'Online') ? 'darkorange' : (count == 0) ? 'darkgreen' : 'darkred'};"></span>
     <span role="img" aria-label="alert" type="alert" class="anticon anticon-alert" style="margin: 0px 0px 0px -15px; font-weight: bold;">${count}</span>
     <span class="nav-text">
-        <span class="ant-badge" style="font-size: 10px;">${name}</span>
+        <span class="ant-badge" style="font-size: ${(name.length < 21) ? '10' : (name.length < 23) ? '9' : '8'}px;">${name}</span>
     </span>
 </a>
 </li>`;
 
-async function make_list() { 
-    var asd = await get_state();
-    var people = '';0
-    asd.forEach(s => {
-        if (s.operator !== null && s.operator.status !== "Offline" && s.operator.fullName.indexOf('ТП') !== -1) {
-            if (s.aCnt == null) s.aCnt = 0;
-            if (s.cCnt == null) s.cCnt = 0;
-            if (s.operator.fullName.indexOf('ТП2-') !== -1) {
-                people = person(s.operator.fullName, s.aCnt + s.cCnt, s.operator.status) + people;
-            } else {
-                people += person(s.operator.fullName, s.aCnt + s.cCnt, s.operator.status);
-            }
-        };
-    }); //aCnt = в работе, cCnt = в очереди, 
-    document.getElementById('people_list').innerHTML = people;
-}
-
-document.onreadystatechange = () => { 
+document.onreadystatechange = () => {
     let elm = document.createElement('li');
     document.querySelector('div[class="app-content"] > ul[role="menu"]').append(elm);
     elm.outerHTML = `
@@ -75,4 +38,40 @@ document.onreadystatechange = () => {
 
     make_list();
     setInterval(make_list, 30000);
+}
+
+function get_state() {
+    let result = new Promise(function (resolve, reject) {
+        fetch("https://skyeng.autofaq.ai/api/operators/statistic/currentState", {
+            "headers": {
+                'Content-Type': 'application/json',
+                'cookie': `jwt=${AutoFaqCookie};`
+            }
+        })
+            .then(r => r.json())
+            .then(response => {
+                resolve(response.rows);
+            });
+    });
+
+    return result.then((array) => {
+		return array;
+	});
+}
+
+async function make_list() { 
+    var asd = await get_state();
+    var people = '';0
+    asd.forEach(s => {
+        if (s && s.operator && s.operator.status !== "Offline" && s.operator.fullName.indexOf('ТП') !== -1) {
+            if (s.aCnt == null) s.aCnt = 0; //в работе
+            if (s.cCnt == null) s.cCnt = 0; //в очереди
+            if (s.operator.fullName.indexOf('ТП2-') !== -1) {
+                people = person(s.operator.fullName, s.aCnt + s.cCnt, s.operator.status) + people;
+            } else {
+                people = people + person(s.operator.fullName, s.aCnt + s.cCnt, s.operator.status);
+            }
+        };
+    });
+    document.getElementById('people_list').innerHTML = people;
 }

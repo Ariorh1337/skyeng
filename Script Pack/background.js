@@ -318,7 +318,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     }
 
                     //Группа
-                    var group = page.querySelector("h6 > a:nth-child(2)");
+                    var group = page.querySelector("h6 > a:nth-child(3)").outerHTML;
 
                     sendResponse({
                         from: from,
@@ -470,9 +470,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         color = "green";
                     }
 
+                    /*
                     if (json.data[i].subject == "english") {
                         subject = "ENG"
                     } else if (json.data[i].subject == "mathematics") {
+                        subject = "MATH"
+                    }
+                    */
+                    
+                   if (json.data[i].serviceTypeKey.indexOf('english') !== -1) {
+                        subject = "ENG"
+                        if (json.data[i].serviceTypeKey.indexOf('junior') !== -1) subject = 'JUN ' + subject;
+                        if (json.data[i].serviceTypeKey.indexOf('kids') !== -1) subject = 'KID ' + subject;
+                    } else if (json.data[i].serviceTypeKey.indexOf("mathematics") !== -1) {
                         subject = "MATH"
                     }
 
@@ -550,11 +560,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                     (roles.indexOf('ROLE_MATH_TEACHER') !== -1) ? roles_text += 'Teacher - <a style="color: darkblue; font-weight: 700;">Math</a><br>' : false;
                                 } else if (roles.indexOf('ROLE_VIMBOX_STUDENT') !== -1) {
                                     role = 'student';
-                                    if (roles.indexOf('ROLE_GROUP_STUDENT') !== -1) {
-                                        roles_text += 'Student - <a style="color: purple; font-weight: 700;">Group</a><br>';
-                                    } else if (roles.indexOf('ROLE_MATH_STUDENT') !== -1) {
-                                        roles_text += 'Student - <a style="color: darkblue; font-weight: 700;">Math</a><br>';
-                                    };
+                                    if (roles.indexOf('ROLE_KIDS_STUDENT') !== -1) {
+                                        if (roles.indexOf('ROLE_GROUP_STUDENT') !== -1) {
+                                            roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: purple; font-weight: 700;">Group</a><br>';
+                                        } else if (roles.indexOf('ROLE_MATH_STUDENT') !== -1) {
+                                            roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">Math</a><br>';
+                                        } else {
+                                            roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">KIDS</a><br>';
+                                        }
+                                    }
+                                } else if (roles.indexOf('ROLE_KIDS_PARENT') !== -1) {
+                                    role = 'parent';
+                                    roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">KIDS</a><br>';
                                 }
                             }
                             
@@ -770,6 +787,12 @@ function getJWT(teacher = '2314498') {
                                     delete c.session;
                                     chrome.cookies.set(c);
                                 });
+
+                                //Удаляем уже не нужный токен из куки
+                                chrome.cookies.remove({
+                                    "url": "https://crm.skyeng.ru",
+                                    "name": "token_global"
+                                });
                             })
                             .then(() => {
                                 chrome.storage.local.get(['JWT_token'], (r) => {
@@ -784,12 +807,16 @@ function getJWT(teacher = '2314498') {
 function checkJWT() {
     chrome.storage.local.get('test-teacher_id', (r) => {
         if (r['test-teacher_id'] == undefined) {
-            chrome.storage.local.set({ 'test-teacher_id': '2314498' });
             test_teacher_id = '2314498';
+            chrome.storage.local.set({ 'test-teacher_id': test_teacher_id });
         } else {
-            if (r['test-teacher_id'] !== test_teacher_id) {
+            if (test_teacher_id) {
+                if (r['test-teacher_id'] !== test_teacher_id) {
+                    test_teacher_id = r['test-teacher_id'];
+                    getJWT(test_teacher_id);
+                }
+            } else {
                 test_teacher_id = r['test-teacher_id'];
-                getJWT(test_teacher_id);
             }
         }
     })

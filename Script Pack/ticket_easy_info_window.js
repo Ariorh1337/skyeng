@@ -47,20 +47,6 @@ var win_html = `<div style="display: flex;">
                     </svg>
                 </span>
 
-                <span id="add_note_student" style="float: right; padding: 0px 4px; cursor: pointer; border-bottom: 1px solid black; height: 23px; width: 15px; margin-left: -1px; border-left: 1px solid black;" title="Добавить заметку">
-                    <svg viewBox="0 0 381 381" height="18px" width="18px" style="margin: -7px;">
-                        <path d="m370.589844 230.964844c-5.523438 0-10 4.476562-10 10v88.792968c-.019532 16.558594-13.4375 29.980469-30 30h-280.589844c-16.5625-.019531-29.980469-13.441406-30-30v-260.589843c.019531-16.5625 13.4375-29.980469 30-30h88.789062c5.523438 0 10-4.476563 10-10 0-5.523438-4.476562-10-10-10h-88.789062c-27.601562.03125-49.96875 22.398437-50 50v260.589843c.03125 27.601563 22.398438 49.96875 50 50h280.589844c27.601562-.03125 49.96875-22.398437 50-50v-88.789062c0-5.523438-4.476563-10.003906-10-10.003906zm0 0"></path>
-                        <path d="m156.367188 178.34375 146.011718-146.015625 47.089844 47.089844-146.011719 146.015625zm0 0"></path>
-                        <path d="m132.542969 249.257812 52.039062-14.414062-37.625-37.625zm0 0"></path>
-                        <path d="m362.488281 7.578125c-9.769531-9.746094-25.585937-9.746094-35.355469 0l-10.605468 10.605469 47.089844 47.089844 10.605468-10.605469c9.75-9.769531 9.75-25.585938 0-35.355469zm0 0"></path>
-                    </svg>
-                </span>
-                <span id="read_note_student" style="float: right; padding: 0px 4px; border-right: solid black 1px; border-bottom: 1px solid black; height: 23px; width: 15px; margin-left: -1px; border-left: 1px solid black;" title="Loading...">
-                    <svg viewBox="0 0 60 60" height="18px" width="16px" style="margin: -7px;">
-                        <path d="M40,0H5v65h50V14.0L42,0z M40,3.5L50.0,14H40V4z M8.5,58V2h29v14h14v42H8.5z"></path>
-                    </svg>
-                </span>
-
                 <span id="add_history_student" style="float: right; padding: 0px 4px; margin-left: -1px; border-left: solid black 1px; border-right: solid black 1px; border-bottom: 1px solid black;height: 23px;width: 15px;" title="Добавить в историю">
                     <svg viewBox="0 0 512.003 512.003" style="margin: -6px 0px;">
                         <path d="M497.003,241.001c-8.284,0-15,6.716-15,15c0,124.617-101.384,226-226,226c-124.617,0-226-101.383-226-226    s101.383-226,226-226c37.999,0,74.962,9.435,107.959,27.413l-18.753,18.753c-4.29,4.29-5.573,10.741-3.252,16.347    c2.322,5.605,7.791,9.26,13.858,9.26h71.773c8.284,0,15-6.716,15-15V15.001c0-6.067-3.654-11.536-9.26-13.858    c-5.607-2.323-12.058-1.039-16.347,3.252l-31.017,31.017c-39.289-23.197-83.959-35.41-129.962-35.41    c-68.38,0-132.668,26.629-181.02,74.98c-48.352,48.353-74.98,112.64-74.98,181.02s26.628,132.667,74.98,181.019    c48.353,48.353,112.64,74.982,181.02,74.982s132.667-26.629,181.019-74.982c48.353-48.352,74.98-112.639,74.98-181.019    C512.003,247.717,505.287,241.001,497.003,241.001z"></path>
@@ -434,16 +420,6 @@ async function get_info(type) { //v.2
                         });
                     };
 
-                    chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
-                        let student_status = document.getElementById('read_note_student');
-                        if (response.answer.length == 0) {
-                            student_status.style.display = 'none';
-                        } else if (response.answer.length !== 0) {
-                            student_status.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-                            student_status.setAttribute('onClick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`)
-                        }
-                    });
-
                     chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
                         if (response.answer.length == 0) {
                             document.getElementById('read_history_student').style.display = 'none';
@@ -568,6 +544,46 @@ async function get_info(type) { //v.2
                     document.getElementById('info_student_status').style.display = 'none';
                     teacher_draw(id);
                 }
+                if (role == 'parent') {
+                    let info_status = document.getElementById('info_status');
+                    info_status.setAttribute('user_id', id);
+                    document.getElementById('btn_hide').style.display = '';
+                    document.getElementById('info_student_block').style.display = '';
+                    info_status.style.display = '';
+                    document.getElementById('info_student_block').innerHTML = value.status + value.answer; 
+                    document.getElementById('info_block').style.display = 'block';
+                    let info_student_status = document.getElementById('info_student_status');
+                    info_student_status.style.display = '';
+                    info_status.lastElementChild.children[2].innerText = role;
+                    document.getElementById('student_edit').onclick = function () {
+                        window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
+                    }
+
+                    document.getElementById('student_login').onclick = function () {
+                        chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
+                            copyToClipboard(response.answer.data.link);
+                        });
+                    };
+
+                    chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
+                        if (response.answer.length == 0) {
+                            document.getElementById('read_history_student').style.display = 'none';
+                        } else {
+                            let attr = '', attr2 = '';
+
+                            for (let i = 0; i < response.answer.length; i++) {
+                                attr += "window.open('" + window.location.origin + "/staff/cases/record" + response.answer[i].ticket + "','_blank'); ";
+                                attr2 += response.answer[i].ticket + '\n';
+                                if (response.answer[i].ticket == window.location.pathname.match(/\/[0-9-]+\//g)) {
+                                    document.getElementById('add_history_student').style.display = 'none';
+                                }
+                            }
+                            
+                            document.getElementById('read_history_student').setAttribute('onclick', attr);
+                            document.getElementById('read_history_student').setAttribute('title', 'click to open\n' + attr2);     
+                        }
+                    });
+                }
             }
         });
     }
@@ -599,16 +615,6 @@ function teacher_draw(id) {
     document.getElementById('teacher_edit').onclick = function () {
         window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
     }
-    
-    chrome.runtime.sendMessage({name: "script_pack", question: 'get_user_comment', id: id}, function(response) {
-        let teacher_status = document.getElementById('read_note_teacher');
-        if (response.answer.length == 0) {
-            teacher_status.style.display = 'none';
-        } else {
-            teacher_status.setAttribute('title', 'from: ' + response.answer[0].name + '\n' + response.answer[0].comment.replace(/~/g,'\n'));
-            teacher_status.setAttribute('onclick', `window.open('${window.location.origin}/staff/cases/record${response.answer[0].ticket}#last_response', '_blank')`);
-        }
-    });
 
     chrome.runtime.sendMessage({name: "script_pack", question: 'get_ticket_history', id: id}, function(response) {
         if (response.answer.length == 0) {
