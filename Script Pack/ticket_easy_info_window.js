@@ -173,15 +173,15 @@ function move_again() {
     document.getElementById('btn1_teacher').onclick = function () {get_info ("teacher");};
     document.getElementById('student_copy').onclick = function () {
         let stdnt = document.getElementById('info_student_block').innerText;
-        copyToClipboard(stdnt) //.replace(/<br>/g,'\n')
+        TrueCopyToClipboard(stdnt) //.replace(/<br>/g,'\n')
     };
     document.getElementById('teacher_copy').onclick = function () {
         let tcher = document.getElementById('info_teacher_block').innerText;
-        copyToClipboard(tcher) //.replace(/<br>/g,'\n')
+        TrueCopyToClipboard(tcher) //.replace(/<br>/g,'\n')
     };
     document.getElementById('info_status').firstElementChild.children[2].onclick = function () {
         let id = document.getElementById('info_status').getAttribute('user_id');
-        copyToClipboard('https://profile.skyeng.ru/profile/' + id + '/showcase');
+        TrueCopyToClipboard('https://profile.skyeng.ru/profile/' + id + '/showcase');
         document.getElementById('info_status').firstElementChild.children[2].setAttribute('title','click to copy link\nto the lesson');
     };
     document.getElementById('btn_hide').onclick = function () {
@@ -190,43 +190,6 @@ function move_again() {
         teacher_easy_timetable();
         document.getElementById('btn_hide').setAttribute('disabled','');
     }
-
-    document.getElementById('add_note_student').addEventListener( "click" , () => {
-        let id = document.getElementById('info_status').getAttribute('user_id');
-        let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
-        if (msg !== '' && msg !== null) {
-            let person_name = document.getElementById('top_avatar').getAttribute('my_name');
-            let ticket_id = window.location.pathname.match(/\/[0-9-]+\//g);
-    
-            let body = 'entry.1187522179=' + id + '&entry.540704615=' + ticket_id + '&entry.988274120=' + encodeURI(person_name) + '&entry.1693454835=' + encodeURI(msg);
-            fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLScInTRTD5AZLEcufsz6SQkMHYu_jCqGUZZ-G2MrsmJbnOSDZQ/formResponse', {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
-                body: body
-            });
-        }
-    });
-    document.getElementById('add_note_teacher').addEventListener( "click" , () => {
-        let id = document.getElementById('teacher_status').getAttribute('user_id');
-        let msg = prompt('Введите заметку о пользователе: ' + id + '\\nДля новой строки введите: "~"');
-        if (msg !== '' && msg !== null) {
-            let person_name = document.getElementById('top_avatar').getAttribute('my_name');
-            let ticket_id = window.location.pathname.match(/\/[0-9-]+\//g);
-    
-            let body = 'entry.1187522179=' + id + '&entry.540704615=' + ticket_id + '&entry.988274120=' + encodeURI(person_name) + '&entry.1693454835=' + encodeURI(msg);
-            fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLScInTRTD5AZLEcufsz6SQkMHYu_jCqGUZZ-G2MrsmJbnOSDZQ/formResponse', {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
-                body: body
-            });
-        }
-    });
 
     if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('skyeng.autofaq.ai') !== -1) {
         document.getElementById('add_history_teacher').style.display = 'none';
@@ -309,8 +272,9 @@ function teacher_easy_timetable() {//Время П
 
 teacher_easy_timetable();
 
-const copyToClipboard = str => {
-    const el = document.createElement('textarea');
+const TrueCopyToClipboard = str => {
+    console.log(str);
+    let el = document.createElement('textarea');
     el.value = str;
     document.body.appendChild(el);
     el.select();
@@ -347,7 +311,7 @@ async function get_info(type) { //v.2
 
     if (id) {
         var get_person_info = new Promise( (resolve) => {
-            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v2', id: id}, function(response) {
+            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v3', id: id}, function(response) {
                 resolve(response);
             })
         });
@@ -415,8 +379,14 @@ async function get_info(type) { //v.2
                     }
 
                     document.getElementById('student_login').onclick = function () {
+                        document.getElementById('student_login').style.backgroundColor = 'orange';
                         chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
-                            copyToClipboard(response.answer.data.link);
+                            if (response.answer.success === true) {
+                                TrueCopyToClipboard(response.answer.data.link);
+                                document.getElementById('student_login').style.backgroundColor = 'green';
+                            } else {
+                                document.getElementById('student_login').style.backgroundColor = 'red';
+                            }
                         });
                     };
 
@@ -478,7 +448,7 @@ async function get_info(type) { //v.2
                                         }
                                     } else {
                                         var get_person_info2 = new Promise( (resolve) => {
-                                            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v2', id: response.teacher}, function(response) {
+                                            chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v3', id: response.teacher}, function(response) {
                                                 resolve(response);
                                             })
                                         });
@@ -521,7 +491,7 @@ async function get_info(type) { //v.2
                                             crm2_status_draw(id, element.color, element.balance, element.subject, element.payment, false);
                                             crm2_teacher_draw(element.teacher);
                                             var get_person_info2 = new Promise( (resolve) => {
-                                                chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v2', id: element.teacher}, function(response) {
+                                                chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v3', id: element.teacher}, function(response) {
                                                     resolve(response);
                                                 })
                                             });
@@ -555,13 +525,22 @@ async function get_info(type) { //v.2
                     let info_student_status = document.getElementById('info_student_status');
                     info_student_status.style.display = '';
                     info_status.lastElementChild.children[2].innerText = role;
+
+                    document.querySelector("#info_student_status").style.display = 'none'; //скрыть кнопки с svg: расписания, профиля, комментария, добавления в историю
+
                     document.getElementById('student_edit').onclick = function () {
                         window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
                     }
 
                     document.getElementById('student_login').onclick = function () {
+                        document.getElementById('student_login').style.backgroundColor = 'orange';
                         chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
-                            copyToClipboard(response.answer.data.link);
+                            if (response.answer.success === true) {
+                                TrueCopyToClipboard(response.answer.data.link);
+                                document.getElementById('student_login').style.backgroundColor = 'green';
+                            } else {
+                                document.getElementById('student_login').style.backgroundColor = 'red';
+                            }
                         });
                     };
 
@@ -583,6 +562,18 @@ async function get_info(type) { //v.2
                             document.getElementById('read_history_student').setAttribute('title', 'click to open\n' + attr2);     
                         }
                     });
+
+                    is_crm1(id).then(result => { 
+                        if (result === true) { 
+                            document.getElementById('student_crm').onclick = function () {
+                                window.open('https://crm.skyeng.ru/admin/orderPriority/search?page=1&user=' + id, '_blank');
+                            }
+                        } else { 
+                            document.getElementById('student_crm').onclick = function () {
+                                window.open('https://crm2.skyeng.ru/persons/' + id, '_blank');
+                            }
+                        }
+                    })
                 }
             }
         });
@@ -608,8 +599,14 @@ function teacher_draw(id) {
         }
     });
     document.getElementById('teacher_login').onclick = function () {
+        document.getElementById('teacher_login').style.backgroundColor = 'orange';
         chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
-            copyToClipboard(response.answer.data.link);
+            if (response.answer.success === true) {
+                TrueCopyToClipboard(response.answer.data.link);
+                document.getElementById('teacher_login').style.backgroundColor = 'green';
+            } else {
+                document.getElementById('teacher_login').style.backgroundColor = 'red';
+            }
         });
     }
     document.getElementById('teacher_edit').onclick = function () {
@@ -644,7 +641,10 @@ function teacher_draw(id) {
             }
             document.getElementById('table_time').setAttribute('busy_time', lessons);
             document.getElementById('table_time').style.display = 'grid';
-        } else { document.getElementById('table_time').style.display = 'none';}
+        } else { document.getElementById('table_time').style.display = 'none'; }
+        if (response && response.slack && response.slack !== null) {
+            document.querySelector('#info_teacher_block').innerHTML += `<br><b>Slack id: </b><a href="https://skyeng.slack.com/team/${response.slack}" target="_blank">${response.slack}</a>`;
+        }
     });
     
     setTimeout( function () {
@@ -741,7 +741,7 @@ function crm2_teacher_draw(id) {
 
     document.getElementById(`teacher_copy_${id}`).onclick = function () {
         let tcher = document.getElementById(`info_teacher_block_${id}`).innerText;
-        copyToClipboard(tcher); //.replace(/<br>/g,'\n')
+        TrueCopyToClipboard(tcher); //.replace(/<br>/g,'\n')
     };
     document.getElementById('add_note_teacher').addEventListener( "click" , () => {
         let id = document.getElementById('teacher_status').getAttribute('user_id');
@@ -776,8 +776,14 @@ function crm2_teacher_draw(id) {
         }
     });
     document.getElementById(`teacher_login_${id}`).onclick = function () {
-        chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
-            copyToClipboard(response.answer.data.link);
+        document.getElementById(`teacher_login_${id}`).style.backgroundColor = 'orange';
+        chrome.runtime.sendMessage({ name: "script_pack", question: 'get_login_link', id: id }, function (response) {
+            if (response.answer.success === true) {
+                TrueCopyToClipboard(response.answer.data.link);
+                document.getElementById(`teacher_login_${id}`).style.backgroundColor = 'green';
+            } else {
+                document.getElementById(`teacher_login_${id}`).style.backgroundColor = 'red';
+            }
         });
     }
     document.getElementById(`teacher_edit_${id}`).onclick = function () {
@@ -852,6 +858,9 @@ function crm2_teacher_draw(id) {
         } else { 
             document.getElementById(`table_time_${id}`).style.display = 'none';
             console.log('у П нет уроков на сегодня');
+        }
+        if (response && response.slack && response.slack !== null) {
+            document.querySelector(`#info_teacher_block_${id}`).innerHTML += `<br><b>Slack id: </b><a href="https://skyeng.slack.com/team/${response.slack}" target="_blank">${response.slack}</a>`;
         }
     });
 }

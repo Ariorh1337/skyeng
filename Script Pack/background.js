@@ -19,13 +19,13 @@ chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info', id
 });
 */
 var JWT_token = '', test_teacher_id = '';
-checkJWT()
+//checkJWT()
 
 //Получаю request со страницы скрипта
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     //Проверяем что это наш запрос:
     if (request.name === "script_pack") {
-        checkJWT()
+        //checkJWT()
         let answer;
         if (request.question == 'get_lesson_info') {
             answer = get_lesson_info(request.id, request.hour, request.day, request.month, request.year);
@@ -132,8 +132,52 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
         if (request.question == 'get_login_link') {
             fetch('https://crm.skyeng.ru/order/generateLoginLink?userId=' + request.id, {headers: {'x-requested-with': 'XMLHttpRequest'}})
-                .then(response => response.json())
-                .then(json => { sendResponse({answer: json}) });
+                .then(response => { if (response.ok === true) { return response.json(); } else { return null; } })
+                .then(json => { 
+                    if (json !== null) {
+                        sendResponse({ answer: json });
+                    } else {
+                        fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
+                            .then(r => r.text())
+                            .then(responce => {
+                                let doc = document.createElement('div');
+                                doc.innerHTML = responce;
+                                fetch("https://id.skyeng.ru/admin/auth/login-links", {
+                                    "headers": {
+                                        "content-type": "application/x-www-form-urlencoded",
+                                        "sec-fetch-dest": "document",
+                                        "sec-fetch-mode": "navigate",
+                                        "sec-fetch-site": "same-origin",
+                                        "sec-fetch-user": "?1",
+                                        "upgrade-insecure-requests": "1"
+                                    },
+                                    "body": `login_link_form%5Bidentity%5D=&login_link_form%5Bid%5D=${request.id}&login_link_form%5Btarget%5D=https%3A%2F%2Fskyeng.ru&login_link_form%5Bpromocode%5D=&login_link_form%5Blifetime%5D=3600&login_link_form%5Bcreate%5D=&login_link_form%5B_token%5D=${doc.querySelector('#login_link_form__token').value}`,
+                                    "method": "POST",
+                                    "mode": "cors",
+                                    "credentials": "include"
+                                })
+                                    .then(() => {
+                                        fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
+                                            .then(r => r.text())
+                                            .then(responce => {
+                                                let doc2 = document.createElement('div');
+                                                doc2.innerHTML = responce;
+                                                let link = (doc2.querySelector(`a[href="/admin/users/${request.id}"]`)) ? doc2.querySelector(`a[href="/admin/users/${request.id}"]`).parentElement.parentElement.querySelector('input[onclick="this.select()"]').value : '';
+
+                                                let result =
+                                                {
+                                                    success: (link !== '') ? true : false,
+                                                    data: {
+                                                        link: link,
+                                                        userID: request.id
+                                                    }
+                                                };
+                                                sendResponse({ answer: result });
+                                            });
+                                    });
+                            });
+                    }
+                });
             return true;
         }
         if (request.question == 'get_trm_id') {
@@ -221,19 +265,23 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         if (classes.length !== 0 && classes_regular.length !== 0) {
                             classes = classes.concat(classes_regular);
                             sendResponse({
-                                answer: classes
+                                answer: classes,
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
                             });
                         } else if (classes.length !== 0 && classes_regular.length == 0) {
                             sendResponse({
-                                answer: classes
+                                answer: classes,
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
                             });
                         } else if (classes.length == 0 && classes_regular.length !== 0) {
                             sendResponse({
-                                answer: classes_regular
+                                answer: classes_regular,
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
                             });
                         } else {
                             sendResponse({
-                                answer: null
+                                answer: null,
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
                             });
                         }
                     });
@@ -550,6 +598,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             let roles_text = '', role = '';
                             let roles = (info.roles) ? info.roles.join(' ').trim() : false;
                             let time = (info.utcOffset) ? `<br>Время: ${makeUTCGreatAgain(info.utcOffset)}` : ``; 
+                            let isSkySmart = false;
                             
                             if (roles) {
                                 if (roles.indexOf('ROLE_OPERATOR') !== -1) { 
@@ -568,10 +617,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                         } else {
                                             roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">KIDS</a><br>';
                                         }
+                                        isSkySmart = true;
+                                    } else if (roles.indexOf('ROLE_KIDS_PARENT') !== -1) {
+                                        isSkySmart = true;
                                     }
                                 } else if (roles.indexOf('ROLE_KIDS_PARENT') !== -1) {
                                     role = 'parent';
                                     roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">KIDS</a><br>';
+                                    isSkySmart = true;
                                 }
                             }
                             
@@ -579,11 +632,140 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             sendResponse({
                                 status: roles_text,
                                 answer: stat,
-                                role: role
+                                role: role,
+                                isSkySmart: isSkySmart
                             });
                         }
                     });
             });            
+            return true;
+        }
+        if (request.question == 'get_person_info_v3') {
+            let contacts = new Promise(function (resolve, reject) {
+                fetch("https://backend.skyeng.ru/api/persons/" + request.id, { "credentials": "include" })
+                .then(r => {
+                    if (r.status === 200) { return r.json(); } else { return { error: r.status }; }
+                })
+                .then(r => resolve(r));
+            });
+
+            let roles = new Promise(function (resolve, reject) {
+                fetch("https://id.skyeng.ru/admin/users/" + request.id, { "credentials": "include" })
+                .then(r => {
+                    if (r.status === 200) { return r.text(); } else { return { error: r.status }; }
+                })
+                .then(r => {
+                    if (!r.error) {
+                        let doc = document.createElement('html');
+                        doc.innerHTML = r;
+                        resolve( doc.querySelectorAll('tr > td > code')[1].innerText.replace(' ', '').split(',') );
+                    } else {
+                        resolve(r);
+                    }
+                });
+            });
+
+            contacts.then((response) => {
+                if (!response.error) {
+                    let info = response.data;
+                    let id = `ID: ${info.id}`;
+                    let names = (info.name === null && info.surname === null) ? '' : `<br>Name: ${(info.name !== null) ? info.name : ''} ${(info.surname !== null) ? info.surname : ''}`;
+                    let mail = (info.email !== null) ? `<br>eMail: ${info.email}` : '';
+                    let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: ${info.phone}` : '';
+                    let skype = (info.skype !== null) ? `<br><a href="skype:${info.skype}?chat">Skype</a>: ${info.skype}` : '';
+                    let identity = (info.identity !== null) ? `<br>Identity: ${info.identity}` : '';
+                    let time = (info.utcOffset) ? `<br>Время: ${(info.utcOffset === 3) ? info.utcOffset + ' UTC' : `<b style="color: #FF5733;">${info.utcOffset}</b>`} UTC` : ``; 
+                    
+                    roles.then(roles => {
+                        if (!roles.error) {
+                            roles = roles.join()
+                            let roles_text = '', role = '', isSkySmart = false;
+                            if (roles.indexOf('ROLE_OPERATOR') !== -1) { 
+                                role = 'operator';
+                                roles_text += 'Operator<br>';
+                            } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
+                                role = 'teacher';
+                                (roles.indexOf('ROLE_MATH_TEACHER') !== -1) ? roles_text += 'Teacher - <a style="color: darkblue; font-weight: 700;">Math</a><br>' : false;
+                            } else if (roles.indexOf('ROLE_VIMBOX_STUDENT') !== -1) {
+                                role = 'student';
+                                if (roles.indexOf('ROLE_KIDS_STUDENT') !== -1) {
+                                    if (roles.indexOf('ROLE_GROUP_STUDENT') !== -1) {
+                                        roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: purple; font-weight: 700;">Group</a><br>';
+                                    } else if (roles.indexOf('ROLE_MATH_STUDENT') !== -1) {
+                                        roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">Math</a><br>';
+                                    } else {
+                                        roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">KIDS</a><br>';
+                                    }
+                                    isSkySmart = true;
+                                } else if (roles.indexOf('ROLE_KIDS_PARENT') !== -1) {
+                                    isSkySmart = true;
+                                }
+                            } else if (roles.indexOf('ROLE_KIDS_PARENT') !== -1) {
+                                role = 'parent';
+                                roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">KIDS</a><br>';
+                                isSkySmart = true;
+                            }
+                        
+                            let stat = id + names + mail + phone + skype + identity + time;
+                            sendResponse({
+                                status: roles_text,
+                                answer: stat,
+                                role: role,
+                                isSkySmart: isSkySmart
+                            });
+                        } else {
+                            sendResponse({
+                                status: '',
+                                answer: 'Тут ошибка с получением ролей<br>id.skyeng.ru выдает:<br>' + response.error + ' HTML error code',
+                                role: 'error',
+                                isSkySmart: false
+                            });
+                        }
+                    })
+                } else {
+                    sendResponse({
+                        status: '',
+                        answer: 'Тут ошибка с получением данных<br>backend.skyeng.ru выдает:<br>' + response.error + ' HTML код',
+                        role: 'error',
+                        isSkySmart: false
+                    });
+                }
+            })
+            
+            return true;
+        }
+        if (request.question == 'duty_info') { 
+            fetch(`https://datsy.ru/api/duty-track`, { "credentials": "include" })
+                .then(r => r.json())
+                .then(r => {
+                    if (r.ok) {
+                        let result = new Array();
+
+                        r.result.forEach((person) => {
+                            let name, isBusy, text = '', start = null;
+                            name = person.user.name;
+                            isBusy = (person.end === null && person.taskName === 'AutoFAQ') ? true : false;
+                            if (isBusy === true) {
+                                text = (person.description === null || person.description === '') ? 'Пусто' : person.description;
+                                start = (person.end === null) ? person.start : null;
+                            }
+
+                            result.push({
+                                'name': name,
+                                'isBusy': isBusy,
+                                'text': text,
+                                'start': start
+                            })
+                        });
+
+                        r.result = result;
+
+                        sendResponse({ answer: r });
+                    } else {
+                        sendResponse({ answer: r });
+                    }
+                });
+            
             return true;
         }
     }
@@ -741,7 +923,56 @@ function getJWT(teacher = '2314498') {
         .then(response => response.text())
         .then((response) => {
             if (response !== 'Login required') {
-                return JSON.parse(response);
+                if (response.ok === true) {
+                    return JSON.parse(response);
+                } else {
+                    let result = new Promise(function (resolve, reject) {
+                        fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
+                        .then(r => r.text())
+                        .then(responce => {
+                            let doc = document.createElement('div');
+                            doc.innerHTML = responce;
+                            fetch("https://id.skyeng.ru/admin/auth/login-links", {
+                                "headers": {
+                                    "content-type": "application/x-www-form-urlencoded",
+                                    "sec-fetch-dest": "document",
+                                    "sec-fetch-mode": "navigate",
+                                    "sec-fetch-site": "same-origin",
+                                    "sec-fetch-user": "?1",
+                                    "upgrade-insecure-requests": "1"
+                                },
+                                "body": `login_link_form%5Bidentity%5D=&login_link_form%5Bid%5D=${teacher}&login_link_form%5Btarget%5D=https%3A%2F%2Fskyeng.ru&login_link_form%5Bpromocode%5D=&login_link_form%5Blifetime%5D=3600&login_link_form%5Bcreate%5D=&login_link_form%5B_token%5D=${doc.querySelector('#login_link_form__token').value}`,
+                                "method": "POST",
+                                "mode": "cors",
+                                "credentials": "include"
+                            })
+                                .then(() => {
+                                    fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
+                                        .then(r => r.text())
+                                        .then(responce => {
+                                            let doc2 = document.createElement('div');
+                                            doc2.innerHTML = responce;
+                                            let link = (doc2.querySelector(`a[href="/admin/users/${teacher}"]`)) ? doc2.querySelector(`a[href="/admin/users/${teacher}"]`).parentElement.parentElement.querySelector('input[onclick="this.select()"]').value : '';
+
+                                            let result = 
+                                            {
+                                                success: (link !== '') ? true : false,
+                                                data: {
+                                                    link: link,
+                                                    userID: teacher
+                                                }
+                                            };
+
+                                            resolve(result);
+                                        });
+                                });
+                        });
+                    });
+
+                    return result.then((array) => {
+                        return array;
+                    });
+                }
             } else {
                 window.open('https://id.skyeng.ru/login');
             }
@@ -780,18 +1011,18 @@ function getJWT(teacher = '2314498') {
                                     });
                                 });
 
+                                //Удаляем уже не нужный токен из куки
+                                chrome.cookies.remove({
+                                    "url": "https://crm.skyeng.ru",
+                                    "name": "token_global"
+                                });
+
                                 //Возвращаем куки обратно на место
                                 save.forEach((c) => {
                                     c.url = "https://id.skyeng.ru";
                                     delete c.hostOnly;
                                     delete c.session;
                                     chrome.cookies.set(c);
-                                });
-
-                                //Удаляем уже не нужный токен из куки
-                                chrome.cookies.remove({
-                                    "url": "https://crm.skyeng.ru",
-                                    "name": "token_global"
                                 });
                             })
                             .then(() => {

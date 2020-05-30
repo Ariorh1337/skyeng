@@ -1,40 +1,25 @@
 //*://skyeng.omnidesk.ru/staff/cases/chat/*
 //*://help.skyeng.ru/staff/cases/chat/*
+//https://omnidesk.ru/client_widgets/widget/7704-ybpput2p?lang=ru - тут
 
-function create_ticket () {
-    const data = window.location.href.split('?')[1];
-    const name = data.split('&')[0].split('=')[1].replace('%20', ' '), email = data.split('&')[1].split('=')[1], text = data.split('&')[2].split('=')[1].replace('%20', ' ');
-
-    document.querySelector('.nav_item.indx-0 > a').addEventListener( "click" , () => {
-        document.getElementsByName('full_name')[0].value = decodeURI(name);
-        document.getElementsByName('emailaddress')[0].value = email;
-        document.getElementsByName('field_10')[0].value = 'Техническая проблема — ' + decodeURI(name);
-        document.getElementsByName('field_11')[0].value = decodeURI(text);
-        document.getElementsByName('field_2246')[0].value = '—'; //teacher
-        document.getElementsByName('field_2247')[0].value = '—'; //student
-
-        document.getElementsByName('field_2169')[0].value = '34'; //Тема
-        document.getElementsByName('field_2169')[0].parentElement.querySelector('div > a > span').innerText = 'Общая техническая помощь';
-
-        document.getElementsByName('field_2385')[0].value = '2'; //Корп
-        document.getElementsByName('field_2385')[0].parentElement.querySelector('div > a > span').innerText = 'Нет';
-        
-        let form = document.getElementById('index-upload-form-email');
-        form.insertBefore(form.lastElementChild, form.children[1]);
-        form.children[1].style = 'margin-bottom: 15px;';
-    });
-
-    document.getElementById('submit_email_case').addEventListener( "click" , () => {
-        setTimeout(() => {
-            var asd = setInterval(() => {
-                if (document.querySelector('#popup_captcha[class="hidden"]') !== null && document.querySelector('.unansweredContent > strong') !== null) {
-                    let ticket_id = document.querySelector('.unansweredContent > strong').innerText.slice(1);
-                    document.querySelector('.unansweredContent > strong').innerHTML = '<a href="https://' + window.location.hostname + '/staff/cases/record/' + ticket_id + '/#last_response" target="_blank" rel="noopener noreferrer">#' + ticket_id + '</a>';
-                    clearInterval(asd);
-                }
-            },200, asd);
-        }, 1000);
-    });
+function show_tiket_id() { 
+    if (document.querySelector('#widget_modal_form_id')) { 
+        const data = window.location.href.split('?')[1];
+        const name = data.split('&')[0].split('=')[1].replace('%20', ' '), email = data.split('&')[1].split('=')[1], text = data.split('&')[2].split('=')[1].replace('%20', ' ');
+    
+        document.getElementsByName('field_user_full_name')[0].value = decodeURI(name);
+        document.getElementsByName('field_user_email')[0].value = email;
+        document.getElementsByName('field_subject')[0].value = 'Техническая проблема — ' + decodeURI(name);
+        document.getElementsByName('field_message')[0].value = decodeURI(text);
+        document.getElementsByName('field_cf_2246')[0].value = '—'; //teacher
+        document.getElementsByName('field_cf_2247')[0].value = '—'; //student
+        document.getElementsByName('field_cf_2169')[0].value = '34'; //Тема
+        document.getElementsByName('field_cf_2385')[0].value = '2'; //Корп
+    } else {
+        var block = document.querySelector('.win_success > p');
+        var tiket = block.innerText.match('[0-9-]+')[0];
+        block.innerHTML = block.innerHTML.replace(ticket, `<a href="https://help.skyeng.ru/staff/cases/record/${ticket}/" target="_blank" rel="noopener noreferrer">${ticket}</a>`);        
+    }
 }
 
 chrome.storage.local.get(['chat_create'], function(result) {
@@ -54,46 +39,13 @@ chrome.storage.local.get(['chat_create'], function(result) {
                 const name = document.querySelector('#info_user_info_panel > .info_fields > p').innerText;
                 const email = document.querySelector('#info_user_info_panel > .info_fields > p > a[href][target]').innerText;
                 const text = document.querySelector('#current_subject > span').innerText.replace(/[ ]/g, '%20');
-                window.open('/l_rus/?name=' + name + '&email=' + email + '&text=' + text,'_blank');
+                window.open('https://omnidesk.ru/client_widgets/widget/7704-ybpput2p?name=' + name + '&email=' + email + '&text=' + text,'_blank');
             }`
             document.getElementsByTagName("head")[0].appendChild(script);
-        } else if (window.location.href.indexOf('l_rus/?') !== -1) {
+        } else if (window.location.href.indexOf('client_widgets/widget') !== -1) {
             var script = document.createElement("script");
             script.setAttribute("type", "text/javascript");
-            script.innerHTML = '(' + create_ticket.toString() + ")();"
-            document.getElementsByTagName("head")[0].appendChild(script);
-        } else if (window.location.href.indexOf('l_rus') !== -1) {
-            var script = document.createElement("script");
-            script.setAttribute("type", "text/javascript");
-            script.innerHTML = `( function () {
-                document.querySelector('.nav_item.indx-0 > a').addEventListener( "click" , () => {
-                    document.getElementsByName('field_10')[0].value = 'Техническая проблема — ';
-                    document.getElementsByName('field_2246')[0].value = '—'; //teacher
-                    document.getElementsByName('field_2247')[0].value = '—'; //student
-            
-                    document.getElementsByName('field_2169')[0].value = '34'; //Тема
-                    document.getElementsByName('field_2169')[0].parentElement.querySelector('div > a > span').innerText = 'Общая техническая помощь';
-            
-                    document.getElementsByName('field_2385')[0].value = '2'; //Корп
-                    document.getElementsByName('field_2385')[0].parentElement.querySelector('div > a > span').innerText = 'Нет';
-
-                    let form = document.getElementById('index-upload-form-email');
-                    form.insertBefore(form.lastElementChild, form.children[1]);
-                    form.children[1].style = 'margin-bottom: 15px;';
-                });
-
-                document.getElementById('submit_email_case').addEventListener( "click" , () => {
-                    setTimeout(() => {
-                        var asd = setInterval(() => {
-                            if (document.querySelector('#popup_captcha[class="hidden"]') !== null && document.querySelector('.unansweredContent > strong') !== null) {
-                                let ticket_id = document.querySelector('.unansweredContent > strong').innerText.slice(1);
-                                document.querySelector('.unansweredContent > strong').innerHTML = '<a href="https://' + window.location.hostname + '/staff/cases/record/' + ticket_id + '/#last_response" target="_blank" rel="noopener noreferrer">#' + ticket_id + '</a>';
-                                clearInterval(asd);
-                            }
-                        },200, asd);
-                    }, 1000);
-                });
-            })();`
+            script.innerHTML = '(' + show_tiket_id.toString() + ")();"
             document.getElementsByTagName("head")[0].appendChild(script);
         }
     }
