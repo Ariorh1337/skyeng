@@ -133,7 +133,7 @@ async function make_list() {
         document.getElementById('people_list').innerHTML = people;
 
         document.getElementById('people_list').childNodes.forEach(function (user) { 
-            if (user.getAttribute('data-is-duty') === false) {
+            if (user.getAttribute('data-is-duty') === "false") {
                 user.addEventListener("click", function () {
                     get_operator_chats(this.getAttribute('data-user-id')).then(r => {
                         if (r.items && r.items.length > 0) {
@@ -163,7 +163,7 @@ document.onreadystatechange = () => {
 
 function get_history_chat(chat_id) {
     let result = new Promise(function (resolve, reject) {
-		fetch(`https://skyeng.autofaq.ai/api/reason8/reports/conversations/${chat_id}`, {
+		fetch(`https://skyeng.autofaq.ai/api/conversations/${chat_id}`, {
             "headers": {
                 'Content-Type': 'application/json',
                 'cookie': `jwt=${document.cookie.match(/jwt=(.*)/)[1]};`

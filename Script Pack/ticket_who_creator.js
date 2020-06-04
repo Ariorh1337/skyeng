@@ -38,10 +38,14 @@ document.onreadystatechange = () => {
         if (ticket_group === "35949" || ticket_group === "35950" || ticket_group === "35951") {
             // 35949 - Техподдержка: 2-я линия, 35950 - Техподдержка: 1-я линия, 35951 - Техподдержка: ВУ
             if (roles.isSkySmart === true) {
-                console.log('isSkySmart');
-                document.querySelector('#case_email_id_chosen > a > span').innerText = 'tech@skysmart.ru';
-                document.querySelector('#case_email_id_chosen > .chosen-drop > div > ul').tabIndex = 37;
-                document.querySelector('#case_email_id').value = '17999';
+                if (ticket_group === "35949" || ticket_group === "35950") {
+                    document.querySelector('#case_email_id_chosen > a > span').innerText = 'tech@skysmart.ru';
+                    document.querySelector('#case_email_id').value = '17999';
+                }
+                if (ticket_group === "35951") {
+                    document.querySelector('#case_email_id_chosen > a > span').innerText = 'il_tech@skysmart.ru';
+                    document.querySelector('#case_email_id').value = '18043';
+                }
                 document.getElementsByClassName('a17_bcc add_mail_copy')[0].click();
                 document.getElementsByClassName('a17_delete')[1].click();
             } else {

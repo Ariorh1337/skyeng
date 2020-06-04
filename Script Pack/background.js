@@ -735,7 +735,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         }
         if (request.question == 'duty_info') { 
-            fetch(`https://datsy.ru/api/duty-track`, { "credentials": "include" })
+            fetch(`https://datsy.ru/api/duty-track`, { "credentials": "include" }) //https://datsy.ru/bots/2duty_v3.php
                 .then(r => r.json())
                 .then(r => {
                     if (r.ok) {
