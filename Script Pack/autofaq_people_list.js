@@ -88,11 +88,8 @@ async function make_list() {
             if (s.aCnt == null) s.aCnt = 0; //в работе
             if (s.cCnt == null) s.cCnt = 0; //в очереди
             if (s.operator.fullName.indexOf('ТП2-') !== -1) {
-                //Do nothing here, remove after 01/05
-                let date = new Date();
-                if (date.getMonth() < 5 && date.getFullYear() >= 2020) { // date.getMonth() < 5 && date.getFullYear() >= 2020
-                    people = person(s.operator.id, s.operator.fullName, s.aCnt + s.cCnt, s.operator.status) + people;
-                }
+                //Do nothing here, remove after 01/06
+                //people = person(s.operator.id, s.operator.fullName, s.aCnt + s.cCnt, s.operator.status) + people;
             } else {
                 people = people + person(s.operator.id, s.operator.fullName, s.aCnt + s.cCnt, s.operator.status);
             }
@@ -101,7 +98,8 @@ async function make_list() {
         //Массив для расшифровки ID оператора
         if (s && s.operator && s.operator.id && s.operator.fullName) {
             operators[s.operator.id] = s.operator.fullName;
-            if (document.querySelector('.user_menu-dropdown-user_name') && s.operator.fullName === document.querySelector('.user_menu-dropdown-user_name')) {
+            let me = document.querySelector('.user_menu-dropdown-user_name');
+            if (me && s.operator.fullName === me.innerText) {
                 say_my_name = {
                     id: s.operator.id,
                     fullName: s.operator.fullName,
@@ -112,22 +110,18 @@ async function make_list() {
     });
 
     chrome.runtime.sendMessage({ name: "script_pack", question: 'duty_info' }, function (response) {
-        //Remove this IF statment after 01\05
-        let date = new Date();
-        if (date.getMonth() > 4 && date.getFullYear() >= 2020) { // date.getMonth() > 4 && date.getFullYear() >= 2020
-            if (response.answer.ok) {
-                response.answer.result.forEach((duty) => {
-                    people = person(
-                        '',
-                        'ТП2-' + duty.name,
-                        (duty.isBusy === false) ? 0 :
-                            (duty.start !== null) ? Math.floor((Number(new Date(new Date().toJSON())) - Number(new Date(duty.start))) / 1000 / 60) : 1,
-                        'Online',
-                        (duty.isBusy === true) ? duty.text : '',
-                        true
-                    ) + people;
-                });
-            }
+        if (response.answer.ok) {
+            response.answer.result.forEach((duty) => {
+                people = person(
+                    '',
+                    'ТП2-' + duty.name,
+                    (duty.isBusy === false) ? 0 :
+                        (duty.start !== null) ? Math.floor((Number(new Date(new Date().toJSON())) - Number(new Date(duty.start))) / 1000 / 60) : 1,
+                    'Online',
+                    (duty.isBusy === true) ? duty.text : '',
+                    true
+                ) + people;
+            });
         }
 
         document.getElementById('people_list').innerHTML = people;
@@ -143,6 +137,12 @@ async function make_list() {
                         }
                     });
                 })
+            } else {
+                user.addEventListener("click", function () {
+                    if (this.getAttribute('title').match(/http(.*)/) !== null) {
+                        window.open(this.getAttribute('title').match(/http(.*)/)[0], '_blank');
+                    }
+                })
             }
         })
     })
@@ -152,11 +152,22 @@ document.onreadystatechange = () => {
     setTimeout(function () {
         head_list();
         make_list();
-        setInterval(make_list, 10000);
+        setInterval(make_list, 25000);
 
         sidebar_css();
         first_step(); //sidebar start
     }, 1000)
+}
+
+function equals (...items) {
+    if (items.length < 2) return true;
+    let result = true;
+    items.forEach((itemOne) => {
+        items.forEach((itemTwo) => {
+            if (itemOne !== itemTwo) result = false;
+        });
+    });
+    return result;
 }
 
 //Sidebar --START--
@@ -209,6 +220,17 @@ function send_msg(user_id, chat_id, text_msg, comment = false) {
         });
 }
 
+function get_used_chat(chat_id, operator_id = say_my_name.id) {
+    fetch("https://skyeng.autofaq.ai/api/conversation/assign", {
+        "headers": {
+            "content-type": "application/json",
+            'cookie': `jwt=${AutoFaqCookie};`
+        },
+        "body": `{\"command\":\"DO_ASSIGN_CONVERSATION\",\"conversationId\":\"${chat_id}\",\"assignToOperatorId\":\"${operator_id}\"}`,
+        "method": "POST"
+    });
+}
+
 function draw_chat(id, type = 0) {
     get_history_chat(id) //'1559977__370534916'
         .then(r => {
@@ -227,7 +249,7 @@ function draw_chat(id, type = 0) {
             `<div style="margin-bottom: 10px;">
                 <span style="display: flex;justify-content: space-between;align-items: center;">
                     <div style="font-weight: bold;">ID: ${r.id}</div>
-                    <button type="button" class="ant-btn ant-dropdown-trigger"><span>...</span></button>
+                    <button type="button" id="grab_chat" class="ant-btn ant-dropdown-trigger" data-chat-id="${r.id}"><span>забрать</span></button>
                 </span>
                 <div style="font-weight: bold;margin-top: -8px;">User ID: ${r.channelUser.id}</div>
             </div>`;
@@ -235,13 +257,43 @@ function draw_chat(id, type = 0) {
 
             r.messages.forEach((msg) => {
                 if (msg.tpe == "Question") block.innerHTML += user_msg((r.channelUser.fullName && r.channelUser.fullName !== null) ? r.channelUser.fullName : 'Неизвестный', msg.ts, msg.txt);
-                if (msg.tpe == "Event")  block.innerHTML += event_msg(msg.eventTpe, msg.ts);
                 if (msg.tpe == "AnswerOperatorWithBot") block.innerHTML += bot_msg(msg.ts, msg.txt);
                 if (msg.tpe == "AnswerBot") block.innerHTML += bot_msg(msg.ts, msg.txt);
                 if (msg.tpe == "OperatorComment") block.innerHTML += comment_msg(msg.operatorId, msg.ts, msg.txt)
                 if (msg.tpe == "AnswerOperator") block.innerHTML += operator_msg(msg.operatorId, msg.ts, msg.txt);
                 if (msg.tpe == "Rate") block.innerHTML += event_msg('Rate', msg.ts);
                 if (msg.tpe == "AnswerSystem") block.innerHTML += bot_msg(msg.ts, msg.txt);
+                if (msg.tpe == "Event") {
+                    let state = msg.eventTpe;
+
+                    if (msg.eventTpe === "NewConversation") state = `Начат новый диалог`;
+                    if (msg.payload.src === "autoAssign" && msg.payload.status === "OnOperator") state = `Диалог назначен на ${operators[msg.payload.oid]}`;
+                    if (msg.payload.prevStatus === "OnOperator" && msg.payload.status === "AssignedToOperator") {
+                        if (equals(msg.payload.oid, msg.payload.sender)) state = `${operators[msg.payload.oid]} взял(а) диалог в работу`;
+                    }
+                    if (msg.payload.prevStatus === "ClosedByOperator" && msg.payload.status === "AssignedToOperator") {
+                        if (equals(msg.payload.oid, msg.payload.sender)) state = `${operators[msg.payload.oid]} взял(а) диалог в работу`;
+                    }
+                    if (msg.payload.prevStatus === "AssignedToOperator" && msg.payload.status === "AssignedToOperator") {
+                        if (equals(msg.payload.prevOid, msg.payload.sender)) {
+                            state = `${operators[msg.payload.sender]} перевел(а) диалог с себя на ${operators[msg.payload.oid]}`;
+                        } else if (equals(msg.payload.oid, msg.payload.sender)) {
+                            state = `${operators[msg.payload.sender]} перевел(а) диалог с ${operators[msg.payload.prevOid]} на себя`;
+                        } else {
+                            state = `${operators[msg.payload.sender]} перевел(а) диалог с ${operators[msg.payload.prevOid]} на ${operators[msg.payload.oid]}`;
+                        }
+                    }
+                    if (msg.eventTpe === "ReturnToQueue") {
+                        if (msg.payload.sender && msg.payload.afsName) {
+                            state = `${operators[msg.payload.sender]} вернул(а) диалог в очередь с тематикой "${msg.payload.afsName}"`;
+                        } else {
+                            state = `Диалог вернулся в общую очередь от ${operators[msg.payload.prevOid]}`;
+                        }
+                    }
+                    if (msg.eventTpe === "CloseConversation" && msg.payload.status === "ClosedByOperator") state = `${operators[msg.payload.sender]} закрыл(а) диалог с тематикой "${msg.payload.afsName}"`;
+
+                    block.innerHTML += event_msg(state, msg.ts);                    
+                }
             });
 
             block.outerHTML +=
@@ -272,6 +324,10 @@ function draw_chat(id, type = 0) {
                     document.querySelector('#send_text').value = '';
                     draw_chat(mode.getAttribute('data-chat-id'), type);
                 }, 1000);
+            }
+
+            document.querySelector('#grab_chat').onclick = function () {
+                get_used_chat(this.getAttribute('data-chat-id'));
             }
         });
 }
@@ -428,6 +484,10 @@ function sidebar_css() {
         
         #send_btns[data-msg-type="note"] > a, #send_btns[data-msg-type="note"] > textarea {
             background-color: lightgray;
+        }
+        
+        #msg_block > .chat_event > .chat_event-text{
+            font-size: 10px !important;
         }`;
     document.head.append(style)
 }

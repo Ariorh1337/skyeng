@@ -643,26 +643,26 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.question == 'get_person_info_v3') {
             let contacts = new Promise(function (resolve, reject) {
                 fetch("https://backend.skyeng.ru/api/persons/" + request.id, { "credentials": "include" })
-                .then(r => {
-                    if (r.status === 200) { return r.json(); } else { return { error: r.status }; }
-                })
-                .then(r => resolve(r));
+                    .then(r => {
+                        if (r.status === 200) { return r.json(); } else { return { error: r.status }; }
+                    })
+                    .then(r => resolve(r));
             });
 
             let roles = new Promise(function (resolve, reject) {
                 fetch("https://id.skyeng.ru/admin/users/" + request.id, { "credentials": "include" })
-                .then(r => {
-                    if (r.status === 200) { return r.text(); } else { return { error: r.status }; }
-                })
-                .then(r => {
-                    if (!r.error) {
-                        let doc = document.createElement('html');
-                        doc.innerHTML = r;
-                        resolve( doc.querySelectorAll('tr > td > code')[1].innerText.replace(' ', '').split(',') );
-                    } else {
-                        resolve(r);
-                    }
-                });
+                    .then(r => {
+                        if (r.status === 200) { return r.text(); } else { return { error: r.status }; }
+                    })
+                    .then(r => {
+                        if (!r.error) {
+                            let doc = document.createElement('html');
+                            doc.innerHTML = r;
+                            resolve( doc.querySelectorAll('tr > td > code')[1].innerText.replace(' ', '').split(',') );
+                        } else {
+                            resolve(r);
+                        }
+                    });
             });
 
             contacts.then((response) => {
@@ -1060,3 +1060,97 @@ function checkJWT() {
         }
     })
 }
+
+
+//ticket_notify ---START---
+function get_tickets(id) {
+    let result = new Promise(function (resolve, reject) {
+        fetch(`https://help.skyeng.ru/staff/cases/list/filter/${id}`)
+            .then(r => r.text())
+            .then(r => {
+                let doc = document.createElement('body');
+                doc.innerHTML = r;
+                var rows = doc.querySelectorAll('div[class="req-main-cont"] > div:not([id="records_list"])');
+
+                let tikets = new Object();
+                
+                rows.forEach((row) => {
+                    let subj, body, priority, number;
+                
+                    subj = row.querySelector('div[class="req-td req-inf"] > div > div > a').innerText;
+                    body = row.querySelector('div[class="req-case-content"]').innerText.trim();
+                    
+                    if (row.classList.contains('color-type3')) priority = "red"; //crit
+                    if (row.classList.contains('color-type2')) priority = "orange"; //high
+                    if (row.classList.contains('color-type1')) priority = "yellow";
+                    if (row.className.indexOf('color-type' === -1)) priority = "grey";
+                
+                    number = row.querySelector('div[class="req-case-main"]').innerText.trim();
+                
+                    tikets[number] = {
+                        'subject': subj,
+                        'body': body,
+                        'priority': priority,
+                        'number': number
+                    }
+                });
+
+                resolve(tikets);
+            })
+    })
+
+    return result.then((resolve) => {
+        return resolve;
+    });
+}
+
+function alert(ticket) {
+    chrome.notifications.create(ticket.number, {
+        type: "basic",
+        title: ticket.subject,
+        message: ticket.body,
+        iconUrl: 'script-pack.png',
+        buttons: [{title: "Ок"},{title: "Открыть"}],
+        requireInteraction: true
+    });
+}
+
+async function ticket_notify() {
+    chrome.storage.local.get(['ticket_notify_id'], function (id) {
+        if (id['ticket_notify_id'] !== undefined && id['ticket_notify_id'] !== '' && Number(id['ticket_notify_id']) !== NaN) {
+            let tickets = get_tickets(id['ticket_notify_id']);
+            tickets.then(tickets => {
+                if (first_run) {
+                    global_tikets = tickets;
+                    first_run = false;
+                } else {
+                    for (ticket in tickets) {
+                        if (!global_tikets[ticket]) {
+                            alert(tickets[ticket]);
+                            global_tikets[ticket] = tickets[ticket];
+                        }
+                    }
+                }
+            });
+        } else {
+            console.log('err ticket_notify_id check');
+        }
+    });
+}
+
+let first_run = true;
+let global_tikets = new Object();
+chrome.notifications.onButtonClicked.addListener(function (id, btn) {
+    if (btn === 1) { window.open(`https://help.skyeng.ru/staff/cases/record/${global_tikets[id].number}`,'_blank') }
+});
+
+setInterval(function () {
+    chrome.storage.local.get(['ticket_notify'], function (result) {
+        if (result['ticket_notify'] === undefined) { chrome.storage.local.set({ ticket_notify: false }, function () { }); }
+        if (result['ticket_notify'] === true) {
+            let date = new Date();
+            if (date.getHours() > 7 && date.getHours() < 23) ticket_notify();
+        }
+    });
+}, 60 * 1000);
+//ticket_notify ----END----

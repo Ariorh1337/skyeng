@@ -19,7 +19,6 @@ window.onload = function () {
             document.querySelector('button#apply_btn').setAttribute('disabled', '');
         }
     }
-
     document.querySelector('button#apply_btn').onclick = () => {
         let id = document.querySelector('input#test-teacher_id');
         if (id.getAttribute('value') !== id.value) {
@@ -28,4 +27,18 @@ window.onload = function () {
             })
         }
     }
+
+    //ticket_notify ---START---
+
+    chrome.storage.local.get(['ticket_notify_id'], function (id) {
+        if (id['ticket_notify_id'] !== undefined && id['ticket_notify_id'] !== '' && Number(id['ticket_notify_id']) !== NaN) {
+            document.querySelector('#ticket_notify_id').value = id['ticket_notify_id'];
+        }
+    });
+
+    document.querySelector('#apply_ticket_notify_id').onclick = () => {
+        chrome.storage.local.set({ 'ticket_notify_id': document.querySelector('#ticket_notify_id').value });
+    }
+    
+    //ticket_notify ----END----
 }

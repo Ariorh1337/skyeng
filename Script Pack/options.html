@@ -178,6 +178,23 @@
                 <input name="Settings" type="checkbox" id="ticket_help_ids">
             </div>
             <div class="description">Проверка на наличие полей ID У и ID П - в регламенте, отключать не рекомендованно</div>
+
+            <div class="block">
+                <div>background.js - ticket_notify</div>
+                <input name="Settings" type="checkbox" id="ticket_notify">
+            </div>
+            <div class="description">
+                Уведомление о новом тикете в указаном фильтре omnidesk
+                <div>
+                    <span>
+                        <span>Фильтр:</span>
+                        <input id="ticket_notify_id" type="number" value="" style="height: 12px; width: 75px; margin: 10px;">
+                    </span>
+                    <span>
+                        <button id="apply_ticket_notify_id">применить</button>
+                    </span>
+                </div>
+            </div>
         </div>
     </body> 
 </html>
