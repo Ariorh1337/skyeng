@@ -80,25 +80,43 @@ function head_list() {
     }
 }
 
+function get_duty() {
+    let result = new Promise(function (resolve, reject) {
+        chrome.runtime.sendMessage({ name: "script_pack", question: 'duty_info' }, function (response) {
+            if (response.answer.ok) {
+                let duty_result = '';
+                response.answer.result.forEach((duty) => {
+                    duty_result += person(
+                        '',
+                        'ТП2-' + duty.name,
+                        (duty.isBusy === false) ? 0 :
+                            (duty.start !== null) ? Math.floor((Number(new Date(new Date().toJSON())) - Number(new Date(duty.start))) / 1000 / 60) : 1,
+                        'Online',
+                        (duty.isBusy === true) ? duty.text : '',
+                        true
+                    );
+                });
+                resolve(duty_result);
+            } else {
+                resolve('');
+            }
+        });
+    });
+
+    return result.then((array) => {
+		return array;
+	});
+}
+
 async function make_list() { 
     var asd = await get_state();
-    var people = '';0
-    asd.forEach(s => {
-        if (s && s.operator && s.operator.status !== "Offline" && s.operator.fullName.indexOf('ТП') !== -1) {
-            if (s.aCnt == null) s.aCnt = 0; //в работе
-            if (s.cCnt == null) s.cCnt = 0; //в очереди
-            if (s.operator.fullName.indexOf('ТП2-') !== -1) {
-                //Do nothing here, remove after 01/06
-                //people = person(s.operator.id, s.operator.fullName, s.aCnt + s.cCnt, s.operator.status) + people;
-            } else {
-                people = people + person(s.operator.id, s.operator.fullName, s.aCnt + s.cCnt, s.operator.status);
-            }
-        };
+    var people = '';
+    let me = document.querySelector('.user_menu-dropdown-user_name');
 
+    asd.forEach(s => {
         //Массив для расшифровки ID оператора
         if (s && s.operator && s.operator.id && s.operator.fullName) {
             operators[s.operator.id] = s.operator.fullName;
-            let me = document.querySelector('.user_menu-dropdown-user_name');
             if (me && s.operator.fullName === me.innerText) {
                 say_my_name = {
                     id: s.operator.id,
@@ -106,45 +124,46 @@ async function make_list() {
                     group: s.operator.kbs[0]
                 };
             }
+
+            if (s.operator.status !== "Offline") {
+                if (s.operator.fullName.indexOf(`${ me.innerText.split('-')[0] }-`) !== -1) {
+                    if (s.aCnt == null) s.aCnt = 0; //в работе
+                    if (s.cCnt == null) s.cCnt = 0; //в очереди
+                    people = people + person(s.operator.id, s.operator.fullName, s.aCnt + s.cCnt, s.operator.status);
+                } else if (me.innerText.split('-')[0] === 'ТП2' && s.operator.fullName.indexOf(`ТП-`) !== -1) {
+                    if (s.aCnt == null) s.aCnt = 0; //в работе
+                    if (s.cCnt == null) s.cCnt = 0; //в очереди
+                    people = people + person(s.operator.id, s.operator.fullName, s.aCnt + s.cCnt, s.operator.status);
+                }
+            };
         }
     });
 
-    chrome.runtime.sendMessage({ name: "script_pack", question: 'duty_info' }, function (response) {
-        if (response.answer.ok) {
-            response.answer.result.forEach((duty) => {
-                people = person(
-                    '',
-                    'ТП2-' + duty.name,
-                    (duty.isBusy === false) ? 0 :
-                        (duty.start !== null) ? Math.floor((Number(new Date(new Date().toJSON())) - Number(new Date(duty.start))) / 1000 / 60) : 1,
-                    'Online',
-                    (duty.isBusy === true) ? duty.text : '',
-                    true
-                ) + people;
-            });
-        }
+    if (me.innerText.indexOf('ТП-') !== -1 || me.innerText.indexOf('ТП2-') !== -1) {
+        let duty = await get_duty();
+        people = duty + people;
+    }
 
-        document.getElementById('people_list').innerHTML = people;
+    document.getElementById('people_list').innerHTML = people;
 
-        document.getElementById('people_list').childNodes.forEach(function (user) { 
-            if (user.getAttribute('data-is-duty') === "false") {
-                user.addEventListener("click", function () {
-                    get_operator_chats(this.getAttribute('data-user-id')).then(r => {
-                        if (r.items && r.items.length > 0) {
-                            second_step();
-                            window.backup = r;
-                            draw_list(window.backup);
-                        }
-                    });
-                })
-            } else {
-                user.addEventListener("click", function () {
-                    if (this.getAttribute('title').match(/http(.*)/) !== null) {
-                        window.open(this.getAttribute('title').match(/http(.*)/)[0], '_blank');
+    document.getElementById('people_list').childNodes.forEach(function (user) { 
+        if (user.getAttribute('data-is-duty') === "false") {
+            user.addEventListener("click", function () {
+                get_operator_chats(this.getAttribute('data-user-id')).then(r => {
+                    if (r.items && r.items.length > 0) {
+                        second_step();
+                        window.backup = r;
+                        draw_list(window.backup);
                     }
-                })
-            }
-        })
+                });
+            })
+        } else {
+            user.addEventListener("click", function () {
+                if (this.getAttribute('title').match(/http(.*)/) !== null) {
+                    window.open(this.getAttribute('title').match(/http(.*)/)[0], '_blank');
+                }
+            })
+        }
     })
 }
 
@@ -159,14 +178,12 @@ document.onreadystatechange = () => {
     }, 1000)
 }
 
-function equals (...items) {
-    if (items.length < 2) return true;
+function equals (...items){
     let result = true;
-    items.forEach((itemOne) => {
-        items.forEach((itemTwo) => {
-            if (itemOne !== itemTwo) result = false;
-        });
-    });
+    if (items.length < 2) return result;
+    items.sort((a, b) => {
+        if (a !== b) result = false;
+    })
     return result;
 }
 
@@ -327,7 +344,11 @@ function draw_chat(id, type = 0) {
             }
 
             document.querySelector('#grab_chat').onclick = function () {
-                get_used_chat(this.getAttribute('data-chat-id'));
+                if (confirm('Вы точно хотите забрать этот чат?')) {
+                    get_used_chat(this.getAttribute('data-chat-id'));
+                } else {
+                    console.log('Нажатие произошло тут: ', this);
+                }
             }
         });
 }
@@ -469,7 +490,7 @@ function sidebar_css() {
             margin-bottom: -11px;
             border-radius: 6px;
             padding-bottom: 0px;
-            width: 29vh;
+            width: 26vh;
             margin-top: 0px;
             height: 30px;
         }
@@ -488,6 +509,11 @@ function sidebar_css() {
         
         #msg_block > .chat_event > .chat_event-text{
             font-size: 10px !important;
+        }
+        
+        body, .DraftEditor-editorContainer > .public-DraftEditor-content, .expert-sidebar-inner > .expert-sider-tabs {
+            color: black;
+            font-weight: 400;
         }`;
     document.head.append(style)
 }

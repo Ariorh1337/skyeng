@@ -259,29 +259,48 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                 }
                             }
                         }
-    
+
+                        let marks = new Array();
+                        if (obj[0].result[0].isLivedAbroad) marks.push('LivedAbroad');
+                        if (obj[0].result[0].isOnVacation) marks.push('OnVacation');
+                        if (obj[0].result[0].isMethodist) marks.push('Methodist');
+                        if (obj[0].result[0].isPassivelyFired) marks.push('PassivelyFired');
+                        if (obj[0].result[0].isGroup) marks.push('Group');
+                        if (obj[0].result[0].isOverbooker) marks.push('Overbooker');
+                        if (obj[0].result[0].isVip) marks.push('Vip');
+                        if (obj[0].result[0].isCorporate) marks.push('Corporate');
+                        if (obj[0].result[0].isScreeningTester) marks.push('ScreeningTester');
+                        if (obj[0].result[0].isSuperCorporate) marks.push('SuperCorporate');
+                        if (obj[0].result[0].isKidsLabPrimary) marks.push('KidsLabPrimary');
+                        if (obj[0].result[0].isExternal) marks.push('External');
+                        if (obj[0].result[0].isJunior) marks.push('Junior');
+
                         (classes) ? true : classes = '';
                         (classes_regular) ? true : classes_regular = '';
                         if (classes.length !== 0 && classes_regular.length !== 0) {
                             classes = classes.concat(classes_regular);
                             sendResponse({
                                 answer: classes,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                                marks: marks
                             });
                         } else if (classes.length !== 0 && classes_regular.length == 0) {
                             sendResponse({
                                 answer: classes,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                                marks: marks
                             });
                         } else if (classes.length == 0 && classes_regular.length !== 0) {
                             sendResponse({
                                 answer: classes_regular,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                                marks: marks
                             });
                         } else {
                             sendResponse({
                                 answer: null,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null
+                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                                marks: marks
                             });
                         }
                     });
@@ -544,7 +563,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     (json.data[i].paymentAgreement.person.general.name) ? payment['name'] = json.data[i].paymentAgreement.person.general.name : false;
                     (balance == null) ? balance = 0 : false;
                     
-                    result.push({"color": color, "balance": balance, "subject": subject, "teacher": teacher, "payment": payment})
+                    result.push({"color": color, "balance": balance, "subject": subject, "teacher": teacher, "payment": payment, "other": json.data})
                 }
 
                 sendResponse({answer: result});
@@ -553,7 +572,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         }
         if (request.question == 'crm2_no_responce') {
-            var body = `log=Тикет ТП omnidesk: ${request.ticket_id} ~ не удалось связаться`;
+            let body;
+            if (request.body) body = 'log=' + request.body;
+                else body = `log=Тикет ТП omnidesk: ${request.ticket_id} ~ не удалось связаться`;
             fetch(`https://backend.skyeng.ru/api/persons/${request.id}/log-any-interaction/`, {
                 method: "POST",
                 headers: {
@@ -674,13 +695,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: ${info.phone}` : '';
                     let skype = (info.skype !== null) ? `<br><a href="skype:${info.skype}?chat">Skype</a>: ${info.skype}` : '';
                     let identity = (info.identity !== null) ? `<br>Identity: ${info.identity}` : '';
-                    let time = (info.utcOffset) ? `<br>Время: ${(info.utcOffset === 3) ? info.utcOffset + ' UTC' : `<b style="color: #FF5733;">${info.utcOffset}</b>`} UTC` : ``; 
+                    let time = (info.utcOffset) ? `<br>Время: ${(info.utcOffset === 3) ? info.utcOffset : `<b style="color: #FF5733;">${info.utcOffset}</b>`} UTC` : ``; 
                     
                     roles.then(roles => {
                         if (!roles.error) {
                             roles = roles.join()
                             let roles_text = '', role = '', isSkySmart = false;
-                            if (roles.indexOf('ROLE_OPERATOR') !== -1) { 
+                            if (roles.indexOf('ROLE_OPERATOR') !== -1 || roles.indexOf('ROLE_HRM_USER') !== -1) { 
                                 role = 'operator';
                                 roles_text += 'Operator<br>';
                             } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
@@ -761,6 +782,46 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         r.result = result;
 
                         sendResponse({ answer: r });
+                    } else {
+                        sendResponse({ answer: r });
+                    }
+                });
+            
+            return true;
+        }
+        if (request.question == 'crm2_get_services') { 
+            fetch(`https://backend.skyeng.ru/api/persons/${request.id}/education-services/`, {
+                credentials: "include",
+            })
+                .then((r) => {
+                    if (r.ok) return r.json();
+                    else return {
+                        error: r.status
+                    };
+                })
+                .then((r) => {
+                    if (!r.error) {
+                        sendResponse({ answer: r.data });
+                    } else {
+                        sendResponse({ answer: r });
+                    }
+                });
+            
+            return true;
+        }
+        if (request.question == 'crm2_get_info') { 
+            fetch(`https://backend.skyeng.ru/api/persons/${request.id}`, {
+                credentials: "include",
+            })
+                .then((r) => {
+                    if (r.ok) return r.json();
+                    else return {
+                        error: r.status
+                    };
+                })
+                .then((r) => {
+                    if (!r.error) {
+                        sendResponse({ answer: r.data });
                     } else {
                         sendResponse({ answer: r });
                     }

@@ -1,7 +1,7 @@
 //*://calendar.google.com/calendar/r/*
 
 function asd() {
-    var settings = 6;
+    var settings = 10;
 
     var button = document.querySelectorAll('div[role="presentation"] > div[role="button"]');
     for (i = 0; i < button.length; i++) {

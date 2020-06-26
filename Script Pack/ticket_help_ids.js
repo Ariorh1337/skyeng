@@ -1,41 +1,58 @@
 chrome.storage.local.get(['ticket_help_ids'], function(result) {
     if (result['ticket_help_ids'] === undefined) { chrome.storage.local.set({ ticket_help_ids: true }, function() {}); }
     if (result['ticket_help_ids'] === true) {
-        document.body.onload = () => { 
-            ID_check();
+        window.addEventListener('load', () => {
+            let fields = document.querySelectorAll('input[name="field_2246"], input[name="field_2247"]');
+            if (fields) {
+                let needToCheck = true;
+                fields.forEach((elm) => {
+                    if (elm.value !== '') needToCheck = false;
+                    elm.addEventListener('change', function () {
+                        check.apply(elm);
+                    });
+                    elm.addEventListener('mouseout', function () {
+                        check.apply(elm);
+                    });
+                });
 
-            setInterval(() => {
-                if (window.check == false) {
-                    document.querySelector('.btn[value="Отправить"]').disabled = 'true';
+                if (needToCheck === true) {
+                    fields.forEach((elm) => {
+                        check.apply(elm);
+                    })
                 }
-            }, 100);
-        }
-        document.body.onkeyup = (event) => {
-            ID_check();
-        }
+            }
+        });
     }
 });
 
-function ID_check() { 
-    let fields = document.querySelectorAll('input[name="field_2246"], input[name="field_2247"]');
-    window.check = false;
-    fields.forEach((elm) => { 
-        if (elm.value !== '') { 
-            window.check = true; 
-            elm.style = ''; 
-        } else { 
-            elm.style = 'background-color: red;'; 
-        } 
-    });
-    if (!window.check) {
-        document.querySelector('.btn[value="Отправить"]').style.backgroundColor = 'red';
+function check() {
+    if (this.value === '') {
+        this.style.backgroundColor = 'red';
+
+        let send_btn = document.querySelector('.btn[value="Отправить"]');
+        if (send_btn) {
+            send_btn.style.backgroundColor = 'red';
+            send_btn.disabled = 'true';
+        }
+
+        let save_btn = document.querySelector('.btn[value="Сохранить"]');
+        if (save_btn) {
+            save_btn.style.backgroundColor = 'red';
+            save_btn.disabled = 'true';
+        }
     } else {
-        document.querySelector('.btn[value="Отправить"]').style.backgroundColor = '';
+        this.style.backgroundColor = '';
+
+        let send_btn = document.querySelector('.btn[value="Отправить"]');
+        if (send_btn) {
+            send_btn.style.backgroundColor = '';
+            send_btn.removeAttribute('disabled')
+        }
+
+        let save_btn = document.querySelector('.btn[value="Сохранить"]');
+        if (save_btn) {
+            save_btn.style.backgroundColor = '';
+            save_btn.removeAttribute('disabled')
+        }
     }
-}
-
-/*
-
-
-text.innerHTML = localStorage.getItem('save_text');
-*/
+} 

@@ -1,4 +1,4 @@
-window.onload = function () {
+setTimeout(() => {
     if (document.getElementsByClassName('info_header').length !== 0) {
         var id = document.querySelectorAll('label > input[class="form-custom-field"]')[0].value.replace(/[^0-9]/g, "");
         if (id !== '') {
@@ -14,4 +14,4 @@ window.onload = function () {
             asd.outerHTML = '<div class="info_header"><p>упоминания Student</p><a href="/staff/cases/search/?search=' + id + '" target="_blank">открыть</a></div>'
         }
     }
-}
+}, 5000);

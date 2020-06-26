@@ -17,7 +17,7 @@ function show_tiket_id() {
         document.getElementsByName('field_cf_2385')[0].value = '2'; //Корп
     } else {
         var block = document.querySelector('.win_success > p');
-        var tiket = block.innerText.match('[0-9-]+')[0];
+        var ticket = block.innerText.match('[0-9-]+')[0];
         block.innerHTML = block.innerHTML.replace(ticket, `<a href="https://help.skyeng.ru/staff/cases/record/${ticket}/" target="_blank" rel="noopener noreferrer">${ticket}</a>`);        
     }
 }
@@ -49,4 +49,4 @@ chrome.storage.local.get(['chat_create'], function(result) {
             document.getElementsByTagName("head")[0].appendChild(script);
         }
     }
-});
+}); //https://omnidesk.ru/client_widgets/widget/7704-ybpput2p?name=Dmitry%20Omelchenko&email=omd1337@gmail.com&text=%D0%A2%D0%B5%D1%81%D1%82%20%D1%82%D0%B8%D0%BA%D0%B5%D1%82%D0%B0%20%D0%B8%D0%B7%20%D1%87%D0%B0%D1%82%D0%B0

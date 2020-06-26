@@ -1,6 +1,6 @@
 {
     "name": "Script Package",
-    "version": "0.5.3",
+    "version": "0.5.6",
     "description": "Сборник скриптов для быстрого доступа к ресурсам: ://.skyeng.ru/* , ://datsy.ru/, ://skyeng.autofaq.ai/, ://skyeng.omnidesk.ru/*",
     "manifest_version": 2,
     "icons": {
@@ -53,6 +53,14 @@
     {
         "js": ["ticket_easy_info_window.js", "autofaq_people_list.js", "autofaq_colorfull_status.js", "autofaq_tkRequest_btn.js"],
         "matches": ["*://skyeng.autofaq.ai/*"]
+    },
+    {
+        "js": ["crm2_new_tab_search.js", "crm2_send_letter.js", "crm2_users_save.js"],
+        "matches": ["*://crm2.skyeng.ru/persons*"]
+    },
+    {
+        "js": ["calc_google.js"],
+        "matches": ["*://calendar.google.com/calendar/*"]
     }],
     "permissions": [
         "cookies", "*://*.skyeng.ru/*","*://skyeng.omnidesk.ru/*","*://datsy.ru/api/*","storage","notifications"
