@@ -5,7 +5,7 @@ function colorfull_status() {
                 s.onclick = () => {
                     setTimeout(() => {
                         let btn = document.querySelector('div[class="user_menu-status"] > button[type="button"]');
-                        if (btn.firstElementChild.innerText == 'Офлайн') btn.style = 'background-color: red;';
+                        if (btn.firstElementChild.innerText == 'Офлайн') btn.style = 'background-color: darkred;';
                         if (btn.firstElementChild.innerText == 'Занят' || btn.firstElementChild.innerText == 'Перерыв') btn.style = 'background-color: orange;';
                         if (btn.firstElementChild.innerText == 'Онлайн') btn.style = 'background-color: green;';
                     }, 1000);

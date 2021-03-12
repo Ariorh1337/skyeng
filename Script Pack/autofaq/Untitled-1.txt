@@ -1,0 +1,27 @@
+<div class="b-popup">
+    <div class="b-popup-content">
+        <button
+            style="display: block;border: 1px solid black;border-radius: 11px;position: fixed;background-color: white;">х</button>
+        <div class="content-menu" style="display: none;">
+            <button class="menu">Добавить новый шаблон</button>
+            <button class="menu">Удалить свой шаблон</button>
+            <button class="menu">Настроить порядок шаблонов</button>
+        </div>
+        <div class="content-new-pattern" style="display: none;">
+            <p>Введите название шаблона</p>
+            <input type="text" placeholder="">
+            <p>Введите текст шаблона</p>
+            <textarea type="text" placeholder=""></textarea><button class="menu">Добавить</button>
+        </div>
+        <div class="content-remove-pattern" style="display: none;">
+            <p>Выберите шаблон:</p>
+            <input type="text" placeholder=""><button class="menu">Удалить свой шаблон</button>
+
+        </div>
+        <div class="content-move-pattern" style="display: none;">
+            <p>Настройте порядок шаблонов:</p>
+            <b>Тест шаблон №1</b>
+            <a href="#">для помощи наведите мышку</a>
+        </div>
+    </div>
+</div>

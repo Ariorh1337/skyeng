@@ -73,6 +73,7 @@ var win_html = `<div style="display: flex;">
             <div style="font-weight: bold; text-align: center; padding: 5px; border-top: 1px black solid; border-bottom: 1px solid black; display: none; cursor: pointer;" id="teacher_status">
                 <span>
                     <button class="win_btn" style="float: left;" id="teacher_copy">Copy</button>
+                    <button class="win_btn" style="float: left;" id="teacher_crm">CRM</button>
                     <button class="win_btn" style="float: left;" id="teacher_trm">TRM</button>
                     <span style="margin: 0px 10px;">Teacher:</span>
                     <button class="win_btn" style="float: right;" id="teacher_login">Login</button>
@@ -159,10 +160,32 @@ mscr.innerHTML = send_comment_js;
     document.getElementById('student_copy').onclick = function () {
         let stdnt = document.getElementById('info_student_block').innerText;
         TrueCopyToClipboard(stdnt) //.replace(/<br>/g,'\n')
+
+        let notes_box = document.getElementsByName('field_2240');
+        if (notes_box && notes_box.length > 0) {
+            if (notes_box[0].value === '') {
+                notes_box[0].value = stdnt;
+            } else {
+                notes_box[0].value += `\n\n${new Array(15).fill('=').join('')}\n\n${stdnt}`;
+            }
+            document.getElementsByClassName('a17_bcc add_mail_copy')[0].click();
+            document.getElementsByClassName('a17_delete')[1].click();
+        }
     };
     document.getElementById('teacher_copy').onclick = function () {
         let tcher = document.getElementById('info_teacher_block').innerText;
         TrueCopyToClipboard(tcher) //.replace(/<br>/g,'\n')
+
+        let notes_box = document.getElementsByName('field_2240');
+        if (notes_box && notes_box.length > 0) {
+            if (notes_box[0].value === '') {
+                notes_box[0].value = tcher;
+            } else {
+                notes_box[0].value += `\n\n${new Array(15).fill('=').join('')}\n\n${tcher}`;
+            }
+            document.getElementsByClassName('a17_bcc add_mail_copy')[0].click();
+            document.getElementsByClassName('a17_delete')[1].click();
+        }
     };
     document.getElementById('info_status').firstElementChild.children[2].onclick = function () {
         let id = document.getElementById('info_status').getAttribute('user_id');
@@ -176,7 +199,7 @@ mscr.innerHTML = send_comment_js;
         document.getElementById('btn_hide').setAttribute('disabled', '');
     }
 
-    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('skyeng.autofaq.ai') !== -1) {
+    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('skyeng.autofaq.ai') !== -1 || window.location.href.indexOf('crm2.skyeng.ru') !== -1) {
         document.getElementById('id_type_for_chat').style.display = '';
         document.getElementById('btn1_student').innerText = 'Info';
         document.getElementById('btn1_teacher').style.display = 'none';
@@ -264,7 +287,7 @@ const TrueCopyToClipboard = str => {
 
 async function get_info(type) { //v.2
     let id;
-    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('skyeng.autofaq.ai') !== -1) {
+    if (window.location.href.indexOf('chat') !== -1 || window.location.href.indexOf('skyeng.autofaq.ai') !== -1 || window.location.href.indexOf('crm2.skyeng.ru') !== -1) {
         id = document.getElementById('id_type_for_chat').value;
         /*/
         if (isNaN(id) == true) {
@@ -298,7 +321,6 @@ async function get_info(type) { //v.2
         
         get_person_info.then( (value) => {
             var role = value.role;
-            var is_kgl = (value.status.indexOf('Group') !== -1) ? true : false;
 
             if (role == 'operator') {
                 document.getElementById('info_status').setAttribute('user_id', id);
@@ -406,6 +428,7 @@ async function get_info(type) { //v.2
                             no_responce(id);
                             document.querySelector('#svg_person').style.display = 'none';
 
+                            /*
                             if (is_kgl === true) {
                                 chrome.runtime.sendMessage({name: "script_pack", question: 'get_group_student_info', id: id}, function(response) {
                                     let info_teacher_block = document.getElementById('info_teacher_block');
@@ -419,23 +442,61 @@ async function get_info(type) { //v.2
                                     info_teacher_block.style.marginTop = '';
                                 });         
                             }
+                            */
 
-                            chrome.runtime.sendMessage({name: "script_pack", question: 'crm2_status', id: id}, function(response) {
+                            chrome.runtime.sendMessage({ name: "script_pack", question: 'crm2_status', id: id }, function (response) {
+                                console.log(response)
                                 if (response.answer.length > 0) {
                                     response.answer.forEach((element) => {
-                                        if (element.teacher !== null) {
-                                            crm2_status_draw(id, element.color, element.balance, element.subject, element.payment, element.teacher);
-                                            crm2_teacher_draw(element.teacher);
-                                            var get_person_info2 = new Promise( (resolve) => {
-                                                chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v3', id: element.teacher}, function(response) {
-                                                    resolve(response);
-                                                })
-                                            });
-                                            get_person_info2.then( (value2) => {
-                                                document.getElementById(`info_teacher_block_${element.teacher}`).innerHTML = value2.status + value2.answer;
+                                        const isKGL = (element.subject.indexOf('KGL') !== -1) ? true : false;
+
+                                        if (isKGL) {
+                                            chrome.runtime.sendMessage({ name: "script_pack", question: 'get_group_student_info', id: id }, function (kglResponce) {
+                                                console.log(kglResponce)
+                                                if (!kglResponce.group && !kglResponce.teacher) crm2_status_draw(id, element.color, element.balance, element.subject, element.payment);
+                                                else {
+                                                    if (kglResponce.teacher) {
+                                                        crm2_status_draw(id, element.color, element.balance, element.subject, element.payment, kglResponce.teacher);
+    
+                                                        crm2_teacher_draw(kglResponce.teacher);
+
+                                                        var get_person_info2 = new Promise((resolve) => {
+                                                            chrome.runtime.sendMessage({ name: "script_pack", question: 'get_person_info_v3', id: kglResponce.teacher }, function (response) {
+                                                                resolve(response);
+                                                            })
+                                                        });
+                                                        get_person_info2.then((value2) => {
+                                                            let info_teacher_block = document.getElementById(`info_teacher_block_${kglResponce.teacher}`);
+                                                            info_teacher_block.innerHTML = `
+                                                            <span>
+                                                                <span style="margin-right: 3px;">Группа:</span>
+                                                                ${kglResponce.group}
+                                                                <a href="https://grouplessons-api.skyeng.ru/admin/student/view/${id}" target="_blank" style="margin-left: 15px;">Карточка</a>
+                                                            </span>
+                                                            <br>
+                                                            <br>`;
+                                                            
+                                                            info_teacher_block.innerHTML += value2.status + value2.answer;
+                                                        });
+                                                    }
+                                                }
                                             });
                                         } else {
-                                            crm2_status_draw(id, element.color, element.balance, element.subject, element.payment);
+                                            if (element.teacher !== null) {
+                                                crm2_status_draw(id, element.color, element.balance, element.subject, element.payment, element.teacher);
+    
+                                                crm2_teacher_draw(element.teacher);
+                                                var get_person_info2 = new Promise( (resolve) => {
+                                                    chrome.runtime.sendMessage({name: "script_pack", question: 'get_person_info_v3', id: element.teacher}, function(response) {
+                                                        resolve(response);
+                                                    })
+                                                });
+                                                get_person_info2.then( (value2) => {
+                                                    document.getElementById(`info_teacher_block_${element.teacher}`).innerHTML = value2.status + value2.answer;
+                                                });
+                                            } else {
+                                                crm2_status_draw(id, element.color, element.balance, element.subject, element.payment);
+                                            }
                                         }
                                     });
                                 }                                
@@ -514,6 +575,9 @@ function teacher_draw(id) {
             window.open('https://tramway.skyeng.ru/teacher/' + response.answer + '/show', '_blank'); 
         }
     });
+    document.getElementById('teacher_crm').onclick = function () {
+        window.open('https://crm2.skyeng.ru/persons/' + id, '_blank'); 
+    }
     document.getElementById('teacher_login').onclick = function () {
         document.getElementById('teacher_login').style.backgroundColor = 'orange';
         chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
@@ -580,6 +644,7 @@ function crm2_teacher_draw(id) {
     <div style="font-weight: bold; text-align: center; padding: 5px; border-top: 1px black solid; border-bottom: 1px solid black; cursor: pointer; display: none;" id="teacher_status_${id}">
         <span>
             <button class="win_btn" style="float: left;" id="teacher_copy_${id}">Copy</button>
+            <button class="win_btn" style="float: left;" id="teacher_crm_${id}">CRM</button>
             <button class="win_btn" style="float: left;" id="teacher_trm_${id}">TRM</button>
             <span style="margin: 0px 10px;">Teacher:</span>
             <button class="win_btn" style="float: right;" id="teacher_login_${id}">Login</button>
@@ -599,6 +664,17 @@ function crm2_teacher_draw(id) {
     document.getElementById(`teacher_copy_${id}`).onclick = function () {
         let tcher = document.getElementById(`info_teacher_block_${id}`).innerText;
         TrueCopyToClipboard(tcher); //.replace(/<br>/g,'\n')
+
+        let notes_box = document.getElementsByName('field_2240');
+        if (notes_box && notes_box.length > 0) {
+            if (notes_box[0].value === '') {
+                notes_box[0].value = tcher;
+            } else {
+                notes_box[0].value += `\n\n${new Array(15).fill('=').join('')}\n\n${tcher}`;
+            }
+            document.getElementsByClassName('a17_bcc add_mail_copy')[0].click();
+            document.getElementsByClassName('a17_delete')[1].click();
+        }
     };
 
     let teacher_status = document.getElementById(`teacher_status_${id}`);
@@ -611,6 +687,9 @@ function crm2_teacher_draw(id) {
             window.open('https://tramway.skyeng.ru/teacher/' + response.answer + '/show', '_blank'); 
         }
     });
+    document.getElementById(`teacher_crm_${id}`).onclick = function () {
+        window.open('https://crm2.skyeng.ru/persons/' + id, '_blank'); 
+    }
     document.getElementById(`teacher_login_${id}`).onclick = function () {
         document.getElementById(`teacher_login_${id}`).style.backgroundColor = 'orange';
         chrome.runtime.sendMessage({ name: "script_pack", question: 'get_login_link', id: id }, function (response) {

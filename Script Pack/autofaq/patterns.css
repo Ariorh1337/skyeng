@@ -1,0 +1,199 @@
+#datalist {
+    margin: auto;
+    position: relative;
+    width: 200px;
+    color: #000;
+    margin-right: 15px;
+}
+
+#datalist.active #datalist-ul {
+    display: block;
+}
+
+#datalist-input {
+    position: relative;
+    height: 32px;
+    bottom: 5px;
+    padding-left: 5px;
+    width: 100%;
+    border: 1px solid #ccc;
+}
+
+#datalist-input:focus {
+    border: 1px solid #AA0000;
+    outline: 0;
+}
+
+#datalist-ul {
+    position: absolute;
+    bottom: 25px;
+    background-color: white;
+    border: 1px solid grey;
+    width: 200px;
+    z-index: 40;
+    padding: 10px;
+    text-align: center;
+    list-style-type: none;
+    display: none;
+    max-height: 20em;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+#datalist-ul li {
+    display: block;
+    text-align: left;
+    padding: 0.8em 1em 0.8em 1em;
+    color: #999;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#datalist-ul li:hover {
+    background: lightgrey;
+    color: black;
+}
+
+#customTextAreaForAutoFaqPatterns {
+    position: absolute;
+    display: none;
+    top: -2px;
+    left: -3px;
+    width: 101%;
+    height: 106%;
+    padding: 4px;
+    z-index: 10000;
+    border: 1px solid black;
+    background-color: white;
+    overflow: scroll;
+    overflow-x: hidden;
+    font-size: 14px !important;
+}
+
+/* Popup Start Block*/
+.b-popup{
+    width:100%;
+    min-height:100%;
+    background-color: rgba(0,0,0,0.1);
+    overflow:hidden;
+    position:fixed;
+    top:0px;
+}
+.b-popup .b-popup-content{
+    margin: 40px auto 0px auto;
+    width: 300px;
+    min-height: 16px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px #000;
+    justify-content: center;
+    text-align: center;
+}
+
+.b-popup-content > * > button:hover{
+    background-color: #e6e6e6;
+}
+
+    /* MENU Start Block*/
+        .content-menu {
+            display: grid;
+        }
+
+        .content-menu > button.menu{
+            margin-bottom: 10px;
+            border: 1px solid;
+            border-radius: 10px;
+            background-color: white;
+            cursor: pointer;
+        }
+    /* MENU Start Block*/
+
+    /* new pattern Start Block*/
+        .content-new-pattern {
+            display: grid;
+        }
+
+        .content-new-pattern > *:not(p) {
+            margin-bottom: 10px;
+            border: 1px solid;
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        .content-new-pattern > p {
+            margin-top: 0px;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+
+        .content-new-pattern > input, .content-new-pattern > textarea {
+            padding: 0px 5px;
+        }
+
+        .content-new-pattern > textarea {
+            height: 65px;
+        }
+    /* new pattern END Block*/
+
+    /* remove pattern Start Block*/
+        .content-remove-pattern {
+            display: grid;
+        }
+
+        .content-remove-pattern > *:not(p) {
+            margin-bottom: 10px;
+            border: 1px solid;
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        .content-remove-pattern > p {
+            margin-top: 0px;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+
+        .content-remove-pattern > input {
+            padding: 0px 5px;
+        }
+    /* remove pattern END Block*/
+
+    /* move pattern Start Block*/
+        .content-move-pattern {
+            display: grid;
+        }
+
+        .content-move-pattern > b {
+            margin-bottom: 10px;
+            border: 1px solid;
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        .content-move-pattern > p {
+            margin-top: 0px;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+
+        .content-move-pattern > a {
+            padding: 0px 5px;
+        }
+
+        .content-move-pattern > a:hover::after {
+            content: 'Нажмите на шаблон, он подстветится зеленым. Стрелками клавиатуры задайте его положение';
+            position: absolute;
+            left: 50%;
+            width: 330px;
+            margin-left: -175px;
+            height: 40px;
+            z-index: 1;
+            background: rgba(222, 222, 222, 0.82);
+            font-family: Arial;
+            font-size: 14px;
+            padding: 10px 10px;
+            color: #000;
+        }
+    /* move pattern END Block*/
+/* Popup END Block*/

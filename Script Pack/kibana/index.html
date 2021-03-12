@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kibana Easy window</title>
+</head>
+<body>
+    <menu>
+        <ul class="main-menu menu2">
+            <li><button id="lesson-log">Лог урока</button></li>
+            <li><button id="visit-log">Лог посещенных страниц</button></li>
+            <li><button id="0-open">тест</button></li>
+            <li><button id="1-open">тест</button></li>
+        </ul>
+    </menu>
+
+    <div name="lesson-log">
+        <ul class="menu2">
+            <li>Дата урока</li>
+            <li><input type="date" id="lesson-date"></li>
+            <li>Время урока</li>
+            <li><input type="time" id="lesson-time" value="00:00"></li>
+            <li>ID 1</li>
+            <li><input type="number" id="userID-first"></li>
+            <li>ID 2</li>
+            <li><input type="number" id="userID-second"></li>
+            <li><button id="start-open">Открыть</button></li>
+        </ul>
+    
+        <table class="data-table" border="0">
+            <thead>
+                <tr>
+                    <th>Время</th>
+                    <th>User ID</th>
+                    <th>Событие</th>
+                    <th>Доп поле 1</th>
+                    <th>Доп поле 2</th>
+                    <th>Доп поле 3</th>
+                </tr>
+            </thead>
+            <tbody id="data-body">
+                <tr><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <style id="fast-style">
+        ul.menu2 {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            display: flex;
+            color: white;
+            font-size: 16px;
+            justify-content: center;
+            align-items: center;
+            height: 34px;
+        }
+
+        ul.menu2 > li {
+            margin-left: 10px;
+        }
+
+        ul.main-menu > li > button {
+            height: 3em;
+            background-color: lightblue;
+            border: 0px;
+        }
+
+        ul.main-menu > li > button:hover {
+            background-color: #d5eaf1;
+        }
+
+        table.data-table {
+            width: 100%;
+            border: 1px dotted black;
+            text-align: center;
+        }
+
+        input#userID-first, input#userID-second {
+            width: 80px;
+        }
+    </style>
+    <script src="interface.js"></script>
+    <script src="query.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

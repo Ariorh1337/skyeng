@@ -11,51 +11,30 @@ window.onload = function (e) {
 	wint.append('подписка');
 	tHead.prepend(wint)
 
-	for (var i = 0; i < tBody.length; i++) {
+	tBody.forEach((elm, i) => {
 		//Замена ID на ссылки
 		let id = document.querySelectorAll('table[ng-table="ctrl.tableParams"] > tbody > tr[class="ng-scope"] > td[data-title-text="ID"]')[i]
 		id.innerHTML = '<a href="https://id.skyeng.ru/admin/users/' + id.innerText + '">' + id.innerText + '</a>'
 		id = id.innerText;
 
 		chrome.runtime.sendMessage({name: "script_pack", question: 'get_group_student_info', id: id}, function(response) {
-			let a = 0
-			for (a; a < document.querySelectorAll('table[ng-table="ctrl.tableParams"] > tbody > tr[class="ng-scope"] > td[data-title-text="ID"]').length; a++) {
-				if ( id == document.querySelectorAll('table[ng-table="ctrl.tableParams"] > tbody > tr[class="ng-scope"] > td[data-title-text="ID"]')[a].innerText ) {
-					break;
-				}
-			}
-
 			//Подписка
+			let subdate = response.subscribe.split(' ');
 			let wint = document.createElement('th');
-			wint.append(response.subscribe);
-			tBody[a].prepend(wint);
+			wint.innerHTML = `<a href="https://grouplessons-api.skyeng.ru/admin/student/view/${id}" target="blank">${subdate[0]}</a><b> ${subdate[1]}</b>`;
+			tBody[i].prepend(wint);
 
-			//Заморозка
-			var now = new Date();
-			var from = new Date(response.from);
-			var to = new Date(response.to);
-			var sub = new Date(response.sub);
+			//Заморозка\Активно\Не оплачено - оранжевый\зеленый\красный
+			tBody[i].style = `color: ${response.status}`;
 
-			if (now < sub) {
-				tBody[a].style = 'color: darkgreen;'
-			}
-
-			if (now > sub) {
-				tBody[a].style = 'color: darkred;'
-			}
-
-			if (now !== null) {
-				if (now > from && now < to) {
-					tBody[a].style = 'color: orange;'
-				}
-			}
-
-			document.querySelectorAll('table[ng-table="ctrl.tableParams"] > tbody > tr[class="ng-scope"] > td[data-title-text="Имя"]')[a].append(document.createElement('span'));
-			document.querySelectorAll('table[ng-table="ctrl.tableParams"] > tbody > tr[class="ng-scope"] > td[data-title-text="Имя"]')[a].className += ' toooltip';
-			document.querySelectorAll('table[ng-table="ctrl.tableParams"] > tbody > tr[class="ng-scope"] > td[data-title-text="Имя"]')[a].firstElementChild.innerHTML = response.info;
-			
-		},);		
-	}
+			//Контакты семьи
+			let td = document.querySelectorAll('table[ng-table="ctrl.tableParams"] > tbody > tr[class="ng-scope"] > td[data-title-text="Имя"]');
+			td[i].append(document.createElement('span'));
+			td[i].className += ' toooltip';
+			td[i].style.cursor = 'help';
+			td[i].firstElementChild.innerHTML = response.info;
+		});		
+	});
 
 	(() => {
 		var list = document.querySelectorAll('div[class="row"] > div[class="col-md-12"] > div:not([class])');

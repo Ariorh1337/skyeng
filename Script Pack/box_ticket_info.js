@@ -1,39 +1,43 @@
 //*://help.skyeng.ru/staff/cases/list/*
 //*://skyeng.omnidesk.ru/staff/cases/list/*
 
-function comment_my_box () {
-    
-    var box = document.getElementsByClassName('req-data-row');
-    var time = document.querySelectorAll('.req-data-row > div[class="req-case-date"]');
-    var text = document.querySelectorAll('.req-data-row > div[class="req-case-content"]');
+importFrom('/libs/element.js').then(element => {
+    window.Element = element.Element;
 
-    for (var i = 0; i < box.length; i++) {
-        if (document.getElementsByClassName('req-td req-inf')[i + 1].lastElementChild.getAttribute('name') !== 'comment') {
-            if (text[i].innerText !== '') {
-                const tex = document.createElement('span');
-                document.getElementsByClassName('req-inf-cont')[i].parentElement.append(tex);
-                tex.setAttribute('name','comment');
-                tex.style = 'text-align: center; border-bottom: 1px solid grey; padding: 2px 2000px 2px 5px; margin-left: -77px;';
-                tex.innerText = time[i].innerText.replace(/(\r\n|\n|\r)/gm,"").slice(12, 24) + ' ~~~ ' + text[i].innerText.replace(/(\r\n|\n|\r)/gm,"");
-                box[i].children[0].style.height = '36px';
-                box[i].children[1].style.height = '36px';
-                box[i].children[2].style.height = '61px';
-            }
+    chrome.storage.local.get(['box_ticket_info'], function(result) {
+        if (result['box_ticket_info'] === undefined) { chrome.storage.local.set({box_ticket_info: true}, function() {}); }
+        if (result['box_ticket_info'] === true) {
+            setInterval( function () {
+                comment_my_box();
+            } , 1000)
         }
-    }
+    });
+})
+
+function comment_my_box () {
+    const time = document.querySelectorAll('.req-tr-line > div[class="req-case-date"]');
+    const commentBox = document.querySelectorAll('.req-td-answer > span:not(#time)'); //— 
+
+    commentBox.forEach((item, index) => {
+        if (!item.previousElementSibling && !item.nextElementSibling) {
+            new Element({
+                html: `<span name="time" style="display: inline;">${time[index].innerText.trim()} —> </span>`,        
+                parentDOM: item.parentElement,
+                possition: 'before'
+            });
+        }
+        if (item.style.getPropertyValue('display') === '') {
+            item.style.setProperty('display', 'inline');
+        }
+    })
 }
 
-chrome.storage.local.get(['box_ticket_info'], function(result) {
-    if (result['box_ticket_info'] === undefined) { chrome.storage.local.set({box_ticket_info: true}, function() {}); }
-    if (result['box_ticket_info'] === true) {
-        setInterval( function () {
-            if (document.getElementsByName('comment').length == 0 || document.getElementsByName('comment').length < document.getElementsByClassName('req-data-row').length) {
-                comment_my_box();
-            }
-        } , 1000)
-    }
-});
-
-
-
+async function importFrom(PATH, MODE = 0) {
+    let textFunc = await fetch(chrome.runtime.getURL(PATH)).then(r => r.text());
+    let func = new Function(
+        (MODE === 0) ? textFunc
+            : 'return ' + textFunc
+    );
+    return func();
+}
 //req-td req-inf height: 61px;

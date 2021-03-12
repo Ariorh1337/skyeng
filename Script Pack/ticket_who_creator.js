@@ -45,6 +45,7 @@ async function check_send_mail(email, type) {
         }
     }
     window.$sendMail = email;
+    window.$mail = email;
 }
 
 function replace_send_mail(type, mail, value) {
@@ -58,6 +59,7 @@ function replace_send_mail(type, mail, value) {
     }
     document.querySelector(`${mail_id} > a > span`).innerText = mail;
     document.querySelector(value_id).value = value;
+    
     document.getElementsByClassName('a17_bcc add_mail_copy')[0].click();
     document.getElementsByClassName('a17_delete')[1].click();
 }
@@ -75,13 +77,13 @@ window.addEventListener("load", () => {
 
     if (type !== 'child') {
         who_was_send_this();
-    } else {
+    } /*else {
         setInterval(() => {
             let elm = document.querySelector('ul[class="select2-choices"] > li[class="select2-search-choice"] > div');
             if (elm) {
-                let mail = elm.innerText.match(/<(.*)>/)[1];
+                let mail = elm.innerText.match(/<(.*)>/);
                 if (mail) {
-                    if (window.$mail !== mail) check_send_mail(mail, type);
+                    if (window.$mail !== mail[1]) check_send_mail(mail[1], type);
                 }
             }
         }, 5000)
@@ -94,7 +96,7 @@ window.addEventListener("load", () => {
             let mail = document.querySelector('#copyMail').value;
             if (mail !== $sendMail) check_send_mail(mail, type);
         }, 5000, $sendMail);
-    }
+    }*/
 
     if (type === 'chat') {
         setInterval( () => {	

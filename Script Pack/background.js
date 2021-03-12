@@ -94,7 +94,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             (sname[i].innerText == 'Имя' || sname[i].innerText == 'Name') ? names = '<br>Name: ' + result[i].innerText : false;
                             (sname[i].innerText == 'Фамилия' || sname[i].innerText == 'Surname') ? names = names + ' ' + result[i].innerText : false;
                             (sname[i].innerText == 'Почта' || sname[i].innerText == 'Email') ? mail = '<br>eMail: ' + result[i].innerText : false;
-                            (sname[i].innerText == 'Телефон' || sname[i].innerText == 'Phone') ? phone = '<br><a href="tel:' + result[i].innerText + '">Phone</a>: ' + result[i].innerText : false;
+                            (sname[i].innerText == 'Телефон' || sname[i].innerText == 'Phone') ? phone = '<br><a href="tel:' + result[i].innerText + '">Phone</a>: ' + `<b style="font-size: 9px;">${result[i].innerText}</b>` : false;
                             (sname[i].innerText == 'Домашний телефон' || sname[i].innerText == 'Home phone') ? phoneD = '<br><a href="tel:' + result[i].innerText + '">Phone2</a>: ' + result[i].innerText : false;
                             (sname[i].innerText == 'Skype') ? skype = '<br><a href="skype:' + result[i].innerText + '?chat">Skype</a>: ' + result[i].innerText : false;
                             (sname[i].innerText == 'Legacy identity') ? identity = '<br>Identity: ' + result[i].innerText : false;
@@ -352,56 +352,77 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
             return true;
         }
-        if (request.question == 'get_group_student_info') {
-            console.log(request.id)
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                if (xhr.status == 200) {
-                    var page = document.createElement('html');
-                    page.innerHTML = xhr.response;
-        
-                    //Заморозка
-                    var table = page.querySelector('ul[class="list-group list-group-flush"] > table > tbody > tr');
-                    if (table !== null) {
-                        var from = table.children[1].innerText;
-                        from = from.split(' ')[0].split('-')[2] + '-' + from.split(' ')[0].split('-')[1] + '-' + from.split(' ')[0].split('-')[0] + ' ' + from.split(' ')[1]
-                        var to = table.children[2].innerText;
-                        to = to.split(' ')[0].split('-')[2] + '-' + to.split(' ')[0].split('-')[1] + '-' + to.split(' ')[0].split('-')[0] + ' ' + to.split(' ')[1]
-                    } else {
-                        var from = null;
-                        var to = null;
+        if (request.question == 'get_Lazzy_TimeTable_v2') {
+            fetch("https://cabinet.skyeng.ru/order/lazyTimetable", {
+                "credentials":"include",
+                "headers":{
+                    "content-type":"application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                "body":`order_id=${request.id}`,
+                "method":"POST"
+            })
+            .then(response => {
+                if (response.ok) return response.text();
+                else return { err: response.status}
+            })
+            .then(html => {
+                let result = ''
+                if (!html.err) {
+                    for (let i = 0; i < 3; i++) {
+                        result += `<div>${html.match(/<span>(.|\n)*?<\/div>/g)[i]}`;
                     }
-                    //Подписка
-                    var subscribe = page.querySelector('div[class="row"] > div > div[class="app-content"] > h6').innerText.split('›')[1].replace(/[^0-9-: ]/gi,'').replace(/[:]/,'').trim();
-                    var sub = subscribe.split(' ')[0].split('-')[2] + '-' + subscribe.split(' ')[0].split('-')[1] + '-' + subscribe.split(' ')[0].split('-')[0] + ' ' + subscribe.split(' ')[1]
-                    subscribe = subscribe.split(' ')[0].split('-')[0] + '/' + subscribe.split(' ')[0].split('-')[1] + ' ' + subscribe.split(' ')[1]
+                } else result = html;
+                sendResponse({ answer: result });
+            }).catch(err => { sendResponse({ 'err': err })  });
+            return true;
+        }
+        if (request.question == 'get_group_student_info') {
+            fetch('https://grouplessons-api.skyeng.ru/admin/student/view/' + request.id, {
+                'headers': {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                "credentials": "include"
+            })
+                .then(r => r.text())
+                .then(response => {
+                    var page = document.createElement('html');
+                    page.innerHTML = response;
 
                     //Семья
-                    var info = page.querySelector('div[id="student-family-list"] > div > ul[class="list-group list-group-flush"]').innerText.trim().replace(/[\s+][\s+]/g, ''), result = '<div>';
-                    for (var o = 1; o < info.split('#').length; o++) {
-                        let int = info.split('#')[o].indexOf('Имя:')
-                        let int2 = info.split('#')[o].indexOf('Почта:')
-                        result += info.split('#')[o -1].slice(0, -5).slice(-8) + ' ' + info.split('#')[o].slice(int, int2) + '</div><div>';
+                    var info = page.querySelector('div[id="student-family-list"] > div > ul[class="list-group list-group-flush"]'), result = '<div>';
+                    if (info) {
+                        info = info.innerText.trim().replace(/[\s+][\s+]/g, '');
+                        for (var o = 1; o < info.split('#').length; o++) {
+                            let int = info.split('#')[o].indexOf('Имя:')
+                            let int2 = info.split('#')[o].indexOf('Почта:')
+                            result += info.split('#')[o -1].slice(0, -5).slice(-8) + ' ' + info.split('#')[o].slice(int, int2) + '</div><div>';
+                        }
                     }
 
                     //Группа
-                    var group = page.querySelector("h6 > a:nth-child(3)").outerHTML;
+                    var group = page.querySelector("h6 > a:nth-child(4)");
+                    if (group) group = group.outerHTML;
+                    else {
+                        group = page.querySelector("div > div:nth-child(2) > small:nth-child(2) > a");
+                        if (group) group = group.outerHTML;
+                    }
+
+                    //Преподаватель
+                    var teacher = page.querySelector('h6 > span[data-user-id]');
+                    if (teacher) teacher = teacher.getAttribute('data-user-id');
+                    else {
+                        teacher = page.querySelector("div.load-users-info-onload > small:nth-child(2) > span[data-user-id]")
+                        if (teacher) teacher = teacher.getAttribute('data-user-id');
+                    }
 
                     sendResponse({
-                        from: from,
-                        to: to,
-                        subscribe: subscribe,
-                        sub: sub,
                         info: result,
-                        group: group
+                        group: group,
+                        teacher: teacher
                     });
-                    console.log(result);
-                }
-            }
-            xhr.open('GET', 'https://grouplessons-api.skyeng.ru/admin/student/view/' + request.id, false)
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.withCredentials = true;
-            xhr.send();
+                });
+
+            return true;
         }
         if (request.question == 'get_user_comment') {
             fetch('https://spreadsheets.google.com/feeds/list/1W_Ay8Mv3aOhcB4JT-6EOg1uqCTIKjEROzD1PvXacVuA/default/public/values?alt=json')
@@ -433,7 +454,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
                 if (table && table !== null) {
                     for (var i = 0; i < table.children.length; i++) {
-                        let c = {'id': table.children[i].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
+                        let c = {'id': table.children[i].children[0].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
                         responce.push(c)
                     }
                 }
@@ -452,7 +473,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
                 if (table && table !== null) {
                     for (var i = 0; i < table.children.length; i++) {
-                        let c = {'id': table.children[i].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
+                        let c = {'id': table.children[i].children[0].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
                         responce.push(c)
                     }
                 }
@@ -545,13 +566,17 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     }
                     */
                     
-                   if (json.data[i].serviceTypeKey.indexOf('english') !== -1) {
+                    if (json.data[i].serviceTypeKey.indexOf('group_english') !== -1) {
+                        subject = "KGL ENG"
+                    } else if (json.data[i].serviceTypeKey.indexOf("mathematics") !== -1) {
+                        subject = "MATH"
+                    } else if (json.data[i].serviceTypeKey.indexOf('english') !== -1) {
                         subject = "ENG"
                         if (json.data[i].serviceTypeKey.indexOf('junior') !== -1) subject = 'JUN ' + subject;
                         if (json.data[i].serviceTypeKey.indexOf('kids') !== -1) subject = 'KID ' + subject;
-                    } else if (json.data[i].serviceTypeKey.indexOf("mathematics") !== -1) {
-                        subject = "MATH"
                     }
+
+                    if (subject === '') subject = json.data[i].serviceTypeKey;
 
                     if (json.data[i].teacher == null) {
                         teacher = null;
@@ -612,7 +637,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             let id = `ID: ${info.id}`;
                             let names = (info.name !== null || info.surname !== null) ? `<br>Name: ${(info.name !== null) ? info.name : ''} ${(info.surname !== null) ? info.surname : ''}`: '';
                             let mail = (info.email !== null) ? `<br>eMail: ${info.email}` : '';
-                            let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: ${info.phone}` : '';
+                            let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: <b style="font-size: 9px;">${info.phone}</b>` : '';
                             let phoneD = (info.homePhone !== null) ? `<br><a href="tel:${info.homePhone}">Phone2</a>: ${info.homePhone}` : '';
                             let skype = (info.skype !== null) ? `<br><a href="skype:${info.skype}?chat">Skype</a>: ${info.skype}` : '';
                             let identity = (info.identity !== null) ? `<br>Identity: ${info.identity}` : '';
@@ -692,7 +717,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     let id = `ID: ${info.id}`;
                     let names = (info.name === null && info.surname === null) ? '' : `<br>Name: ${(info.name !== null) ? info.name : ''} ${(info.surname !== null) ? info.surname : ''}`;
                     let mail = (info.email !== null) ? `<br>eMail: ${info.email}` : '';
-                    let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: ${info.phone}` : '';
+                    let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: <b style="font-size: 9px;">${info.phone}</b>` : '';//
                     let skype = (info.skype !== null) ? `<br><a href="skype:${info.skype}?chat">Skype</a>: ${info.skype}` : '';
                     let identity = (info.identity !== null) ? `<br>Identity: ${info.identity}` : '';
                     let time = (info.utcOffset) ? `<br>Время: ${(info.utcOffset === 3) ? info.utcOffset : `<b style="color: #FF5733;">${info.utcOffset}</b>`} UTC` : ``; 
@@ -701,13 +726,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         if (!roles.error) {
                             roles = roles.join()
                             let roles_text = '', role = '', isSkySmart = false;
-                            if (roles.indexOf('ROLE_OPERATOR') !== -1 || roles.indexOf('ROLE_HRM_USER') !== -1) { 
+                            if (roles.indexOf('ROLE_OPERATOR') !== -1 || (roles.indexOf('ROLE_HRM_USER') !== -1 && roles.indexOf('ROLE_TEACHER') === -1)) { 
                                 role = 'operator';
                                 roles_text += 'Operator<br>';
                             } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
                                 role = 'teacher';
                                 (roles.indexOf('ROLE_MATH_TEACHER') !== -1) ? roles_text += 'Teacher - <a style="color: darkblue; font-weight: 700;">Math</a><br>' : false;
-                            } else if (roles.indexOf('ROLE_VIMBOX_STUDENT') !== -1) {
+                            } else if (roles.indexOf('ROLE_VIMBOX_STUDENT') !== -1 || roles.indexOf('ROLE_STUDENT') !== -1) {
                                 role = 'student';
                                 if (roles.indexOf('ROLE_KIDS_STUDENT') !== -1) {
                                     if (roles.indexOf('ROLE_GROUP_STUDENT') !== -1) {
@@ -765,12 +790,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         r.result.forEach((person) => {
                             let name, isBusy, text = '', start = null;
                             name = person.user.name;
-                            isBusy = (person.end === null && person.taskName === 'AutoFAQ') ? true : false;
+                            isBusy = (person.end === null && (person.projectName === '1. Calendar' || person.projectName === '2. CRM2' || person.projectName === '3. Duty')) ? true : false;
                             if (isBusy === true) {
                                 text = (person.description === null || person.description === '') ? 'Пусто' : person.description;
                                 start = (person.end === null) ? person.start : null;
                             }
-
+                            
                             result.push({
                                 'name': name,
                                 'isBusy': isBusy,
@@ -825,6 +850,38 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     } else {
                         sendResponse({ answer: r });
                     }
+                });
+            
+            return true;
+        }
+        if (request.question == 'crm2_get_self_group') { 
+            fetch(`https://customer-support.skyeng.ru/operator/group`, {
+                credentials: "include",
+            })
+                .then((r) => {
+                    if (r.ok) return r.json();
+                    else return {
+                        error: r.status
+                    };
+                })
+                .then((r) => {
+                    sendResponse({ data: r.data });
+                });
+            
+            return true;
+        }
+        if (request.question == 'crm2_get_task_list') { 
+            fetch(`https://customer-support.skyeng.ru/task/user/${request.id}`, {
+                credentials: "include",
+            })
+                .then((r) => {
+                    if (r.ok) return r.json();
+                    else return {
+                        error: r.status
+                    };
+                })
+                .then((r) => {
+                    sendResponse({ data: r.data });
                 });
             
             return true;

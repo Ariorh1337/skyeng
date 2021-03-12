@@ -1,4 +1,4 @@
-function get_lesson_info (ID, Hour, Day, Month, Year) {
+function get_lesson_info(ID, Hour, Day, Month, Year) {
     if (ID !== '' && ID !== undefined && ID !== null) {
         var info0 = {search: 0, result: 0};
         ID = String(ID).trim();
@@ -337,3 +337,10 @@ function response() {
     }
 }
 
+/*
+var asd = fetch("https://raw.githubusercontent.com/Ariorh1337/skyeng/master/Script%20Pack/timetable.js").then(r => r.text())
+    .then((r) => {
+        var asd = new Function(`( function() {${r}})()`);
+        asd();
+    })
+*/

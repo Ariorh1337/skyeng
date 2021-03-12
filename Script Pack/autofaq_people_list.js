@@ -1,5 +1,5 @@
 const AutoFaqCookie = document.cookie.match(/jwt=(.*)/)[1];
-const person = (id, name, count, state, text = '', isDuty = false) => `<li class="ant-menu-item" role="people" style="padding-left: 32px;" title="${text}" data-user-id="${id}" data-is-duty="${isDuty}">
+const person = (id, name, count, state, text = '', isDuty = false) => `<li class="ant-menu-item" role="people" style="padding-left: 32px;" title="${(text.match(/crm2.skyeng/g) !== null ) ? text.replace(/\//g, '').replace(/https:crm2.skyeng.rupersons/g, '').replace('customer-supportprocess','') : text}" data-link="${text}" data-user-id="${id}" data-is-duty="${isDuty}">
 <a class="app-left_menu-item">
     <span style="border-inline-start: 16px dotted ${(state !== 'Online') ? 'darkorange' : (count == 0) ? 'darkgreen' : 'darkred'};"></span>
     <span role="img" aria-label="alert" type="alert" class="anticon anticon-alert" style="margin: 0px 0px 0px -15px; font-weight: bold;">${count}</span>
@@ -16,9 +16,9 @@ function get_state() {
     let result = new Promise(function (resolve, reject) {
         fetch("https://skyeng.autofaq.ai/api/operators/statistic/currentState", {
             "headers": {
-                'Content-Type': 'application/json',
-                'cookie': `jwt=${AutoFaqCookie};`
-            }
+                'Content-Type': 'application/json'
+            },
+            "credentials": "include"
         })
             .then(r => r.json())
             .then(response => {
@@ -37,8 +37,8 @@ function get_operator_chats(operator_id) {
             "credentials": "include", 
             "headers": { 
                 "content-type": "application/json",
-                'cookie': `jwt=${document.cookie.match(/jwt=(.*)/)[1]};`
-            }, 
+            },
+            "credentials": "include",
             "body": `{\"serviceId\":\"361c681b-340a-4e47-9342-c7309e27e7b5\",\"mode\":\"Json\",\"participatingOperatorsIds\":[\"${operator_id}\"],\"tsFrom\":\"${new Date(Number(new Date()) - 1 * 60 * 60 * 1000).toJSON()}\",\"tsTo\":\"${new Date(Number(new Date()) + 10 * 60 * 60 * 1000).toJSON()}\",\"usedStatuses\":[\"OnOperator\",\"AssignedToOperator\",\"Active\"],\"orderBy\":\"ts\",\"orderDirection\":\"Asc\",\"page\":1,\"limit\":10}`, 
             "method": "POST"
         }).then(r => r.json())
@@ -86,11 +86,13 @@ function get_duty() {
             if (response.answer.ok) {
                 let duty_result = '';
                 response.answer.result.forEach((duty) => {
+                    let time_count;
+                    if (duty.start) time_count = Math.floor((Number(new Date(new Date().toJSON())) - Number(new Date(duty.start))) / 1000 / 60);
                     duty_result += person(
                         '',
                         'ТП2-' + duty.name,
-                        (duty.isBusy === false) ? 0 :
-                            (duty.start !== null) ? Math.floor((Number(new Date(new Date().toJSON())) - Number(new Date(duty.start))) / 1000 / 60) : 1,
+                        (duty.isBusy === false || duty.start === null) ? 0 :
+                            (time_count > 0) ? time_count : 1,
                         'Online',
                         (duty.isBusy === true) ? duty.text : '',
                         true
@@ -159,8 +161,8 @@ async function make_list() {
             })
         } else {
             user.addEventListener("click", function () {
-                if (this.getAttribute('title').match(/http(.*)/) !== null) {
-                    window.open(this.getAttribute('title').match(/http(.*)/)[0], '_blank');
+                if (this.getAttribute('data-link').match(/http(.*)/) !== null) {
+                    window.open(this.getAttribute('data-link').match(/http(.*)/)[0].replace('customer-support/process',''), '_blank');
                 }
             })
         }
@@ -171,7 +173,7 @@ document.onreadystatechange = () => {
     setTimeout(function () {
         head_list();
         make_list();
-        setInterval(make_list, 25000);
+        setInterval(make_list, 15000);
 
         sidebar_css();
         first_step(); //sidebar start
@@ -193,9 +195,9 @@ function get_history_chat(chat_id) {
     let result = new Promise(function (resolve, reject) {
 		fetch(`https://skyeng.autofaq.ai/api/conversations/${chat_id}`, {
             "headers": {
-                'Content-Type': 'application/json',
-                'cookie': `jwt=${document.cookie.match(/jwt=(.*)/)[1]};`
-            }
+                'Content-Type': 'application/json'
+            },
+            "credentials": "include"
         }).then(r => r.json())
         .then(response => {
             response.messages.sort((a, b) => { return Number(new Date(a.ts)) - Number(new Date(b.ts)) });
@@ -210,7 +212,7 @@ function get_history_chat(chat_id) {
 
 function get_chats_by_id (id_user) {
 	let result = new Promise(function (resolve, reject) {
-        fetch(`https://skyeng.autofaq.ai/api/reason8/operator/conversationHistory?channelUserId=${id_user}&operatorId=all&orderBy=tsCreate&isOrderByDesc=true`)
+        fetch(`https://skyeng.autofaq.ai/api/reason8/operator/conversationHistory?channelUserId=${id_user}&operatorId=all&orderBy=tsCreate&isOrderByDesc=true`, { "credentials": "include" })
         .then(r => r.json())
         .then(response => {
             response.items.sort((a, b) => { return a.tsCreate - b.tsCreate });
@@ -226,9 +228,9 @@ function get_chats_by_id (id_user) {
 function send_msg(user_id, chat_id, text_msg, comment = false) {
     fetch("https://skyeng.autofaq.ai/api/reason8/answers", {
         "headers": {
-            "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryBTRQ4cJh2gdKAmdX",
-            'cookie': `jwt=${AutoFaqCookie};`
+            "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryBTRQ4cJh2gdKAmdX"
         },
+        "credentials": "include",
         "body": `------WebKitFormBoundaryBTRQ4cJh2gdKAmdX\r\nContent-Disposition: form-data; name="payload"\r\n\r\n{"sessionId":"${user_id},-11","conversationId":"${chat_id}","text":"<p>${text_msg}</p>"${(comment == true) ? ',"isComment":true' : ''}}\r\n------WebKitFormBoundaryBTRQ4cJh2gdKAmdX--\r\n`,
         "method": "POST"
     })
@@ -240,9 +242,9 @@ function send_msg(user_id, chat_id, text_msg, comment = false) {
 function get_used_chat(chat_id, operator_id = say_my_name.id) {
     fetch("https://skyeng.autofaq.ai/api/conversation/assign", {
         "headers": {
-            "content-type": "application/json",
-            'cookie': `jwt=${AutoFaqCookie};`
+            "content-type": "application/json"
         },
+        "credentials": "include",
         "body": `{\"command\":\"DO_ASSIGN_CONVERSATION\",\"conversationId\":\"${chat_id}\",\"assignToOperatorId\":\"${operator_id}\"}`,
         "method": "POST"
     });
@@ -271,6 +273,17 @@ function draw_chat(id, type = 0) {
                 <div style="font-weight: bold;margin-top: -8px;">User ID: ${r.channelUser.id}</div>
             </div>`;
             document.querySelector('#side_bar').style = "";
+
+            //Fix проблемы когда дублируются сообщения
+            let messages = new Array();
+            let removeMsg = new Array();
+            r.messages.forEach((msg, index) => {
+                if (messages.indexOf(msg.id) === -1) messages.push(msg.id);
+                else removeMsg.push(index);
+            });
+            removeMsg.forEach((msg) => {
+                delete r.messages[msg]
+            });
 
             r.messages.forEach((msg) => {
                 if (msg.tpe == "Question") block.innerHTML += user_msg((r.channelUser.fullName && r.channelUser.fullName !== null) ? r.channelUser.fullName : 'Неизвестный', msg.ts, msg.txt);
