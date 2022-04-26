@@ -42,6 +42,9 @@
       "js": [ "crm2_new_tab_search.js", "crm2_send_letter.js", "crm2_users_save.js" ],
       "matches": [ "*://crm2.skyeng.ru/persons*" ]
    }, {
+      "js": [ "crm2_new_task_reminder.js" ],
+      "matches": [ "*://crm2.skyeng.ru/*" ]
+   }, {
       "js": [ "calc_google.js" ],
       "matches": [ "*://calendar.google.com/calendar/*" ]
    }, {
