@@ -33,13 +33,17 @@ let svg_phone = `<svg height="16" width="16" viewBox="0 0 512 512" style="margin
 <path d="m331 121c-57.891 0-105 47.109-105 105s47.109 105 105 105 105-47.109 105-105-47.109-105-105-105zm31.816 115.605c5.859 5.859 5.859 15.352 0 21.211s-15.352 5.859-21.211 0l-10.605-10.605-10.605 10.605c-5.859 5.859-15.352 5.859-21.211 0s-5.859-15.352 0-21.211l10.605-10.605-10.605-10.605c-5.859-5.859-5.859-15.352 0-21.211s15.352-5.859 21.211 0l10.605 10.605 10.605-10.605c5.859-5.859 15.352-5.859 21.211 0s5.859 15.352 0 21.211l-10.605 10.605z"></path>
 </svg>`;
 
-var win_html = `<div style="display: flex;">
+var win_html = `
+<div style="display: flex;">
     <span style="cursor: -webkit-grab;">
         <input id="id_type_for_chat" autocomplete="off" type="text" style="text-align: center; width: 72px; color: black; display: none; margin-left: 1px;" onchange="this.value = this.value.replace(' ','')">
         <datalist id="user_search"></datalist>
         <div style="margin: 10px;">
             <button style="width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" id="btn1_student">Info У</button>
         </div>
+
+        
+
         <div style="margin: 10px;">
             <button style="width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" id="btn1_teacher">Info П</button>
         </div>
@@ -47,6 +51,9 @@ var win_html = `<div style="display: flex;">
             <button style="padding-left: 1px; width: 55px; height: 22px; background-color: rgb(118, 141, 135); border-radius: 5px; border: 1px solid rgb(86, 105, 99); color: rgb(255, 255, 255); display: none;" id="btn_hide" disabled>Скрыть</button>
         </div>
     </span>
+
+    
+
     <span style="border-left: solid black 1px;">
         <div id="info_block" style="display: none;">
             <div style="text-align: center; font-weight: bold; border-block-end: 1px black solid; padding: 6px;" id="info_status" title="">
@@ -102,20 +109,51 @@ var win_html = `<div style="display: flex;">
             </div>
         </div>
     </span>
-</div>`;
+</div>
+<button id="rollUp" style="display: flex; height: 15px; width: 15px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" >^</button>
+<div id="searhcIdHash" style="display: flex;">
+    <span style="cursor: -webkit-grab;">
+        <div>
+            <input id="hash_type_for_chat" autocomplete="off" type="text" style="text-align: center; width: 72px; color: black; margin-left: 1px;" onchange="this.value = this.value.replace(' ','')">
+            <datalist id="user_search"></datalist>
+            <div style="margin: 10px; ">
+                <button style="display: block; width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" id="btn1_hash">Хэш</button>
+                <button style="position: relative; top: 6px; width: 55px; background-color:#768d87; border-radius:5px; border:1px solid #566963; color:#ffffff; padding:4px 4px;" class="display-block-hash" id="btn1_hash_close">Скрыть</button>
+            </div>
+            
+        </div>
+    </span>
+
+    <span style="cursor: -webkit-grab;">
+        <div class="display-block-hash" id="block-hash">
+            <div style="text-align: center; padding: 7px; display: flex;" id="info_student_block">
+                <pre>У: </pre>
+                <pre id="student_id_res"></pre>
+            </div>
+        </div>
+    </span>
+
+</div>
+`;
 
 //Добавляем стили
 let mstl = document.createElement('style');
 document.body.append(mstl);
-var style = `.win_btn {
-    background-color: #768d87;
-    border-radius: 10px;
-    border: 1px solid #566963;
-    color: #ffffff;
-    font-size: 12px;
-    padding: 3px 2px;
-    margin: -2px 1px;
-}`
+var style = `
+    .win_btn {
+        background-color: #768d87;
+        border-radius: 10px;
+        border: 1px solid #566963;
+        color: #ffffff;
+        font-size: 12px;
+        padding: 3px 2px;
+        margin: -2px 1px;
+    }
+    .display-block-hash{
+        display: none;
+    }
+
+`
 mstl.innerHTML = style;
 
 //Сохранение позиции окна
@@ -153,7 +191,28 @@ mscr.innerHTML = send_comment_js;
         document.addEventListener('mousemove', listener);
     }
     wint.onmouseup = function () { document.removeEventListener('mousemove', listener); }
+    
+    // Функции на кнопку поиска id по хэшу
+    document.querySelector('#btn1_hash').onclick = function () {
+        let hash = document.querySelector('#hash_type_for_chat').value;
+        getIdUsersHash(hash);
+        //sdocument.querySelector('#btn1_hash').classList.remove('display-block-hash');
+        document.querySelector('#btn1_hash_close').classList.remove ('display-block-hash');
+    }
+    document.querySelector('#btn1_hash_close').onclick = function () {
+        //document.querySelector('#btn1_hash').classList.remove('display-block-hash');
+        document.querySelector('#btn1_hash_close').classList.add('display-block-hash');
+        document.querySelector('#block-hash').classList.add('display-block-hash');
+    }
 
+    document.querySelector('#searhcIdHash').style.display = 'none';
+    document.querySelector('#rollUp').ondblclick = function () {
+        if(document.querySelector('#searhcIdHash').style.display == 'none') {
+            document.querySelector('#searhcIdHash').style.display = 'flex';
+        }else {
+            document.querySelector('#searhcIdHash').style.display = 'none';
+        }
+    } 
     //События на главные кнопки
     document.getElementById('btn1_student').onclick = function () { get_info("student"); };
     document.getElementById('btn1_teacher').onclick = function () { get_info("teacher"); };
@@ -351,14 +410,14 @@ async function get_info(type) { //v.2
 
                     info_status.lastElementChild.children[2].innerText = role;
                     document.getElementById('student_edit').onclick = function () {
-                        window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
+                        window.open('https://id.skyeng.ru/admin/users/' + id + '/update-contacts', '_blank');
                     }
 
                     document.getElementById('student_login').onclick = function () {
                         document.getElementById('student_login').style.backgroundColor = 'orange';
                         chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
                             if (response.answer.success === true) {
-                                TrueCopyToClipboard(response.answer.data.link);
+                                TrueCopyToClipboard(response.answer.loginLink);
                                 document.getElementById('student_login').style.backgroundColor = 'green';
                             } else {
                                 document.getElementById('student_login').style.backgroundColor = 'red';
@@ -525,14 +584,14 @@ async function get_info(type) { //v.2
                     document.querySelector("#info_student_status").style.display = 'none'; //скрыть кнопки с svg: расписания, профиля, комментария, добавления в историю
 
                     document.getElementById('student_edit').onclick = function () {
-                        window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
+                        window.open('https://id.skyeng.ru/admin/users/' + id + '/update-contacts', '_blank');
                     }
 
                     document.getElementById('student_login').onclick = function () {
                         document.getElementById('student_login').style.backgroundColor = 'orange';
                         chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
                             if (response.answer.success === true) {
-                                TrueCopyToClipboard(response.answer.data.link);
+                                TrueCopyToClipboard(response.answer.loginLink);
                                 document.getElementById('student_login').style.backgroundColor = 'green';
                             } else {
                                 document.getElementById('student_login').style.backgroundColor = 'red';
@@ -582,7 +641,7 @@ function teacher_draw(id) {
         document.getElementById('teacher_login').style.backgroundColor = 'orange';
         chrome.runtime.sendMessage({name: "script_pack", question: 'get_login_link', id: id}, function(response) {
             if (response.answer.success === true) {
-                TrueCopyToClipboard(response.answer.data.link);
+                TrueCopyToClipboard(response.answer.loginLink);
                 document.getElementById('teacher_login').style.backgroundColor = 'green';
             } else {
                 document.getElementById('teacher_login').style.backgroundColor = 'red';
@@ -590,7 +649,7 @@ function teacher_draw(id) {
         });
     }
     document.getElementById('teacher_edit').onclick = function () {
-        window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
+        window.open('https://id.skyeng.ru/admin/users/' + id + '/update-contacts', '_blank');
     }
    
     //Easy timetable start
@@ -694,7 +753,7 @@ function crm2_teacher_draw(id) {
         document.getElementById(`teacher_login_${id}`).style.backgroundColor = 'orange';
         chrome.runtime.sendMessage({ name: "script_pack", question: 'get_login_link', id: id }, function (response) {
             if (response.answer.success === true) {
-                TrueCopyToClipboard(response.answer.data.link);
+                TrueCopyToClipboard(response.answer.loginLink);
                 document.getElementById(`teacher_login_${id}`).style.backgroundColor = 'green';
             } else {
                 document.getElementById(`teacher_login_${id}`).style.backgroundColor = 'red';
@@ -702,7 +761,7 @@ function crm2_teacher_draw(id) {
         });
     }
     document.getElementById(`teacher_edit_${id}`).onclick = function () {
-        window.open('https://id.skyeng.ru/admin/users/' + id + '/update', '_blank');
+        window.open('https://id.skyeng.ru/admin/users/' + id + '/update-contacts', '_blank');
     }
     
     //Easy timetable start
@@ -896,4 +955,18 @@ function no_responce(id) {
             });
         }
     };
+}
+
+
+
+function getIdUsersHash(hash){
+    document.querySelector('#student_id_res').innerText = 'загрузка..'
+    chrome.runtime.sendMessage({name: "script_pack", question: 'get_id_users_hash', hash: hash}, function(response) {
+        b = (response.answer);
+        console.log(b)
+        document.querySelector('#student_id_res').innerText = b.studentId
+        
+    });
+    console.log("test")
+    document.querySelector('#block-hash').classList.remove ('display-block-hash');
 }

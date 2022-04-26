@@ -4,6 +4,10 @@
       "scripts": [ "background.js" ]
    },
    "content_scripts": [ {
+      "css": [ "cms-step/stats-people.css" ],
+      "js": [ "cms-step/app.js" ],
+      "matches": [ "*://vimbox.skyeng.ru/kids/english/room/*" ]
+   }, {
       "js": [ "timetable.js" ],
       "matches": [ "*://timetable.skyeng.ru/*" ]
    }, {
@@ -31,8 +35,8 @@
       "js": [ "chat_new_ticket.js" ],
       "matches": [ "*://skyeng.omnidesk.ru/l_rus/*", "*://*.skyeng.ru/l_rus/*", "*://omnidesk.ru/client_widgets/widget/*" ]
    }, {
-      "css": [ "autofaq/patterns.css" ],
-      "js": [ "ticket_easy_info_window.js", "autofaq_people_list.js", "autofaq_colorfull_status.js", "autofaq_tkRequest_btn.js" ],
+      "css": [ "autofaq/stats-people.css", "autofaq/patterns.css" ],
+      "js": [ "autofaq/stats-people.js", "ticket_easy_info_window.js", "autofaq_tkRequest_btn.js" ],
       "matches": [ "*://skyeng.autofaq.ai/*" ]
    }, {
       "js": [ "crm2_new_tab_search.js", "crm2_send_letter.js", "crm2_users_save.js" ],
@@ -49,6 +53,9 @@
    }, {
       "js": [ "vimbox_homework.js" ],
       "matches": [ "*://vimbox.skyeng.ru/student/*/homework" ]
+   }, {
+      "js": [ "/slack/redirect.js" ],
+      "matches": [ "*://skyeng.slack.com/*" ]
    } ],
    "description": "Сборник скриптов для быстрого доступа к ресурсам: ://.skyeng.ru/* , ://datsy.ru/, ://skyeng.autofaq.ai/, ://skyeng.omnidesk.ru/*",
    "icons": {
@@ -62,6 +69,6 @@
    "options_page": "options.html",
    "permissions": [ "cookies", "*://*.skyeng.ru/*", "*://skyeng.omnidesk.ru/*", "*://datsy.ru/api/*", "*://kibana-logs.skyeng.link/", "storage", "notifications" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.5.19",
+   "version": "0.6.306",
    "web_accessible_resources": [ "libs/*", "autofaq/*" ]
 }

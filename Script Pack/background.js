@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.question == 'info_user_status') {
             (async () => {
                 let response = await fetch('https://cabinet.skyeng.ru/admin/orderPriority/search?user=' + request.id, {
-                    method: 'POST',	headers: {'content-type': 'application/x-www-form-urlencoded'}, async: true
+                    method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, async: true
                 });
                 let text = await response.text(); // прочитать тело ответа как текст
                 if (response.status == 200) {
@@ -50,10 +50,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     page.innerHTML = text;
 
                     if (page.querySelector('.order_container > span') !== null && page.querySelector('.order_container > span').innerText == "Нет подходящих заявок") {
-                        sendResponse({status: '', time: '', teacher: '', order: '', comment: '', group: '', type: 'crm1_user_not_found'});
+                        sendResponse({ status: '', time: '', teacher: '', order: '', comment: '', group: '', type: 'crm1_user_not_found' });
                         console.log('Status = Not Found')
                     } else {
-                        let answer = {'6': 'purple', '5': 'green', '4': 'lightblue', '3': 'orange', '2': 'pink', '1': 'grey', '0': 'grey'};
+                        let answer = { '6': 'purple', '5': 'green', '4': 'lightblue', '3': 'orange', '2': 'pink', '1': 'grey', '0': 'grey' };
                         let group = (page.querySelector('table > tbody > tr[data-order] > td > div[class="top-buffer"] > strong') == null) ? '' : page.querySelector('table > tbody > tr[data-order] > td > div[class="top-buffer"] > strong').innerText;
 
                         let responce = {
@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     }
                 } else {
                     console.log('Status != 200')
-                    sendResponse({status: '', time: '', teacher: '', order: '', comment: '', group: '', type: 'responce_status_error'});
+                    sendResponse({ status: '', time: '', teacher: '', order: '', comment: '', group: '', type: 'responce_status_error' });
                 }
             })();
             return true;
@@ -77,14 +77,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.question == 'get_person_info') {
             (async () => {
                 let response = await fetch('https://id.skyeng.ru/admin/users/' + request.id, {
-                    method: 'GET',	headers: {'content-type': 'application/x-www-form-urlencoded'}, async: true
+                    method: 'GET', headers: { 'content-type': 'application/x-www-form-urlencoded' }, async: true
                 });
                 let text = await response.text(); // прочитать тело ответа как текст
                 if (response.status == 200) {
                     var page = document.createElement('a');
                     page.innerHTML = text.toString();
-                    
-                    var id = '',    names = '',    mail = '',    phone = '',    phoneD = '',    skype = '',    identity = '', roles = false, roles_text = '', role = '', time = '';
+
+                    var id = '', names = '', mail = '', phone = '', phoneD = '', skype = '', identity = '', roles = false, roles_text = '', role = '', time = '';
                     var sname = page.querySelectorAll('main > div > table > tbody > tr > th');
                     var result = page.querySelectorAll('main > div > table > tbody > tr > td');
 
@@ -99,12 +99,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             (sname[i].innerText == 'Skype') ? skype = '<br><a href="skype:' + result[i].innerText + '?chat">Skype</a>: ' + result[i].innerText : false;
                             (sname[i].innerText == 'Legacy identity') ? identity = '<br>Identity: ' + result[i].innerText : false;
                             (sname[i].innerText == 'Смещение UTC') ? time = `<br>Время: ${makeUTCGreatAgain(result[i].innerText)}` : false;
-							(sname[i].innerText == 'Все новые роли' || sname[i].innerText == 'All new roles') ? roles = result[i].innerText.trim() : false;
+                            (sname[i].innerText == 'Все новые роли' || sname[i].innerText == 'All new roles') ? roles = result[i].innerText.trim() : false;
                         }
                     }
 
                     if (roles) {
-						if (roles.indexOf('ROLE_OPERATOR') !== -1) { 
+                        if (roles.indexOf('ROLE_OPERATOR') !== -1) {
                             role = 'operator';
                             roles_text += 'Operator<br>';
                         } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
@@ -131,63 +131,47 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         }
         if (request.question == 'get_login_link') {
-            fetch('https://crm.skyeng.ru/order/generateLoginLink?userId=' + request.id, {headers: {'x-requested-with': 'XMLHttpRequest'}})
-                .then(response => { if (response.ok === true) { return response.json(); } else { return null; } })
-                .then(json => { 
-                    if (json !== null) {
-                        sendResponse({ answer: json });
-                    } else {
-                        fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
-                            .then(r => r.text())
-                            .then(responce => {
-                                let doc = document.createElement('div');
-                                doc.innerHTML = responce;
-                                fetch("https://id.skyeng.ru/admin/auth/login-links", {
-                                    "headers": {
-                                        "content-type": "application/x-www-form-urlencoded",
-                                        "sec-fetch-dest": "document",
-                                        "sec-fetch-mode": "navigate",
-                                        "sec-fetch-site": "same-origin",
-                                        "sec-fetch-user": "?1",
-                                        "upgrade-insecure-requests": "1"
-                                    },
-                                    "body": `login_link_form%5Bidentity%5D=&login_link_form%5Bid%5D=${request.id}&login_link_form%5Btarget%5D=https%3A%2F%2Fskyeng.ru&login_link_form%5Bpromocode%5D=&login_link_form%5Blifetime%5D=3600&login_link_form%5Bcreate%5D=&login_link_form%5B_token%5D=${doc.querySelector('#login_link_form__token').value}`,
-                                    "method": "POST",
-                                    "mode": "cors",
-                                    "credentials": "include"
-                                })
-                                    .then(() => {
-                                        fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
-                                            .then(r => r.text())
-                                            .then(responce => {
-                                                let doc2 = document.createElement('div');
-                                                doc2.innerHTML = responce;
-                                                let link = (doc2.querySelector(`a[href="/admin/users/${request.id}"]`)) ? doc2.querySelector(`a[href="/admin/users/${request.id}"]`).parentElement.parentElement.querySelector('input[onclick="this.select()"]').value : '';
-
-                                                let result =
-                                                {
-                                                    success: (link !== '') ? true : false,
-                                                    data: {
-                                                        link: link,
-                                                        userID: request.id
-                                                    }
-                                                };
-                                                sendResponse({ answer: result });
-                                            });
-                                    });
-                            });
-                    }
+            let json = {
+                'loginLink': '',
+                'success': 'true'
+            }
+            let body = `login_link_form%5Bid%5D=${request.id}`
+            body += '&login_link_form%5Btarget%5D=https%3A%2F%2Fskyeng.ru'
+            body += '&login_link_form%5Blifetime%5D=2000'
+            fetch("https://id.skyeng.ru/admin/auth/login-links", {
+                "headers": {
+                    "content-type": "application/x-www-form-urlencoded",
+                },
+                "referrer": "https://id.skyeng.ru/admin/auth/login-links",
+                "referrerPolicy": "strict-origin-when-cross-origin",
+                "body": body,
+                "method": "POST",
+                "mode": "cors",
+                "credentials": "include"
+            }).then(res => res.text())
+                .then(textHtml => {
+                    let domPars = new DOMParser()
+                    let loginLinks = domPars.parseFromString(textHtml, `text/html`).querySelectorAll("[value^='https://id.skyeng.ru/auth/login-link/']")
+                    let last = loginLinks[loginLinks.length - 1].value;
+                    console.log(`Loginner: ${last}`)
+                    json.loginLink = last
+                    json.success = true
+                    sendResponse({ answer: json });
+                })
+                .catch(function(err) {  
+                    json.success = false
+                    sendResponse({ answer: false });
                 });
             return true;
         }
         if (request.question == 'get_trm_id') {
-            fetch('https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=' + request.id, {headers: {'content-type': 'application/x-www-form-urlencoded'}})
+            fetch('https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=' + request.id, { headers: { 'content-type': 'application/x-www-form-urlencoded' } })
                 .then(response => response.json())
                 .then(json => {
                     if (request.type = 'trm_id') {
-                        sendResponse({answer: json[0].id})
+                        sendResponse({ answer: json[0].id })
                     } else {
-                        sendResponse({answer: json[0].label})
+                        sendResponse({ answer: json[0].label })
                     }
                 });
             return true;
@@ -195,119 +179,119 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.question == 'get_lessons_today') {
             let data = new Date()
             let body = 'from=' + String(data.getDate() - 1) + '-' + String(data.getMonth() + 1) + '-' + String(data.getFullYear()) + ' 20:00:00&to=' + String(data.getDate()) + '-' + String(data.getMonth() + 1) + '-' + String(data.getFullYear()) + ' 20:00:00&offset=0&filters[teacherIds][]=' + String(request.id);
-            fetch('https://timetable.skyeng.ru/api/teachers/search', { method: 'POST', headers: {'content-type': 'application/x-www-form-urlencoded'}, body: body })
+            fetch('https://timetable.skyeng.ru/api/teachers/search', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: body })
                 .then(response => response.json())
-                    .then(obj => {
-                        if (obj[0].result[0].classes !== undefined) {
-                            var classes = obj[0].result[0].classes;
-                            for (var i = 0; i < classes.length; i++) {
-                                if (classes[i].createdAt !== undefined) {
-                                    let str = classes[i].createdAt;
-                                    classes[i].createdAt = classes[i].createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                                }
-                                if (classes[i].endAt !== undefined) {
-                                    let str = classes[i].endAt;
-                                    classes[i].endAt = classes[i].endAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                                }
-                                if (classes[i].startAt !== undefined) {
-                                    classes[i].startAt = String(Number(classes[i].startAt.slice(11, 13)) + 3);
-                                }
-                                if (classes[i].updatedAt !== undefined) {
-                                    let str = classes[i].updatedAt;
-                                    classes[i].updatedAt = classes[i].updatedAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                                }
-                                if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
-                                    let str = classes[i].classStatus.createdAt;
-                                    classes[i].classStatus.createdAt = classes[i].classStatus.createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
-                                }
+                .then(obj => {
+                    if (obj[0].result[0].classes !== undefined) {
+                        var classes = obj[0].result[0].classes;
+                        for (var i = 0; i < classes.length; i++) {
+                            if (classes[i].createdAt !== undefined) {
+                                let str = classes[i].createdAt;
+                                classes[i].createdAt = classes[i].createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                            }
+                            if (classes[i].endAt !== undefined) {
+                                let str = classes[i].endAt;
+                                classes[i].endAt = classes[i].endAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                            }
+                            if (classes[i].startAt !== undefined) {
+                                classes[i].startAt = String(Number(classes[i].startAt.slice(11, 13)) + 3);
+                            }
+                            if (classes[i].updatedAt !== undefined) {
+                                let str = classes[i].updatedAt;
+                                classes[i].updatedAt = classes[i].updatedAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
+                            }
+                            if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
+                                let str = classes[i].classStatus.createdAt;
+                                classes[i].classStatus.createdAt = classes[i].classStatus.createdAt.replace(str.slice(10, 13), 'T' + String(Number(str.slice(11, 13)) + 3));
                             }
                         }
-    
-                        if (obj[0].result[0].classesRegular !== undefined) {
-                            let classes = obj[0].result[0].classesRegular;
-                            var classes_regular = [];
-                            if (data.getDay() == 0) { 
-                                var date_day = 6; 
-                            } else { 
-                                var date_day = data.getDay() - 1; 
-                            }
-                            for (var i = 0; i < classes.length; i++) {
-                                classes[i].startAt = classes[i].startAt.split(':')[0].slice(1)
-                                classes[i].startAtDays = Math.floor( classes[i].startAt / 24);
-                                classes[i].startAt = classes[i].startAt - classes[i].startAtDays * 24 + 3;
-                            }
-                            for (var i = 0; i < classes.length; i++) {
-                                if (classes[i].startAtDays == date_day) { 
-                                    classes_regular.push(classes[i]); 
-                                }
+                    }
+
+                    if (obj[0].result[0].classesRegular !== undefined) {
+                        let classes = obj[0].result[0].classesRegular;
+                        var classes_regular = [];
+                        if (data.getDay() == 0) {
+                            var date_day = 6;
+                        } else {
+                            var date_day = data.getDay() - 1;
+                        }
+                        for (var i = 0; i < classes.length; i++) {
+                            classes[i].startAt = classes[i].startAt.split(':')[0].slice(1)
+                            classes[i].startAtDays = Math.floor(classes[i].startAt / 24);
+                            classes[i].startAt = classes[i].startAt - classes[i].startAtDays * 24 + 3;
+                        }
+                        for (var i = 0; i < classes.length; i++) {
+                            if (classes[i].startAtDays == date_day) {
+                                classes_regular.push(classes[i]);
                             }
                         }
-    
-                        if (classes && classes_regular) {
-                            for (var i = 0; i < classes.length; i++) {
-                                if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
-                                    if (classes[i].classRegularId !== undefined && classes[i].classRegularId !== '') {
-                                        for (let c = 0; c < classes_regular.length; c++) {
-                                            if (classes_regular[c].id == classes[i].classRegularId) {
-                                                classes_regular.splice(c,1);
-                                                c--;
-                                            }
+                    }
+
+                    if (classes && classes_regular) {
+                        for (var i = 0; i < classes.length; i++) {
+                            if (classes[i].classStatus !== undefined && classes[i].classStatus.createdAt !== undefined) {
+                                if (classes[i].classRegularId !== undefined && classes[i].classRegularId !== '') {
+                                    for (let c = 0; c < classes_regular.length; c++) {
+                                        if (classes_regular[c].id == classes[i].classRegularId) {
+                                            classes_regular.splice(c, 1);
+                                            c--;
                                         }
                                     }
-                                    classes.splice(i,1);
-                                    i--;
                                 }
+                                classes.splice(i, 1);
+                                i--;
                             }
                         }
+                    }
 
-                        let marks = new Array();
-                        if (obj[0].result[0].isLivedAbroad) marks.push('LivedAbroad');
-                        if (obj[0].result[0].isOnVacation) marks.push('OnVacation');
-                        if (obj[0].result[0].isMethodist) marks.push('Methodist');
-                        if (obj[0].result[0].isPassivelyFired) marks.push('PassivelyFired');
-                        if (obj[0].result[0].isGroup) marks.push('Group');
-                        if (obj[0].result[0].isOverbooker) marks.push('Overbooker');
-                        if (obj[0].result[0].isVip) marks.push('Vip');
-                        if (obj[0].result[0].isCorporate) marks.push('Corporate');
-                        if (obj[0].result[0].isScreeningTester) marks.push('ScreeningTester');
-                        if (obj[0].result[0].isSuperCorporate) marks.push('SuperCorporate');
-                        if (obj[0].result[0].isKidsLabPrimary) marks.push('KidsLabPrimary');
-                        if (obj[0].result[0].isExternal) marks.push('External');
-                        if (obj[0].result[0].isJunior) marks.push('Junior');
+                    let marks = new Array();
+                    if (obj[0].result[0].isLivedAbroad) marks.push('LivedAbroad');
+                    if (obj[0].result[0].isOnVacation) marks.push('OnVacation');
+                    if (obj[0].result[0].isMethodist) marks.push('Methodist');
+                    if (obj[0].result[0].isPassivelyFired) marks.push('PassivelyFired');
+                    if (obj[0].result[0].isGroup) marks.push('Group');
+                    if (obj[0].result[0].isOverbooker) marks.push('Overbooker');
+                    if (obj[0].result[0].isVip) marks.push('Vip');
+                    if (obj[0].result[0].isCorporate) marks.push('Corporate');
+                    if (obj[0].result[0].isScreeningTester) marks.push('ScreeningTester');
+                    if (obj[0].result[0].isSuperCorporate) marks.push('SuperCorporate');
+                    if (obj[0].result[0].isKidsLabPrimary) marks.push('KidsLabPrimary');
+                    if (obj[0].result[0].isExternal) marks.push('External');
+                    if (obj[0].result[0].isJunior) marks.push('Junior');
 
-                        (classes) ? true : classes = '';
-                        (classes_regular) ? true : classes_regular = '';
-                        if (classes.length !== 0 && classes_regular.length !== 0) {
-                            classes = classes.concat(classes_regular);
-                            sendResponse({
-                                answer: classes,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
-                                marks: marks
-                            });
-                        } else if (classes.length !== 0 && classes_regular.length == 0) {
-                            sendResponse({
-                                answer: classes,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
-                                marks: marks
-                            });
-                        } else if (classes.length == 0 && classes_regular.length !== 0) {
-                            sendResponse({
-                                answer: classes_regular,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
-                                marks: marks
-                            });
-                        } else {
-                            sendResponse({
-                                answer: null,
-                                slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
-                                marks: marks
-                            });
-                        }
-                    });
+                    (classes) ? true : classes = '';
+                    (classes_regular) ? true : classes_regular = '';
+                    if (classes.length !== 0 && classes_regular.length !== 0) {
+                        classes = classes.concat(classes_regular);
+                        sendResponse({
+                            answer: classes,
+                            slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                            marks: marks
+                        });
+                    } else if (classes.length !== 0 && classes_regular.length == 0) {
+                        sendResponse({
+                            answer: classes,
+                            slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                            marks: marks
+                        });
+                    } else if (classes.length == 0 && classes_regular.length !== 0) {
+                        sendResponse({
+                            answer: classes_regular,
+                            slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                            marks: marks
+                        });
+                    } else {
+                        sendResponse({
+                            answer: null,
+                            slack: (obj[0].result[0].slackUserId) ? obj[0].result[0].slackUserId : null,
+                            marks: marks
+                        });
+                    }
+                });
             return true;
         }
         if (request.question == 'get_Lazzy_TimeTable') {
-            
+
             fetch('https://crm.skyeng.ru/orderV2/ajaxLessonsHistoryTab/id/' + request.id, {
                 method: 'GET',
                 headers: {
@@ -315,65 +299,65 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     'x-requested-with': 'XMLHttpRequest'
                 }
             })
-            .then(response => response.text())
-            .then(html => {
-                var page = document.createElement('html');
-                page.innerHTML = html;
-                if (page.querySelector('#lesson-planned-container').lastElementChild.innerText.trim() !== "Запланированных уроков нет") {
-                    document.body.prepend(page);
-					let str = Array(), str2 = Array();
-                    page.querySelector('#lesson-planned-container').innerText.split('\n').forEach((elm) => {
-                        if (elm.trim() !== '') {
-                            str.push(elm);
-                        }
-                    });
-                    str.splice(0,3);
+                .then(response => response.text())
+                .then(html => {
+                    var page = document.createElement('html');
+                    page.innerHTML = html;
+                    if (page.querySelector('#lesson-planned-container').lastElementChild.innerText.trim() !== "Запланированных уроков нет") {
+                        document.body.prepend(page);
+                        let str = Array(), str2 = Array();
+                        page.querySelector('#lesson-planned-container').innerText.split('\n').forEach((elm) => {
+                            if (elm.trim() !== '') {
+                                str.push(elm);
+                            }
+                        });
+                        str.splice(0, 3);
 
-                    str.forEach((elm) => {
-                        let cut = elm.split('	');
+                        str.forEach((elm) => {
+                            let cut = elm.split('	');
 
-						(cut[0].indexOf("Mon") !== -1) ? cut[0] = cut[0].replace('Mon','ПН') : false;
-                        (cut[0].indexOf("Tue") !== -1) ? cut[0] = cut[0].replace('Tue','ВТ') : false;
-                        (cut[0].indexOf("Wed") !== -1) ? cut[0] = cut[0].replace('Wed','СР') : false;
-                        (cut[0].indexOf("Thu") !== -1) ? cut[0] = cut[0].replace('Thu','ЧТ') : false;
-                        (cut[0].indexOf("Fri") !== -1) ? cut[0] = cut[0].replace('Fri','ПТ') : false;
-                        (cut[0].indexOf("Sat") !== -1) ? cut[0] = cut[0].replace('Sat','СБ') : false;
-                        (cut[0].indexOf("Sun") !== -1) ? cut[0] = cut[0].replace('Sun','ВС') : false;
+                            (cut[0].indexOf("Mon") !== -1) ? cut[0] = cut[0].replace('Mon', 'ПН') : false;
+                            (cut[0].indexOf("Tue") !== -1) ? cut[0] = cut[0].replace('Tue', 'ВТ') : false;
+                            (cut[0].indexOf("Wed") !== -1) ? cut[0] = cut[0].replace('Wed', 'СР') : false;
+                            (cut[0].indexOf("Thu") !== -1) ? cut[0] = cut[0].replace('Thu', 'ЧТ') : false;
+                            (cut[0].indexOf("Fri") !== -1) ? cut[0] = cut[0].replace('Fri', 'ПТ') : false;
+                            (cut[0].indexOf("Sat") !== -1) ? cut[0] = cut[0].replace('Sat', 'СБ') : false;
+                            (cut[0].indexOf("Sun") !== -1) ? cut[0] = cut[0].replace('Sun', 'ВС') : false;
 
-                        str2.push(`${cut[0]} | ${cut[1].match(/#[0-9]*/i)[0]} | ${cut[3] == "Английский язык" ? "Англ" : "Math"} | ${cut[4] == "Регулярный" ? "reg" : "one"}`);
-                    });
-                    str2 = str2.join('\n');
-					page.remove();
+                            str2.push(`${cut[0]} | ${cut[1].match(/#[0-9]*/i)[0]} | ${cut[3] == "Английский язык" ? "Англ" : "Math"} | ${cut[4] == "Регулярный" ? "reg" : "one"}`);
+                        });
+                        str2 = str2.join('\n');
+                        page.remove();
 
-                    sendResponse({ answer: str2 });
-                } else {
-                    sendResponse({ answer: 'Нет уроков' });
-                }
-            });
+                        sendResponse({ answer: str2 });
+                    } else {
+                        sendResponse({ answer: 'Нет уроков' });
+                    }
+                });
             return true;
         }
         if (request.question == 'get_Lazzy_TimeTable_v2') {
             fetch("https://cabinet.skyeng.ru/order/lazyTimetable", {
-                "credentials":"include",
-                "headers":{
-                    "content-type":"application/x-www-form-urlencoded; charset=UTF-8"
+                "credentials": "include",
+                "headers": {
+                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
                 },
-                "body":`order_id=${request.id}`,
-                "method":"POST"
+                "body": `order_id=${request.id}`,
+                "method": "POST"
             })
-            .then(response => {
-                if (response.ok) return response.text();
-                else return { err: response.status}
-            })
-            .then(html => {
-                let result = ''
-                if (!html.err) {
-                    for (let i = 0; i < 3; i++) {
-                        result += `<div>${html.match(/<span>(.|\n)*?<\/div>/g)[i]}`;
-                    }
-                } else result = html;
-                sendResponse({ answer: result });
-            }).catch(err => { sendResponse({ 'err': err })  });
+                .then(response => {
+                    if (response.ok) return response.text();
+                    else return { err: response.status }
+                })
+                .then(html => {
+                    let result = ''
+                    if (!html.err) {
+                        for (let i = 0; i < 3; i++) {
+                            result += `<div>${html.match(/<span>(.|\n)*?<\/div>/g)[i]}`;
+                        }
+                    } else result = html;
+                    sendResponse({ answer: result });
+                }).catch(err => { sendResponse({ 'err': err }) });
             return true;
         }
         if (request.question == 'get_group_student_info') {
@@ -395,7 +379,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         for (var o = 1; o < info.split('#').length; o++) {
                             let int = info.split('#')[o].indexOf('Имя:')
                             let int2 = info.split('#')[o].indexOf('Почта:')
-                            result += info.split('#')[o -1].slice(0, -5).slice(-8) + ' ' + info.split('#')[o].slice(int, int2) + '</div><div>';
+                            result += info.split('#')[o - 1].slice(0, -5).slice(-8) + ' ' + info.split('#')[o].slice(int, int2) + '</div><div>';
                         }
                     }
 
@@ -426,60 +410,60 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
         if (request.question == 'get_user_comment') {
             fetch('https://spreadsheets.google.com/feeds/list/1W_Ay8Mv3aOhcB4JT-6EOg1uqCTIKjEROzD1PvXacVuA/default/public/values?alt=json')
-                .then( response => response.json())
-                .then( json => {
-                        for (let i = json.feed.entry.length -1; i > 0; i--) {
-                            if (json.feed.entry[i]['gsx$id']['$t'] == request.id) {
-                                let test = [{
-                                    'id': json.feed.entry[i]['gsx$id']['$t'],
-                                    'ticket': json.feed.entry[i]['gsx$ticketid']['$t'],
-                                    'name': json.feed.entry[i]['gsx$name']['$t'],
-                                    'comment': json.feed.entry[i]['gsx$comment']['$t']
-                                }]
-                                sendResponse({answer: test});
-                                break;
-                            }
+                .then(response => response.json())
+                .then(json => {
+                    for (let i = json.feed.entry.length - 1; i > 0; i--) {
+                        if (json.feed.entry[i]['gsx$id']['$t'] == request.id) {
+                            let test = [{
+                                'id': json.feed.entry[i]['gsx$id']['$t'],
+                                'ticket': json.feed.entry[i]['gsx$ticketid']['$t'],
+                                'name': json.feed.entry[i]['gsx$name']['$t'],
+                                'comment': json.feed.entry[i]['gsx$comment']['$t']
+                            }]
+                            sendResponse({ answer: test });
+                            break;
                         }
-                        sendResponse({answer: []});
+                    }
+                    sendResponse({ answer: [] });
                 })
             return true;
         }
         if (request.question == 'info_user_search') {
             fetch('https://id.skyeng.ru/admin/users?user_list_form%5Bidentity%5D=' + encodeURI(request.id))
-            .then(response => response.text())
-            .then(text => {
-                let html = document.createElement('html')
-                html.innerHTML = text;
-                var table = html.querySelector('tbody'), responce = [];
+                .then(response => response.text())
+                .then(text => {
+                    let html = document.createElement('html')
+                    html.innerHTML = text;
+                    var table = html.querySelector('tbody'), responce = [];
 
-                if (table && table !== null) {
-                    for (var i = 0; i < table.children.length; i++) {
-                        let c = {'id': table.children[i].children[0].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
-                        responce.push(c)
+                    if (table && table !== null) {
+                        for (var i = 0; i < table.children.length; i++) {
+                            let c = { 'id': table.children[i].children[0].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText }
+                            responce.push(c)
+                        }
                     }
-                }
 
-                sendResponse({answer: responce});
-            });
+                    sendResponse({ answer: responce });
+                });
             return true;
         }
         if (request.question == 'info_users_search') {
             fetch('https://id.skyeng.ru/admin/users?user_list_form%5Bemail%5D=' + encodeURI(request.id))
-            .then(response => response.text())
-            .then(text => {
-                let html = document.createElement('html')
-                html.innerHTML = text;
-                var table = html.querySelector('tbody'), responce = [];
+                .then(response => response.text())
+                .then(text => {
+                    let html = document.createElement('html')
+                    html.innerHTML = text;
+                    var table = html.querySelector('tbody'), responce = [];
 
-                if (table && table !== null) {
-                    for (var i = 0; i < table.children.length; i++) {
-                        let c = {'id': table.children[i].children[0].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText}
-                        responce.push(c)
+                    if (table && table !== null) {
+                        for (var i = 0; i < table.children.length; i++) {
+                            let c = { 'id': table.children[i].children[0].children[0].innerText, 'identity': table.children[i].children[1].innerText, 'name': table.children[i].children[2].innerText, 'mail': table.children[i].children[3].innerText }
+                            responce.push(c)
+                        }
                     }
-                }
 
-                sendResponse({answer: responce});
-            });
+                    sendResponse({ answer: responce });
+                });
             return true;
         }
         if (request.question == 'get_ticket_history') {
@@ -487,11 +471,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 method: 'GET',
                 headers: { 'content-type': 'application/x-www-form-urlencoded' }
             })
-            .then(response => response.text())
-            .then( text => {
-                text = JSON.parse(text.replace(/\(/g,'{').replace(/\)/g,'}').replace(/\'/g,'"'))
-                sendResponse({answer: text});
-            })
+                .then(response => response.text())
+                .then(text => {
+                    text = JSON.parse(text.replace(/\(/g, '{').replace(/\)/g, '}').replace(/\'/g, '"'))
+                    sendResponse({ answer: text });
+                })
             return true;
         }
         if (request.question == 'put_ticket_history') {
@@ -501,24 +485,24 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
         }
         if (request.question == 'get_teacher_by_name') {
-            fetch(`https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=${request.fullname}`, { 
+            fetch(`https://tramway.skyeng.ru/teacher/autocomplete/search?stage=all&term=${request.fullname}`, {
                 method: 'GET', headers: { 'content-type': 'application/x-www-form-urlencoded' }
             })
-            .then(response => response.json())
-            .then(json => { 
-                json.forEach((a) => {
-                    var logic = true;
-                    request.fullname.split(' ').forEach((b) => {
-                        if (a.name.indexOf(b) == -1) {
-                            logic = false;
+                .then(response => response.json())
+                .then(json => {
+                    json.forEach((a) => {
+                        var logic = true;
+                        request.fullname.split(' ').forEach((b) => {
+                            if (a.name.indexOf(b) == -1) {
+                                logic = false;
+                            }
+                        })
+
+                        if (logic == true) {
+                            sendResponse({ answer: { trm: a.id, name: a.name, full_name: a.label } });
                         }
                     })
-            
-                    if (logic == true) {
-                        sendResponse({answer: { trm: a.id, name: a.name, full_name: a.label}});
-                    }
-                })
-            });
+                });
             return true;
         }
         if (request.question == 'is_crm1') {
@@ -527,9 +511,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                     'x-requested-with': 'XMLHttpRequest'
-                }	
+                }
             }).then(text => text.json()).then(json => {
-                sendResponse({answer: json.data[0].isFromCrm1});
+                sendResponse({ answer: json.data[0].isFromCrm1 });
             })
             return true;
         }
@@ -539,12 +523,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                     'x-requested-with': 'XMLHttpRequest'
-                }	
+                }
             }).then(text => text.json()).then(json => {
                 let result = [];
 
                 for (let i = 0; i < json.data.length; i++) {
-                    let color = '', balance = json.data[i].balance, subject = '', teacher = '', payment = { "id": '', "name": ''};
+                    let color = '', balance = json.data[i].balance, subject = '', teacher = '', payment = { "id": '', "name": '' };
 
                     if (json.data[i].stage == "lost") {
                         color = "purple";
@@ -565,7 +549,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         subject = "MATH"
                     }
                     */
-                    
+
                     if (json.data[i].serviceTypeKey.indexOf('group_english') !== -1) {
                         subject = "KGL ENG"
                     } else if (json.data[i].serviceTypeKey.indexOf("mathematics") !== -1) {
@@ -587,11 +571,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     (json.data[i].paymentAgreement.person.general.id) ? payment['id'] = json.data[i].paymentAgreement.person.general.id : false;
                     (json.data[i].paymentAgreement.person.general.name) ? payment['name'] = json.data[i].paymentAgreement.person.general.name : false;
                     (balance == null) ? balance = 0 : false;
-                    
-                    result.push({"color": color, "balance": balance, "subject": subject, "teacher": teacher, "payment": payment, "other": json.data})
+
+                    result.push({ "color": color, "balance": balance, "subject": subject, "teacher": teacher, "payment": payment, "other": json.data })
                 }
 
-                sendResponse({answer: result});
+                sendResponse({ answer: result });
             })
 
             return true;
@@ -599,19 +583,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.question == 'crm2_no_responce') {
             let body;
             if (request.body) body = 'log=' + request.body;
-                else body = `log=Тикет ТП omnidesk: ${request.ticket_id} ~ не удалось связаться`;
+            else body = `log=Тикет ТП omnidesk: ${request.ticket_id} ~ не удалось связаться`;
             fetch(`https://backend.skyeng.ru/api/persons/${request.id}/log-any-interaction/`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                     'x-requested-with': 'XMLHttpRequest'
                 },
-                body: body	
-            }).then( responce => {
+                body: body
+            }).then(responce => {
                 if (responce.status == 204) {
-                    sendResponse({answer: 'done'});
+                    sendResponse({ answer: 'done' });
                 } else {
-                    sendResponse({answer: 'error'});
+                    sendResponse({ answer: 'error' });
                 }
             })
             return true;
@@ -635,7 +619,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         if (response.data.success == true) {
                             let info = response.data.result;
                             let id = `ID: ${info.id}`;
-                            let names = (info.name !== null || info.surname !== null) ? `<br>Name: ${(info.name !== null) ? info.name : ''} ${(info.surname !== null) ? info.surname : ''}`: '';
+                            let names = (info.name !== null || info.surname !== null) ? `<br>Name: ${(info.name !== null) ? info.name : ''} ${(info.surname !== null) ? info.surname : ''}` : '';
                             let mail = (info.email !== null) ? `<br>eMail: ${info.email}` : '';
                             let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: <b style="font-size: 9px;">${info.phone}</b>` : '';
                             let phoneD = (info.homePhone !== null) ? `<br><a href="tel:${info.homePhone}">Phone2</a>: ${info.homePhone}` : '';
@@ -643,11 +627,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             let identity = (info.identity !== null) ? `<br>Identity: ${info.identity}` : '';
                             let roles_text = '', role = '';
                             let roles = (info.roles) ? info.roles.join(' ').trim() : false;
-                            let time = (info.utcOffset) ? `<br>Время: ${makeUTCGreatAgain(info.utcOffset)}` : ``; 
+                            let time = (info.utcOffset) ? `<br>Время: ${makeUTCGreatAgain(info.utcOffset)}` : ``;
                             let isSkySmart = false;
-                            
+
                             if (roles) {
-                                if (roles.indexOf('ROLE_OPERATOR') !== -1) { 
+                                if (roles.indexOf('ROLE_OPERATOR') !== -1) {
                                     role = 'operator';
                                     roles_text += 'Operator<br>';
                                 } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
@@ -673,7 +657,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                     isSkySmart = true;
                                 }
                             }
-                            
+
                             let stat = id + names + mail + phone + phoneD + skype + identity + time;
                             sendResponse({
                                 status: roles_text,
@@ -683,7 +667,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             });
                         }
                     });
-            });            
+            });
             return true;
         }
         if (request.question == 'get_person_info_v3') {
@@ -704,7 +688,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         if (!r.error) {
                             let doc = document.createElement('html');
                             doc.innerHTML = r;
-                            resolve( doc.querySelectorAll('tr > td > code')[1].innerText.replace(' ', '').split(',') );
+                            resolve(doc.querySelectorAll('tr > td > code')[1].innerText.replace(' ', '').split(','));
                         } else {
                             resolve(r);
                         }
@@ -720,13 +704,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     let phone = (info.phone !== null) ? `<br><a href="tel:${info.phone}">Phone</a>: <b style="font-size: 9px;">${info.phone}</b>` : '';//
                     let skype = (info.skype !== null) ? `<br><a href="skype:${info.skype}?chat">Skype</a>: ${info.skype}` : '';
                     let identity = (info.identity !== null) ? `<br>Identity: ${info.identity}` : '';
-                    let time = (info.utcOffset) ? `<br>Время: ${(info.utcOffset === 3) ? info.utcOffset : `<b style="color: #FF5733;">${info.utcOffset}</b>`} UTC` : ``; 
-                    
+                    let time = (info.utcOffset) ? `<br>Время: ${(info.utcOffset === 3) ? info.utcOffset : `<b style="color: #FF5733;">${info.utcOffset}</b>`} UTC` : ``;
+
                     roles.then(roles => {
                         if (!roles.error) {
                             roles = roles.join()
                             let roles_text = '', role = '', isSkySmart = false;
-                            if (roles.indexOf('ROLE_OPERATOR') !== -1 || (roles.indexOf('ROLE_HRM_USER') !== -1 && roles.indexOf('ROLE_TEACHER') === -1)) { 
+                            if (roles.indexOf('ROLE_OPERATOR') !== -1 || (roles.indexOf('ROLE_HRM_USER') !== -1 && roles.indexOf('ROLE_TEACHER') === -1)) {
                                 role = 'operator';
                                 roles_text += 'Operator<br>';
                             } else if (roles.indexOf('ROLE_TEACHER') !== -1) {
@@ -751,7 +735,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                 roles_text = '<a style="color: #2581f3;font-weight: 700;">Skysmart</a> - <a style="color: darkblue; font-weight: 700;">KIDS</a><br>';
                                 isSkySmart = true;
                             }
-                        
+
                             let stat = id + names + mail + phone + skype + identity + time;
                             sendResponse({
                                 status: roles_text,
@@ -777,10 +761,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     });
                 }
             })
-            
+
             return true;
         }
-        if (request.question == 'duty_info') { 
+        if (request.question == 'duty_info') {
             fetch(`https://datsy.ru/api/duty-track`, { "credentials": "include" }) //https://datsy.ru/bots/2duty_v3.php
                 .then(r => r.json())
                 .then(r => {
@@ -795,7 +779,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                 text = (person.description === null || person.description === '') ? 'Пусто' : person.description;
                                 start = (person.end === null) ? person.start : null;
                             }
-                            
+
                             result.push({
                                 'name': name,
                                 'isBusy': isBusy,
@@ -811,10 +795,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         sendResponse({ answer: r });
                     }
                 });
-            
+
             return true;
         }
-        if (request.question == 'crm2_get_services') { 
+        if (request.question == 'crm2_get_services') {
             fetch(`https://backend.skyeng.ru/api/persons/${request.id}/education-services/`, {
                 credentials: "include",
             })
@@ -831,10 +815,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         sendResponse({ answer: r });
                     }
                 });
-            
+
             return true;
         }
-        if (request.question == 'crm2_get_info') { 
+        if (request.question == 'crm2_get_info') {
             fetch(`https://backend.skyeng.ru/api/persons/${request.id}`, {
                 credentials: "include",
             })
@@ -851,10 +835,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         sendResponse({ answer: r });
                     }
                 });
-            
+
             return true;
         }
-        if (request.question == 'crm2_get_self_group') { 
+        if (request.question == 'crm2_get_self_group') {
             fetch(`https://customer-support.skyeng.ru/operator/group`, {
                 credentials: "include",
             })
@@ -867,10 +851,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 .then((r) => {
                     sendResponse({ data: r.data });
                 });
-            
+
             return true;
         }
-        if (request.question == 'crm2_get_task_list') { 
+        if (request.question == 'crm2_get_task_list') {
             fetch(`https://customer-support.skyeng.ru/task/user/${request.id}`, {
                 credentials: "include",
             })
@@ -883,7 +867,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 .then((r) => {
                     sendResponse({ data: r.data });
                 });
-            
+
             return true;
         }
     }
@@ -1046,45 +1030,45 @@ function getJWT(teacher = '2314498') {
                 } else {
                     let result = new Promise(function (resolve, reject) {
                         fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
-                        .then(r => r.text())
-                        .then(responce => {
-                            let doc = document.createElement('div');
-                            doc.innerHTML = responce;
-                            fetch("https://id.skyeng.ru/admin/auth/login-links", {
-                                "headers": {
-                                    "content-type": "application/x-www-form-urlencoded",
-                                    "sec-fetch-dest": "document",
-                                    "sec-fetch-mode": "navigate",
-                                    "sec-fetch-site": "same-origin",
-                                    "sec-fetch-user": "?1",
-                                    "upgrade-insecure-requests": "1"
-                                },
-                                "body": `login_link_form%5Bidentity%5D=&login_link_form%5Bid%5D=${teacher}&login_link_form%5Btarget%5D=https%3A%2F%2Fskyeng.ru&login_link_form%5Bpromocode%5D=&login_link_form%5Blifetime%5D=3600&login_link_form%5Bcreate%5D=&login_link_form%5B_token%5D=${doc.querySelector('#login_link_form__token').value}`,
-                                "method": "POST",
-                                "mode": "cors",
-                                "credentials": "include"
-                            })
-                                .then(() => {
-                                    fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
-                                        .then(r => r.text())
-                                        .then(responce => {
-                                            let doc2 = document.createElement('div');
-                                            doc2.innerHTML = responce;
-                                            let link = (doc2.querySelector(`a[href="/admin/users/${teacher}"]`)) ? doc2.querySelector(`a[href="/admin/users/${teacher}"]`).parentElement.parentElement.querySelector('input[onclick="this.select()"]').value : '';
+                            .then(r => r.text())
+                            .then(responce => {
+                                let doc = document.createElement('div');
+                                doc.innerHTML = responce;
+                                fetch("https://id.skyeng.ru/admin/auth/login-links", {
+                                    "headers": {
+                                        "content-type": "application/x-www-form-urlencoded",
+                                        "sec-fetch-dest": "document",
+                                        "sec-fetch-mode": "navigate",
+                                        "sec-fetch-site": "same-origin",
+                                        "sec-fetch-user": "?1",
+                                        "upgrade-insecure-requests": "1"
+                                    },
+                                    "body": `login_link_form%5Bidentity%5D=&login_link_form%5Bid%5D=${teacher}&login_link_form%5Btarget%5D=https%3A%2F%2Fskyeng.ru&login_link_form%5Bpromocode%5D=&login_link_form%5Blifetime%5D=3600&login_link_form%5Bcreate%5D=&login_link_form%5B_token%5D=${doc.querySelector('#login_link_form__token').value}`,
+                                    "method": "POST",
+                                    "mode": "cors",
+                                    "credentials": "include"
+                                })
+                                    .then(() => {
+                                        fetch("https://id.skyeng.ru/admin/auth/login-links", { "credentials": "include" })
+                                            .then(r => r.text())
+                                            .then(responce => {
+                                                let doc2 = document.createElement('div');
+                                                doc2.innerHTML = responce;
+                                                let link = (doc2.querySelector(`a[href="/admin/users/${teacher}"]`)) ? doc2.querySelector(`a[href="/admin/users/${teacher}"]`).parentElement.parentElement.querySelector('input[onclick="this.select()"]').value : '';
 
-                                            let result = 
-                                            {
-                                                success: (link !== '') ? true : false,
-                                                data: {
-                                                    link: link,
-                                                    userID: teacher
-                                                }
-                                            };
+                                                let result =
+                                                {
+                                                    success: (link !== '') ? true : false,
+                                                    data: {
+                                                        link: link,
+                                                        userID: teacher
+                                                    }
+                                                };
 
-                                            resolve(result);
-                                        });
-                                });
-                        });
+                                                resolve(result);
+                                            });
+                                    });
+                            });
                     });
 
                     return result.then((array) => {
@@ -1108,9 +1092,9 @@ function getJWT(teacher = '2314498') {
                     "url": "https://crm.skyeng.ru",
                     "name": "session_global"
                 });
-                    
+
                 //Логинимся по ссылке логинеру в аккаунт П
-                fetch(link.data.link, { "credentials": "include"})
+                fetch(link.data.link, { "credentials": "include" })
                     .then(r => r.text)
                     .then(r => {
                         //Запрашиваем генерацию JWT токена
@@ -1191,20 +1175,20 @@ function get_tickets(id) {
                 var rows = doc.querySelectorAll('div[class="req-main-cont"] > div:not([id="records_list"])');
 
                 let tikets = new Object();
-                
+
                 rows.forEach((row) => {
                     let subj, body, priority, number;
-                
+
                     subj = row.querySelector('div[class="req-td req-inf"] > div > div > a').innerText;
                     body = row.querySelector('div[class="req-case-content"]').innerText.trim();
-                    
+
                     if (row.classList.contains('color-type3')) priority = "red"; //crit
                     if (row.classList.contains('color-type2')) priority = "orange"; //high
                     if (row.classList.contains('color-type1')) priority = "yellow";
                     if (row.className.indexOf('color-type' === -1)) priority = "grey";
-                
+
                     number = row.querySelector('div[class="req-case-main"]').innerText.trim();
-                
+
                     tikets[number] = {
                         'subject': subj,
                         'body': body,
@@ -1228,7 +1212,7 @@ function alert(ticket) {
         title: ticket.subject,
         message: ticket.body,
         iconUrl: 'script-pack.png',
-        buttons: [{title: "Ок"},{title: "Открыть"}],
+        buttons: [{ title: "Ок" }, { title: "Открыть" }],
         requireInteraction: true
     });
 }
@@ -1259,7 +1243,7 @@ async function ticket_notify() {
 let first_run = true;
 let global_tikets = new Object();
 chrome.notifications.onButtonClicked.addListener(function (id, btn) {
-    if (btn === 1) { window.open(`https://help.skyeng.ru/staff/cases/record/${global_tikets[id].number}`,'_blank') }
+    if (btn === 1) { window.open(`https://help.skyeng.ru/staff/cases/record/${global_tikets[id].number}`, '_blank') }
 });
 
 setInterval(function () {
